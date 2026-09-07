@@ -133,7 +133,7 @@ func boCSRF(h http.Handler) http.Handler {
 				Name:     tenCookieCSRF,
 				Value:    token,
 				Path:     "/",
-				HttpOnly: false, // để script đọc được nếu sau này cần gửi bằng fetch
+				HttpOnly: true, // không script nào đọc nó — mẫu nhúng token sẵn qua {{$.CSRF}}
 				Secure:   HTTPSBat,
 				SameSite: http.SameSiteLaxMode,
 				MaxAge:   12 * 3600,

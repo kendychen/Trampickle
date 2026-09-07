@@ -136,7 +136,10 @@ func TestMaDuPhongChiDungMotLan(t *testing.T) {
 // Đăng nhập khi đã bật 2FA: mật khẩu đúng chưa đủ.
 func TestDangNhapCanMaTOTP(t *testing.T) {
 	h, _ := dungHandlerThu(t, VaiTroChu)
-	xoaKhoaThu(t)
+	dungKhoaThu(t)
+	buocDaDungMu.Lock()
+	buocDaDung = map[string]int64{}
+	buocDaDungMu.Unlock()
 
 	hash, err := bcrypt.GenerateFromPassword([]byte("mat-khau-thu"), bcrypt.MinCost)
 	if err != nil {
@@ -185,18 +188,30 @@ func TestDangNhapCanMaTOTP(t *testing.T) {
 	}
 }
 
-// Bộ đếm khoá đăng nhập là biến toàn cục, test trước để lại rác thì test sau
-// bị khoá oan.
-func xoaKhoaThu(t *testing.T) {
-	t.Helper()
-	don := func() {
-		khoaMu.Lock()
-		khoaIP, khoaTen, ipQuen = map[string]*demSai{}, map[string]*demSai{}, map[string]map[string]bool{}
-		khoaMu.Unlock()
-		buocDaDungMu.Lock()
-		buocDaDung = map[string]int64{}
-		buocDaDungMu.Unlock()
+// Mượn được phiên đang mở thì cũng không được buộc 2FA sang điện thoại khác.
+// Nếu buộc lại được thì lớp "tắt phải gõ mã hiện tại" chỉ là hàng rào giả:
+// khỏi tắt, buộc thẳng sang máy mình là xong.
+func TestKhongBuocLai2FAKhiDangBat(t *testing.T) {
+	h, ck := dungHandlerThu(t, VaiTroChu)
+
+	cu := sinhBiMatTOTP()
+	nguoiDungMu.Lock()
+	cuND := nguoiDung
+	nguoiDung = []NguoiDung{{Ten: "kendy", VaiTro: VaiTroChu, TotpBat: true, TotpBiMat: cu}}
+	nguoiDungMu.Unlock()
+	t.Cleanup(func() {
+		nguoiDungMu.Lock()
+		nguoiDung = cuND
+		nguoiDungMu.Unlock()
+	})
+
+	moi := sinhBiMatTOTP()
+	post2FA(t, h, ck, "viec=bat&bi_mat="+moi+"&ma="+maBayGio(t, moi))
+	if nd, _ := TimNguoiDung("kendy"); nd.TotpBiMat != cu {
+		t.Fatal("buộc được 2FA sang bí mật khác mà không cần mã hiện tại")
 	}
-	don()
-	t.Cleanup(don)
+	// Kể cả bước "bắt đầu" cũng không được cấp bí mật mới.
+	if strings.Contains(post2FA(t, h, ck, "viec=bat-dau"), `name="bi_mat"`) {
+		t.Fatal("đang bật mà vẫn phát bí mật mới")
+	}
 }

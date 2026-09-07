@@ -26,12 +26,18 @@ const (
 	khoaDau     = 15 * time.Minute
 	khoaTran    = 4 * time.Hour
 	ipQuenToiDa = 20
+	// khoaToiDa: quá số này thì dọn các mục đã nguội. Một lượt quét phân tán
+	// đi qua Cloudflare có thể mang tới hàng vạn IP khác nhau; mỗi IP một mục
+	// không bao giờ xoá là rò bộ nhớ, và rò bằng chính đòn mà bộ đếm này sinh
+	// ra để chặn.
+	khoaToiDa = 5000
 )
 
 type demSai struct {
 	sai     int
 	lanKhoa int
 	moLuc   time.Time
+	chamLuc time.Time // lần cuối chạm tới, để biết mục nào đã nguội
 }
 
 var (
@@ -76,6 +82,26 @@ func ghiThuSai(ip, ten string) {
 	defer khoaMu.Unlock()
 	dem(khoaIP, ip, saiToiDaIP)
 	dem(khoaTen, ten, saiToiDaTen)
+	if len(khoaIP) > khoaToiDa {
+		donNguoi(khoaIP)
+	}
+	if len(khoaTen) > khoaToiDa {
+		donNguoi(khoaTen)
+	}
+}
+
+// donNguoi xoá các mục hết khoá và không ai chạm tới trong khoaTran. Giữ
+// nguyên mục đang khoá — đó mới là mục có việc. Gọi khi đang giữ khoaMu.
+func donNguoi(m map[string]*demSai) {
+	cat := time.Now().Add(-khoaTran)
+	for k, d := range m {
+		if d.moLuc.After(time.Now()) {
+			continue // đang khoá, giữ
+		}
+		if d.chamLuc.Before(cat) {
+			delete(m, k)
+		}
+	}
 }
 
 // dem tăng bộ đếm và khoá khi chạm ngưỡng. Gọi khi đang giữ khoaMu.
@@ -91,6 +117,7 @@ func dem(m map[string]*demSai, k string, nguong int) {
 		d.sai = 0
 		d.moLuc = time.Time{}
 	}
+	d.chamLuc = time.Now()
 	d.sai++
 	if d.sai >= nguong {
 		d.lanKhoa++

@@ -32,7 +32,17 @@ func hQt2FA(w http.ResponseWriter, r *http.Request) {
 		r.Body = http.MaxBytesReader(w, r.Body, 16*1024)
 		r.ParseForm()
 
-		switch r.FormValue("viec") {
+		viec := r.FormValue("viec")
+		// Đang bật rồi thì không cho buộc lại vào một bí mật khác. Thiếu chặn
+		// này thì lớp "tắt phải gõ mã hiện tại" ở dưới là vô nghĩa: ai mượn
+		// được phiên chỉ cần buộc 2FA sang điện thoại của mình, không cần tắt.
+		if nd.TotpBat && (viec == "bat" || viec == "bat-dau") {
+			d.Loi = "Đang bật rồi. Muốn đổi sang điện thoại khác thì tắt trước, " +
+				"mà tắt thì phải gõ được mã hiện tại hoặc một mã dự phòng."
+			viec = ""
+		}
+
+		switch viec {
 		case "bat":
 			// Bí mật đi vòng qua ô ẩn trong biểu mẫu chứ không giữ trong RAM
 			// máy chủ: giữ trong RAM phải quản lý hết hạn, dọn rác, và một
