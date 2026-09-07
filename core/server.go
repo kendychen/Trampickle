@@ -807,6 +807,8 @@ func hDangNhap(w http.ResponseWriter, r *http.Request) {
 		Chung
 		Ten string
 		Loi string
+		// Hoi2FA: mật khẩu đúng rồi, giờ hỏi thêm mã 6 số.
+		Hoi2FA bool
 	}
 	d := dl{Chung: chung(r, "dang-nhap")}
 	if d.DaDangNhap {
@@ -817,14 +819,66 @@ func hDangNhap(w http.ResponseWriter, r *http.Request) {
 		r.Body = http.MaxBytesReader(w, r.Body, 8*1024)
 		r.ParseForm()
 		d.Ten = catBot(r.FormValue("ten"), 50)
+		ip := ipCua(r)
+
+		// Chặn TRƯỚC khi chạy bcrypt: mỗi lần so mật khẩu là một lần cost 12,
+		// để kẻ dò kích hoạt tuỳ ý là biếu không CPU của máy chủ.
+		if ok, con := choPhepThu(ip, d.Ten); !ok {
+			GhiNhatKy(MucNhatKy{Ai: d.Ten, IP: ip, Viec: "dang-nhap", KetQua: "bi-khoa"})
+			d.Loi = fmt.Sprintf("Sai quá nhiều lần. Thử lại sau %d phút.",
+				int(con.Minutes())+1)
+			w.WriteHeader(http.StatusTooManyRequests)
+			render(w, "dangnhap.html", d)
+			return
+		}
+
 		nd, err := KiemTraDangNhap(d.Ten, r.FormValue("mat_khau"))
 		if err != nil {
+			ghiThuSai(ip, d.Ten)
+			GhiNhatKy(MucNhatKy{Ai: d.Ten, IP: ip, Viec: "dang-nhap", KetQua: "sai-mat-khau"})
 			d.Loi = err.Error()
 			w.WriteHeader(http.StatusUnauthorized)
 			render(w, "dangnhap.html", d)
 			return
 		}
-		taoPhien(w, nd.Ten, ipCua(r))
+
+		if nd.TotpBat {
+			maNhap := strings.TrimSpace(r.FormValue("ma_totp"))
+			if maNhap == "" {
+				// Mật khẩu đúng nhưng chưa có mã: hiện ô nhập mã, CHƯA cấp
+				// phiên. Không cấp phiên tạm nào cả — mật khẩu gõ lại cùng mã
+				// đơn giản hơn, và không có phiên nửa vời nào để rò.
+				d.Hoi2FA = true
+				render(w, "dangnhap.html", d)
+				return
+			}
+			buoc, ok := kiemTOTP(nd.TotpBiMat, maNhap, time.Now())
+			if ok && daDungBuoc(nd.Ten, buoc) {
+				ok = false // chống phát lại: mã này vừa dùng xong
+			}
+			if !ok && !DungMaDuPhong(nd.Ten, maNhap) {
+				ghiThuSai(ip, d.Ten)
+				GhiNhatKy(MucNhatKy{Ai: nd.Ten, IP: ip, Viec: "dang-nhap", KetQua: "sai-2fa"})
+				d.Loi = "Mã xác thực không đúng."
+				d.Hoi2FA = true
+				w.WriteHeader(http.StatusUnauthorized)
+				render(w, "dangnhap.html", d)
+				return
+			}
+			if ok {
+				nhoBuoc(nd.Ten, buoc)
+			}
+		}
+
+		// Hỏi "IP này quen chưa" TRƯỚC khi ghiThuDung, vì ghiThuDung chính là
+		// thứ làm cho nó thành quen.
+		la := !ipDaQuen(nd.Ten, ip)
+		ghiThuDung(ip, nd.Ten)
+		GhiNhatKy(MucNhatKy{Ai: nd.Ten, IP: ip, Viec: "dang-nhap", KetQua: "ok"})
+		if la {
+			canhBaoDangNhapLa(nd.Ten, ip)
+		}
+		taoPhien(w, nd.Ten, ip)
 		http.Redirect(w, r, "/qt", http.StatusSeeOther)
 		return
 	}
@@ -832,6 +886,9 @@ func hDangNhap(w http.ResponseWriter, r *http.Request) {
 }
 
 func hDangXuat(w http.ResponseWriter, r *http.Request) {
+	if nd, ok := NguoiDangNhap(r); ok {
+		GhiNhatKy(MucNhatKy{Ai: nd.Ten, IP: ipCua(r), Viec: "dang-xuat", KetQua: "ok"})
+	}
 	xoaPhien(w, r)
 	http.Redirect(w, r, "/dang-nhap", http.StatusSeeOther)
 }

@@ -3355,32 +3355,18 @@ body.la-app .app-hero h1 {
    hàng, còn chỗ cho ba khối gấp bên dưới nằm cùng một màn hình. Số ngày làm
    vẫn còn nguyên ở trang từng dịch vụ. Khai sau media query trên kia để
    thắng nó, hai bên cùng một mức đặc hiệu. */
-.app-luoi-nho { grid-template-columns: repeat(2, 1fr); gap: 9px; }
-@media (min-width: 520px) { .app-luoi-nho { grid-template-columns: repeat(4, 1fr); } }
+/* Bốn cột cố định, ô vuông, trong ô chỉ có biểu tượng. Trần 400px cho cả
+   lưới: trên máy tính bảng .app-than rộng 620px mà vẫn chia bốn thì mỗi ô
+   phình thành khung 145px chứa một hình 28px, nhìn như bảng còn thiếu chữ.
+   Tám ô hai hàng luôn đầy — có thêm dịch vụ thì hàng cuối hở vài ô, không
+   sao: ô vuông nhỏ nên khoảng hở không thành cái lỗ như hồi ô còn chữ. */
+.app-luoi-nho { grid-template-columns: repeat(4, 1fr); gap: 9px; max-width: 400px; margin: 0 auto; }
 .app-luoi-nho .app-o {
-  flex-direction: row; align-items: center; justify-content: flex-start;
-  min-height: 60px; padding: 10px 12px; gap: 10px; text-align: left;
+  align-items: center; justify-content: center;
+  min-height: 0; aspect-ratio: 1; padding: 6px; gap: 0;
 }
-/* Biểu tượng ngồi trong một khung bo tròn thay vì thả trôi: tám ô xếp thành
-   bốn hàng, không có khung thì tám cái hình line-art nhạt trôi giữa khoảng
-   trắng, mắt không bám vào đâu để dò xuống. */
-.app-luoi-nho .app-bt {
-  flex: none; width: 34px; height: 34px; border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  background: var(--th-nen);
-}
-.app-luoi-nho .app-bt .bt { width: 19px; height: 19px; }
-.app-luoi-nho .app-ten { margin-top: 0; font-size: 13.5px; line-height: 1.22; }
-.app-luoi-nho .app-phu { display: none; }
-/* Số dịch vụ lẻ thì ô cuối đứng một mình, nửa hàng còn lại là một lỗ trống
-   to bằng cả cái ô. Cho nó chiếm hết hàng. Bốn cột thì lỗ chỉ hở khi ô cuối
-   rơi đúng đầu hàng — bắt đúng trường hợp ấy, mấy trường hợp còn lại màn đã
-   rộng, một khe hở cuối lưới không thành vấn đề. */
-.app-luoi-nho > :last-child:nth-child(odd) { grid-column: 1 / -1; }
-@media (min-width: 520px) {
-  .app-luoi-nho > :last-child:nth-child(odd) { grid-column: auto; }
-  .app-luoi-nho > :last-child:nth-child(4n+1) { grid-column: 1 / -1; }
-}
+.app-luoi-nho .app-bt { display: flex; align-items: center; justify-content: center; }
+.app-luoi-nho .app-bt .bt { width: 28px; height: 28px; }
 
 /* Ô vuông cỡ ngón tay: cạnh ngắn nhất vẫn trên 44px kể cả trên máy 320px. */
 .app-o {

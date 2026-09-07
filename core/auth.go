@@ -35,6 +35,15 @@ type NguoiDung struct {
 	MatKhauHash string `yaml:"mat_khau_hash"`
 	VaiTro      string `yaml:"vai_tro"`
 	Tat         bool   `yaml:"tat"`
+
+	// Xác thực hai bước. Xem core/auth2fa.go và core/totp.go.
+	// TotpBiMat giữ bản rõ base32: máy chủ phải tính lại mã mỗi lần kiểm,
+	// nên không băm được. Ai đọc được file này thì cũng đã đọc được hash
+	// mật khẩu — chỗ bảo vệ là quyền 600 và ổ đĩa, không phải mã hoá.
+	TotpBiMat string `yaml:"totp_bi_mat,omitempty"`
+	TotpBat   bool   `yaml:"totp_bat,omitempty"`
+	// MaDuPhong là bcrypt hash, mỗi mã dùng một lần rồi xoá khỏi danh sách.
+	MaDuPhong []string `yaml:"ma_du_phong,omitempty"`
 }
 
 func (n NguoiDung) LaChu() bool { return n.VaiTro == VaiTroChu }
@@ -301,48 +310,9 @@ func NguoiDangNhap(r *http.Request) (NguoiDung, bool) {
 	return nd, true
 }
 
-// --- Chặn dò mật khẩu ------------------------------------------------
-
-type demSai struct {
-	mu  sync.Mutex
-	lan map[string][]time.Time
-}
-
-var loginFail = &demSai{lan: map[string][]time.Time{}}
-
-const (
-	soLanSaiToiDa = 5
-	cuaSoKhoa     = 15 * time.Minute
-)
-
-func (d *demSai) biKhoa(khoa string) (bool, time.Duration) {
-	d.mu.Lock()
-	defer d.mu.Unlock()
-	now := time.Now()
-	con := d.lan[khoa][:0]
-	for _, t := range d.lan[khoa] {
-		if now.Sub(t) < cuaSoKhoa {
-			con = append(con, t)
-		}
-	}
-	d.lan[khoa] = con
-	if len(con) >= soLanSaiToiDa {
-		return true, cuaSoKhoa - now.Sub(con[0])
-	}
-	return false, 0
-}
-
-func (d *demSai) ghiSai(khoa string) {
-	d.mu.Lock()
-	d.lan[khoa] = append(d.lan[khoa], time.Now())
-	d.mu.Unlock()
-}
-
-func (d *demSai) xoa(khoa string) {
-	d.mu.Lock()
-	delete(d.lan, khoa)
-	d.mu.Unlock()
-}
+// Chặn dò mật khẩu nằm ở core/khoadangnhap.go. Trước đây có một bản ngay tại
+// đây (loginFail) nhưng chưa bao giờ được gọi từ hDangNhap — nghĩa là
+// /dang-nhap thật ra không giới hạn gì. Đã xoá bản chết đó.
 
 // KiemTraDangNhap — so mật khẩu. Luôn chạy bcrypt kể cả khi không có tài
 // khoản đó, để thời gian trả lời không tiết lộ tên nào tồn tại.
