@@ -197,6 +197,12 @@ func hQtBaiAnhThem(w http.ResponseWriter, r *http.Request) {
 		veBaiViet(w, r, ve, "", "Ảnh quá nặng")
 		return
 	}
+
+	// Biểu mẫu có tệp: lớp bọc không đọc được thân yêu cầu nên không kiểm
+	// CSRF hộ được. Xem core/csrf.go.
+	if !KiemCSRFMultipart(w, r) {
+		return
+	}
 	if v := strings.TrimSpace(r.FormValue("ve")); slugSach(v) {
 		ve = "/qt/bai-viet/" + v
 	} else {

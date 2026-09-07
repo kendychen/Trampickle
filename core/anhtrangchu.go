@@ -291,6 +291,12 @@ func hQtAnhTrangChuThem(w http.ResponseWriter, r *http.Request) {
 		veAnhTrangChu(w, r, "", "Ảnh quá nặng")
 		return
 	}
+
+	// Biểu mẫu có tệp: lớp bọc không đọc được thân yêu cầu nên không kiểm
+	// CSRF hộ được. Xem core/csrf.go.
+	if !KiemCSRFMultipart(w, r) {
+		return
+	}
 	chuThich := strings.TrimSpace(r.FormValue("chu_thich"))
 	if len(chuThich) > 120 {
 		chuThich = chuThich[:120]

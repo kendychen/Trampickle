@@ -520,6 +520,13 @@ func hQtTaiAnh(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/qt/don/"+ma+"?ok=Ảnh+quá+nặng", http.StatusSeeOther)
 		return
 	}
+
+	// Biểu mẫu có tệp: lớp bọc không đọc được thân yêu cầu nên không kiểm
+	// CSRF hộ được. Xem core/csrf.go.
+	if !KiemCSRFMultipart(w, r) {
+		return
+	}
+
 	nhan := r.FormValue("nhan") // truoc | sau
 	if nhan != "sau" {
 		nhan = "truoc"

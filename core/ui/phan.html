@@ -81,7 +81,7 @@
 
      Hero và dải số bỏ qua — hai khối đó nằm ngay đầu trang, ẩn đi rồi hiện lại
      chỉ tổ làm trang trông chậm. */}}
-<script>
+<script nonce="{{$.Nonce}}">
 (function () {
   if (!('IntersectionObserver' in window)) return;
   if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -112,6 +112,7 @@
      song song là kiểu gì cũng có ngày lệch nhau. */}}
 {{define "form-yeu-cau"}}
 <form method="post" action="/gui-yeu-cau" enctype="multipart/form-data" class="f-yc">
+  <input type="hidden" name="_csrf" value="{{$.CSRF}}">
   <div class="hang">
     <label>{{nd "form.ten"}}<input name="ten" maxlength="100" autocomplete="name"></label>
     <label>{{nd "form.lien-he"}}<input name="lien_he" maxlength="100" required autocomplete="tel"></label>
@@ -145,7 +146,7 @@
      form ở trên, nhưng luật chặn tệp nặng thì phải y hệt. Đặt ngay sau
      thẻ </form> — nó tìm form bằng previousElementSibling. */}}
 {{define "js-tep"}}
-<script>
+<script nonce="{{$.Nonce}}">
 // Chặn tệp quá nặng ngay tại máy khách. Để server chặn thì khách đã ngồi
 // đợi hết hai phút upload rồi mới thấy trang lỗi, và mất luôn phần mô tả
 // vừa gõ.
@@ -223,7 +224,8 @@
       <a href="/" target="_blank">Xem trang khách ↗</a>
       {{if .DaDangNhap}}
       <a href="/qt/mat-khau" {{if eq .Trang "mat-khau"}}class="day"{{end}}>{{.NguoiDung.TenHienThi}}{{if .NguoiDung.LaChu}} · chủ{{end}}</a>
-      <form method="post" action="/dang-xuat" style="margin:0"><button class="phu nho" type="submit">Thoát</button></form>
+      <form method="post" action="/dang-xuat" style="margin:0">
+        <input type="hidden" name="_csrf" value="{{$.CSRF}}"><button class="phu nho" type="submit">Thoát</button></form>
       {{else}}
       <a href="/dang-nhap">Đăng nhập</a>
       {{end}}

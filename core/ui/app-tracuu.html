@@ -36,6 +36,7 @@
   {{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
 
   <form method="post" action="/app/tra-cuu" class="app-form" id="tra-form">
+    <input type="hidden" name="_csrf" value="{{$.CSRF}}">
     <label>{{nd "tracuu.ma-nhan"}}
       <input name="ma" id="tra-ma" value="{{.Ma}}" placeholder="{{nd "tracuu.ma-goi-y"}}"
              maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false" required>
@@ -177,7 +178,7 @@
 
 {{template "thanh-app" .}}
 
-<script>
+<script nonce="{{$.Nonce}}">
 // Nhớ mã đơn ngay trên máy khách. Không gửi đi đâu, không đặt cookie: chỉ
 // localStorage của chính điện thoại ấy. Nhớ giùm luôn: app cài từ màn hình
 // chính và Safari là hai kho riêng, tra ở bên này không hiện ở bên kia — đó

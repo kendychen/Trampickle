@@ -15,6 +15,7 @@
 </p>
 
 <form method="post" action="/qt/giao-dien" style="max-width:760px;margin-top:22px">
+  <input type="hidden" name="_csrf" value="{{$.CSRF}}">
   <div class="chon-gd">
     {{range .DanhSach}}
     <label class="gd-o{{if eq .Ma $.DangDung}} dang-dung{{end}}">
@@ -65,12 +66,14 @@
     </p>
     <form method="post" action="/qt/giao-dien/logo" enctype="multipart/form-data"
           style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px">
+      <input type="hidden" name="_csrf" value="{{$.CSRF}}">
       <input type="hidden" name="loai" value="logo">
       <input type="file" name="tep" accept=".svg,.png,.webp,.jpg,.jpeg,image/*" required>
       <button type="submit">Tải lên</button>
     </form>
     {{if .LogoTen}}
     <form method="post" action="/qt/giao-dien/logo-xoa" style="margin-top:10px">
+      <input type="hidden" name="_csrf" value="{{$.CSRF}}">
       <input type="hidden" name="loai" value="logo">
       <button class="phu nho" type="submit">Bỏ tệp, quay về logo mặc định</button>
     </form>
@@ -99,12 +102,14 @@
     </p>
     <form method="post" action="/qt/giao-dien/logo" enctype="multipart/form-data"
           style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px">
+      <input type="hidden" name="_csrf" value="{{$.CSRF}}">
       <input type="hidden" name="loai" value="bieu-tuong">
       <input type="file" name="tep" accept=".svg,.png,.webp,.jpg,.jpeg,.ico,image/*" required>
       <button type="submit">Tải lên</button>
     </form>
     {{if .IconTen}}
     <form method="post" action="/qt/giao-dien/logo-xoa" style="margin-top:10px">
+      <input type="hidden" name="_csrf" value="{{$.CSRF}}">
       <input type="hidden" name="loai" value="bieu-tuong">
       <button class="phu nho" type="submit">Bỏ tệp, quay về biểu tượng mặc định</button>
     </form>

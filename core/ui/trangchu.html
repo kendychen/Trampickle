@@ -101,7 +101,7 @@
 </section>
 
 {{if gt (len .Anh) 1}}
-<script>
+<script nonce="{{$.Nonce}}">
 // Băng ảnh hero. Chuyển ảnh bằng cách đổi một class, không đụng tới style —
 // hiệu ứng mờ nằm hết trong CSS nên máy khách bật "giảm chuyển động" là tự
 // hết mờ, không cần biết ở đây.

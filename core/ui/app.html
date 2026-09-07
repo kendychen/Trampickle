@@ -134,6 +134,7 @@
     <div class="app-gap-than">
     <p class="nho mo">{{ndd "app.tra.chu"}}</p>
     <form method="post" action="/app/tra-cuu" id="nha-form">
+      <input type="hidden" name="_csrf" value="{{$.CSRF}}">
       <div class="app-tra-doi">
         <label>{{nd "tracuu.ma-nhan"}}
           <input name="ma" id="nha-ma" placeholder="{{nd "tracuu.ma-goi-y"}}" maxlength="40"
@@ -179,7 +180,7 @@
 
 {{template "thanh-app" .}}
 
-<script>
+<script nonce="{{$.Nonce}}">
 // Mã đơn máy nhớ giùm. Cùng một khoá localStorage với màn tra cứu — nhớ ở
 // bên kia thì bên này thấy, quên ở bên này thì bên kia mất. Chỉ đọc và xoá,
 // việc ghi để nguyên cho màn tra cứu: chỉ nó mới biết mã ấy có tra ra thật

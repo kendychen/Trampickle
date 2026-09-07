@@ -179,6 +179,12 @@ func hQtLogoTai(w http.ResponseWriter, r *http.Request) {
 		veGiaoDien(w, r, "", "Tệp quá nặng — logo nên dưới 2 MB")
 		return
 	}
+
+	// Biểu mẫu có tệp: lớp bọc không đọc được thân yêu cầu nên không kiểm
+	// CSRF hộ được. Xem core/csrf.go.
+	if !KiemCSRFMultipart(w, r) {
+		return
+	}
 	loai := r.FormValue("loai")
 	if loai != loaiLogo && loai != loaiIcon {
 		veGiaoDien(w, r, "", "Không hiểu yêu cầu")

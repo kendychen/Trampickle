@@ -50,6 +50,7 @@
   </div>
 
   <form method="post" action="/qt/kho/phieu/luu" class="noi">
+    <input type="hidden" name="_csrf" value="{{$.CSRF}}">
     <input type="hidden" name="loai" value="{{$p.Loai}}">
     <input type="hidden" name="ma" value="{{$p.Ma}}">
 
@@ -137,6 +138,7 @@
       {{if $nhap}} Khoản chi kèm theo trong sổ tiền cũng mất theo.{{end}}
     </p>
     <form method="post" action="/qt/kho/phieu/xoa" onsubmit="return confirm('Xoá phiếu {{$p.Ma}}? Tồn kho sẽ tính lại.')">
+      <input type="hidden" name="_csrf" value="{{$.CSRF}}">
       <input type="hidden" name="ma" value="{{$p.Ma}}">
       <button type="submit" class="phu">Xoá phiếu {{$p.Ma}}</button>
     </form>

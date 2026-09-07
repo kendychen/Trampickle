@@ -13,6 +13,7 @@
 {{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
 
 <form method="post" action="/qt/bai-viet/luu" id="f-bai">
+  <input type="hidden" name="_csrf" value="{{$.CSRF}}">
   <input type="hidden" name="cu" value="{{if .Moi}}{{else}}{{.Bai.Slug}}{{end}}">
 
   <div class="the-nhom">
@@ -159,6 +160,7 @@ Chú thích dưới hình.
       <h3>Ảnh chèn trong bài</h3>
       <div class="noi">
         <form method="post" action="/qt/bai-viet/anh" enctype="multipart/form-data" class="doc">
+          <input type="hidden" name="_csrf" value="{{$.CSRF}}">
           <input type="hidden" name="ve" value="{{if .Moi}}moi{{else}}{{.Bai.Slug}}{{end}}">
           <label>Tải ảnh lên
             <span class="hd">JPG, PNG hoặc WEBP, dưới 8MB. Tải xong thì sao đường dẫn
@@ -179,6 +181,7 @@ Chú thích dưới hình.
               <div class="anh-nut">
                 <form method="post" action="/qt/bai-viet/anh-xoa"
                       onsubmit="return confirm('Xoá hẳn tệp ảnh này? Bài nào đang dùng sẽ mất ảnh.')">
+                  <input type="hidden" name="_csrf" value="{{$.CSRF}}">
                   <input type="hidden" name="ten" value="{{.}}">
                   <input type="hidden" name="ve" value="{{if $.Moi}}moi{{else}}{{$.Bai.Slug}}{{end}}">
                   <button class="phu nho" type="submit">Xoá</button>
@@ -204,6 +207,7 @@ Chú thích dưới hình.
         </p>
         <form method="post" action="/qt/bai-viet/{{.Bai.Slug}}/xoa"
               onsubmit="return confirm('Xoá hẳn bài “{{.Bai.TieuDe}}”? Không lấy lại được.')">
+          <input type="hidden" name="_csrf" value="{{$.CSRF}}">
           <button class="phu" type="submit">Xoá bài này</button>
         </form>
       </div>
@@ -214,7 +218,7 @@ Chú thích dưới hình.
 
 {{/* Xem thử gọi về server dựng, không dựng bằng JS: hai trình dựng là hai kết
      quả, mà chỗ này thì thấy sao phải ra vậy. */}}
-<script>
+<script nonce="{{$.Nonce}}">
 (function () {
   var nut = document.getElementById('nut-xem');
   var o = document.getElementById('o-than');
@@ -226,7 +230,10 @@ Chú thích dưới hình.
     d.append('than', o.value);
     fetch('/qt/bai-viet/xem-thu', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'X-CSRF-Token': {{$.CSRF}}
+      },
       body: d.toString()
     }).then(function (res) {
       if (!res.ok) throw new Error(res.status);

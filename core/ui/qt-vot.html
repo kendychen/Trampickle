@@ -95,9 +95,9 @@
   </div>
 </div>
 
-<script>var CT = {{.ChiTiet | json}};</script>
+<script nonce="{{$.Nonce}}">var CT = {{.ChiTiet | json}};</script>
 
-<script>
+<script nonce="{{$.Nonce}}">
 (function () {
   var q = document.getElementById('q'),
       fg = document.getElementById('f-gap'),

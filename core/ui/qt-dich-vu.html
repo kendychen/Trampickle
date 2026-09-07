@@ -26,6 +26,7 @@
 </p>
 
 <form method="post" action="/qt/dich-vu" style="max-width:860px;margin-top:24px">
+  <input type="hidden" name="_csrf" value="{{$.CSRF}}">
   {{range .DichVu}}
   <input type="hidden" name="co.{{.Ma}}" value="1">
   <div class="o-nguong" style="border-left:3px solid {{if .DangHien}}var(--nhan,#d6f32f){{else}}var(--vien,#3a3a3a){{end}};padding:14px 0 14px 16px;margin:20px 0">

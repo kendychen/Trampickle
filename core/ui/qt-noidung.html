@@ -27,6 +27,7 @@
 {{if .Hien.MoTa}}<p class="nho mo" style="max-width:70ch;margin-top:14px">{{.Hien.MoTa}}</p>{{end}}
 
 <form method="post" action="/qt/noi-dung/luu" id="f-nd">
+  <input type="hidden" name="_csrf" value="{{$.CSRF}}">
   <input type="hidden" name="ma" value="{{.Hien.Ma}}">
 
   {{range .Nhom}}
@@ -70,6 +71,7 @@
 </form>
 
 <form method="post" action="/qt/noi-dung/khoi-phuc" id="f-kp" hidden>
+  <input type="hidden" name="_csrf" value="{{$.CSRF}}">
   <input type="hidden" name="ma" value="{{.Hien.Ma}}">
 </form>
 

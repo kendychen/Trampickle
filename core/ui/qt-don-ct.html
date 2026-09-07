@@ -27,6 +27,7 @@
       <h3>Đổi trạng thái</h3>
       <div class="noi">
         <form method="post" action="/qt/don/{{$d.Ma}}/trang-thai">
+          <input type="hidden" name="_csrf" value="{{$.CSRF}}">
           <div class="hang" style="align-items:flex-end">
             <label style="margin:0" class="co-hep">Trạng thái
               <select name="trang_thai">
@@ -42,6 +43,7 @@
     </div>
 
     <form method="post" action="/qt/don/{{$d.Ma}}/luu" class="doc" style="gap:18px">
+      <input type="hidden" name="_csrf" value="{{$.CSRF}}">
 
       <div class="the-nhom">
         <h3>Khách và vợt</h3>
@@ -145,6 +147,7 @@
       <h3>Ảnh trước / sau</h3>
       <div class="noi">
         <form method="post" action="/qt/don/{{$d.Ma}}/anh" enctype="multipart/form-data">
+          <input type="hidden" name="_csrf" value="{{$.CSRF}}">
           <div class="hang" style="align-items:flex-end">
             <label style="margin:0" class="co-hep">Nhãn
               <select name="nhan"><option value="truoc">Trước khi sửa</option><option value="sau">Sau khi sửa</option></select>
@@ -163,6 +166,7 @@
             <div class="duoi">
               <span>{{if batdau . "sau"}}sau{{else}}trước{{end}}</span>
               <form method="post" action="/qt/don/{{$d.Ma}}/xoa-anh" onsubmit="return confirm('Xoá ảnh này?')">
+                <input type="hidden" name="_csrf" value="{{$.CSRF}}">
                 <input type="hidden" name="ten" value="{{.}}">
                 <button type="submit">Xoá</button>
               </form>
@@ -198,6 +202,7 @@
       <h3>Thu tiền</h3>
       <div class="noi">
         <form method="post" action="/qt/don/{{$d.Ma}}/thu" class="doc" style="gap:12px">
+          <input type="hidden" name="_csrf" value="{{$.CSRF}}">
           <div class="hang" style="margin:0">
             <label style="margin:0" class="co-hep">Khách đưa<input name="so_tien" inputmode="numeric" required placeholder="{{oso $d.ConNo}}"></label>
             <label style="margin:0" class="co-hep">Bằng
@@ -220,6 +225,7 @@
             <td class="p">{{tien .SoTien}}</td>
             <td style="width:52px">
               <form method="post" action="/qt/don/{{$d.Ma}}/thu-xoa" onsubmit="return confirm('Xoá lần thu này?')">
+                <input type="hidden" name="_csrf" value="{{$.CSRF}}">
                 <input type="hidden" name="ma" value="{{.Ma}}">
                 <button type="submit" class="nut-nho phu">Xoá</button>
               </form>
@@ -242,6 +248,7 @@
       <div class="noi">
         <form method="post" action="/qt/don/{{$d.Ma}}/hoan" class="doc" style="gap:12px"
               onsubmit="return confirm('Ghi một khoản chi trả lại tiền cho khách?')">
+          <input type="hidden" name="_csrf" value="{{$.CSRF}}">
           <div class="hang" style="margin:0">
             <label style="margin:0" class="co-hep">Trả lại<input name="so_tien" inputmode="numeric" required placeholder="{{oso $d.DaThu}}"></label>
             <label style="margin:0" class="co-hep">Bằng
@@ -294,10 +301,12 @@
         </table>
         <div class="hang-nut">
           <form method="post" action="/qt/don/{{$d.Ma}}/xuat-kho">
+            <input type="hidden" name="_csrf" value="{{$.CSRF}}">
             <input type="hidden" name="nhanh" value="1">
             <button type="submit" class="nut-nho">Đúng vậy, trừ kho</button>
           </form>
           <form method="post" action="/qt/don/{{$d.Ma}}/xuat-kho">
+            <input type="hidden" name="_csrf" value="{{$.CSRF}}">
             <button type="submit" class="nut-nho phu">Sửa lại rồi trừ</button>
           </form>
         </div>
@@ -358,7 +367,7 @@
   </div>
 </div>
 
-<script>
+<script nonce="{{$.Nonce}}">
 function dinhDang(n){ return n.toLocaleString('vi-VN') + 'đ'; }
 function tinhTong(){
   var t = 0;

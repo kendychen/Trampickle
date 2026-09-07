@@ -51,6 +51,7 @@
   <p class="app-dan">{{ndd "trangchu.gui.dan"}}</p>
 
   <form method="post" action="/app/gui-anh" enctype="multipart/form-data" class="app-form">
+    <input type="hidden" name="_csrf" value="{{$.CSRF}}">
     {{/* Hai lối nạp ảnh, tách hẳn ra hai nút. Trước đây gộp một ô có
          capture="environment": máy Android hiểu là "chỉ được chụp" và khoá
          luôn đường vào thư viện, khách đã chụp sẵn ảnh cây vợt từ hôm qua thì

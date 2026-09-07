@@ -27,6 +27,7 @@
 </div>
 
 <form method="post" action="/qt/giao-trinh/luu" id="f-gt" style="margin-top:18px">
+  <input type="hidden" name="_csrf" value="{{$.CSRF}}">
   <input type="hidden" name="ma" value="{{.Bai.Ma}}">
 
   <div class="the-nhom">
@@ -60,7 +61,7 @@
 
 {{/* Xem thử dựng ở server, dùng đúng trình dựng markdown của trang bài viết —
      dựng hai nơi là hai kết quả khác nhau. */}}
-<script>
+<script nonce="{{$.Nonce}}">
 (function () {
   var nut = document.getElementById('nut-xem');
   var o = document.getElementById('o-than');
@@ -72,7 +73,10 @@
     d.append('than', o.value);
     fetch('/qt/giao-trinh/xem-thu', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'X-CSRF-Token': {{$.CSRF}}
+      },
       body: d.toString()
     }).then(function (res) {
       if (!res.ok) throw new Error(res.status);

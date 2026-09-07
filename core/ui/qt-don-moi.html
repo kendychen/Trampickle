@@ -10,6 +10,7 @@
 {{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
 
 <form method="post" action="/qt/don-moi" class="doc" style="gap:18px;max-width:820px">
+  <input type="hidden" name="_csrf" value="{{$.CSRF}}">
 
   <div class="the-nhom">
     <h3>Khách</h3>
@@ -123,7 +124,7 @@
   </div>
 </form>
 
-<script>
+<script nonce="{{$.Nonce}}">
 // Cộng các con số đã chốt để người nhập thấy tổng ngay. Đây là cộng sổ,
 // không phải định giá — mọi con số ở đây đều do bảng giá hoặc do thợ gõ.
 function dinhDang(n){ return n.toLocaleString('vi-VN') + 'đ'; }

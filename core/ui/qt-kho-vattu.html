@@ -19,6 +19,7 @@
     </p>
   </div>
   <form method="post" action="/qt/kho/vat-tu">
+    <input type="hidden" name="_csrf" value="{{$.CSRF}}">
     <div class="cuon">
       <table class="bang">
         <thead>
@@ -81,6 +82,7 @@
   </div>
   {{if .VatTu}}
   <form method="post" action="/qt/kho/dinh-muc" class="noi">
+    <input type="hidden" name="_csrf" value="{{$.CSRF}}">
     {{$dm := .DinhMuc}}
     {{$vt := .VatTu}}
     {{range .DichVu}}

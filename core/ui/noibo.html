@@ -74,7 +74,7 @@
   <code class="so">python scripts/add_case.py --voice ...</code>
 </p>
 
-<script>
+<script nonce="{{$.Nonce}}">
 const $ = (s) => document.querySelector(s);
 const nutHoi = $("#nut-hoi"), nutIdx = $("#nut-index"),
       tt = $("#trang-thai"), kq = $("#ket-qua");
@@ -101,7 +101,7 @@ async function hoi() {
   try {
     const r = await fetch("/api/hoi", {
       method: "POST",
-      headers: {"Content-Type": "application/json"},
+      headers: {"Content-Type": "application/json", "X-CSRF-Token": {{$.CSRF}}},
       body: JSON.stringify({cau_hoi: q}),
     });
     const d = await r.json();
@@ -136,7 +136,7 @@ async function dungIndex() {
   khoaNut(true);
   tt.textContent = "Đang nhúng vector…";
   try {
-    const r = await fetch("/api/index", {method: "POST"});
+    const r = await fetch("/api/index", {method: "POST", headers: {"X-CSRF-Token": {{$.CSRF}}}});
     const d = await r.json();
     if (!r.ok) throw new Error(d.loi || "lỗi không rõ");
     tt.textContent = `Xong: ${d.so_doan} đoạn (${d.so_doan_moi} mới), ${d.so_chieu} chiều, qua ${d.nha_cung_cap}.`;

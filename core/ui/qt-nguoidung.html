@@ -27,6 +27,7 @@
               <td>{{if .Tat}}<span class="chip chip-tuchoi">Đã khoá</span>{{else}}<span class="mo nho">đang dùng</span>{{end}}</td>
               <td>
                 <form method="post" action="/qt/nguoi-dung" class="hang" style="gap:6px;align-items:center">
+                  <input type="hidden" name="_csrf" value="{{$.CSRF}}">
                   <input type="hidden" name="viec" value="vai_tro">
                   <input type="hidden" name="ten" value="{{.Ten}}">
                   <select name="vai_tro" style="flex:0 0 auto;padding:5px 8px;font-size:13px">
@@ -51,6 +52,7 @@
       <h3>Đặt lại mật khẩu cho một người</h3>
       <div class="noi">
         <form method="post" action="/qt/nguoi-dung">
+          <input type="hidden" name="_csrf" value="{{$.CSRF}}">
           <input type="hidden" name="viec" value="mat_khau">
           <div class="hang" style="align-items:flex-end">
             <label style="margin:0" class="co-hep">Tài khoản
@@ -73,6 +75,7 @@
       <h3>Thêm người</h3>
       <div class="noi">
         <form method="post" action="/qt/nguoi-dung" class="doc">
+          <input type="hidden" name="_csrf" value="{{$.CSRF}}">
           <input type="hidden" name="viec" value="them">
           <label>Tên đăng nhập
             <span class="hd">Chữ thường, không dấu, không khoảng trắng.</span>

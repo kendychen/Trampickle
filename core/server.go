@@ -14,9 +14,8 @@
 // liệu, và ở quy mô 141 KB thì nhồi thẳng vào prompt đã đủ, index không
 // thêm được gì để đáng đánh đổi.
 //
-// Chống CSRF dựa vào cookie SameSite=Lax: trình duyệt không gửi cookie
-// phiên khi form POST đến từ trang web khác. Đủ cho quy mô này; khi nào có
-// tên miền và HTTPS thì thêm token cho chắc.
+// Chống CSRF: token trong mọi biểu mẫu, kiểm ở lớp bọc quanh mux. Cookie
+// SameSite=Lax vẫn giữ làm lớp thứ hai. Xem core/csrf.go và core/middleware.go.
 package core
 
 import (
@@ -317,6 +316,11 @@ type Chung struct {
 	GiaiDoan   int
 	Theme      string // giao diện đang bật, chọn ở /qt/giao-dien
 	LopThan    string // lớp cho <body>: theme + nền tối nếu trang đó tối
+	// Nonce cho <script> nội tuyến. CSP chặn mọi script không mang nonce
+	// đúng của lượt tải trang đó — xem core/middleware.go.
+	Nonce string
+	// CSRF: token cho <input type="hidden" name="_csrf">. Xem core/csrf.go.
+	CSRF string
 }
 
 // Tiêu đề tab gom về một chỗ, thay vì rải mỗi handler một chuỗi rồi lệch
@@ -388,6 +392,8 @@ func chung(r *http.Request, trang string) Chung {
 		GiaiDoan:   GiaiDoan,
 		Theme:      theme,
 		LopThan:    lopThan(trang, theme),
+		Nonce:      nonceCua(r),
+		CSRF:       tokenCSRF(r),
 	}
 }
 
@@ -652,6 +658,12 @@ func hGuiYeuCau(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer r.MultipartForm.RemoveAll()
+
+	// Biểu mẫu có tệp: lớp bọc không đọc được thân yêu cầu nên không kiểm
+	// CSRF hộ được. Xem core/csrf.go.
+	if !KiemCSRFMultipart(w, r) {
+		return
+	}
 
 	yc := yeuCauKhach{
 		Ma:      time.Now().Format("2006-01-02-150405") + "-" + maNgauNhien(3),

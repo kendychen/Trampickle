@@ -11,6 +11,7 @@
     <h3>Tài khoản {{.NguoiDung.Ten}}</h3>
     <div class="noi">
       <form method="post" action="/qt/mat-khau" class="doc">
+        <input type="hidden" name="_csrf" value="{{$.CSRF}}">
         <label>Mật khẩu hiện tại<input name="cu" type="password" autocomplete="current-password" required></label>
         <label>Mật khẩu mới
           <span class="hd">Ít nhất 8 ký tự.</span>

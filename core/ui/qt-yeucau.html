@@ -55,8 +55,10 @@
         {{else if .DaXuLy}}
           <span class="chip chip-trung">Đã bỏ qua</span>
         {{else}}
-          <form method="post" action="/qt/yeu-cau/{{.Ma}}/tao-don"><button type="submit">Tạo đơn</button></form>
-          <form method="post" action="/qt/yeu-cau/{{.Ma}}/bo-qua"><button type="submit" class="nut-phu">Bỏ qua</button></form>
+          <form method="post" action="/qt/yeu-cau/{{.Ma}}/tao-don">
+            <input type="hidden" name="_csrf" value="{{$.CSRF}}"><button type="submit">Tạo đơn</button></form>
+          <form method="post" action="/qt/yeu-cau/{{.Ma}}/bo-qua">
+            <input type="hidden" name="_csrf" value="{{$.CSRF}}"><button type="submit" class="nut-phu">Bỏ qua</button></form>
         {{end}}
       </div>
     </div>

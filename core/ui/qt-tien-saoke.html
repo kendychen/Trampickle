@@ -13,6 +13,7 @@
   <h3>Dán vào đây</h3>
   <div class="noi">
     <form method="post" action="/qt/tien/sao-ke">
+      <input type="hidden" name="_csrf" value="{{$.CSRF}}">
       <label>Chép từ app ngân hàng, mỗi giao dịch một dòng
         <span class="hd">Kéo chọn cả bảng rồi dán thẳng vào. Cần có ngày, số tiền, và nội dung chuyển khoản.</span>
         <textarea name="sao_ke" rows="10" style="font-family:'JetBrains Mono',monospace;font-size:13px" placeholder="05/09/2026  +350.000  TV2609001 NGUYEN VAN A chuyen tien">{{.Text}}</textarea>
@@ -30,6 +31,7 @@
 <div class="the-nhom">
   <h3>Đọc được {{len .Dong}} dòng — đề xuất ghi {{.SoDe}}</h3>
   <form method="post" action="/qt/tien/sao-ke/ghi">
+    <input type="hidden" name="_csrf" value="{{$.CSRF}}">
     <div class="cuon">
       <table class="bang">
         <thead>

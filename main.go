@@ -136,7 +136,7 @@ func main() {
 
 	srv := &http.Server{
 		Addr:              addr,
-		Handler:           core.NewMux(*public),
+		Handler:           core.NewHandler(*public),
 		ReadHeaderTimeout: 10 * time.Second,
 		// Khách gửi kèm video quay bằng điện thoại: 40MB qua mạng 4G yếu
 		// mất hơn một phút. 60s cắt đúng lúc sắp xong, và khách chỉ thấy

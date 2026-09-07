@@ -18,6 +18,7 @@
 </p>
 
 <form method="post" action="/qt/lien-he" style="max-width:760px;margin-top:24px">
+  <input type="hidden" name="_csrf" value="{{$.CSRF}}">
   {{range .O}}
   <div class="o-nguong" style="border-left:3px solid var(--nhan,#d6f32f);padding:12px 0 12px 16px;margin:16px 0">
     <label for="{{.Khoa}}"><b>{{.Nhan}}</b></label>

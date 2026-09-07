@@ -78,7 +78,8 @@
   {{/* Form để ngoài bảng, ô nhập trỏ vào bằng thuộc tính form=: <form> nằm
        giữa <tr> và <td> là HTML sai, trình duyệt sẽ lôi nó ra khỏi bảng và
        nút bấm gửi đi một form rỗng. */}}
-  {{range .ChoDuyet}}<form method="post" action="/qt/tien/duyet" id="duyet-{{.Ma}}"><input type="hidden" name="ma" value="{{.Ma}}"></form>{{end}}
+  {{range .ChoDuyet}}<form method="post" action="/qt/tien/duyet" id="duyet-{{.Ma}}">
+    <input type="hidden" name="_csrf" value="{{$.CSRF}}"><input type="hidden" name="ma" value="{{.Ma}}"></form>{{end}}
   <div class="cuon">
     <table class="bang">
       <thead><tr><th>Việc</th><th>Nhóm</th><th style="width:150px">Ngày trả</th><th style="width:150px">Số tiền</th><th style="width:110px"></th></tr></thead>
@@ -136,6 +137,7 @@
               <td>
                 {{if not .MaPhieu}}
                 <form method="post" action="/qt/tien/xoa" onsubmit="return confirm('Xoá khoản này khỏi sổ?')">
+                  <input type="hidden" name="_csrf" value="{{$.CSRF}}">
                   <input type="hidden" name="ma" value="{{.Ma}}">
                   <button type="submit" class="nut-nho phu">Xoá</button>
                 </form>
@@ -183,6 +185,7 @@
       <h3>Ghi một khoản</h3>
       <div class="noi">
         <form method="post" action="/qt/tien/them" class="doc">
+          <input type="hidden" name="_csrf" value="{{$.CSRF}}">
           <label>Loại
             <select name="loai" id="loai">
               <option value="chi">Chi ra</option>
@@ -242,7 +245,7 @@
   </div>
 </div>
 
-<script>
+<script nonce="{{$.Nonce}}">
 // Chọn "Thu vào" mà nhóm vẫn đang là "Định phí" thì khoản ghi vào sổ sai nhóm
 // và không ai nhìn ra. Lọc luôn danh sách nhóm theo loại.
 (function () {
