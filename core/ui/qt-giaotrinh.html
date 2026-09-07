@@ -1,0 +1,68 @@
+{{define "qt-giaotrinh.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang">
+  <h1>Giáo trình</h1>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<p class="mo" style="max-width:72ch">
+  Giáo trình dạy nghề, <b>nội bộ</b> — không có trên web khách, chỉ tài khoản chủ
+  mở được. Đây cũng chính là {{.SoBai}} bài mà
+  <a href="/noi-bo">Trợ lý kỹ thuật</a> đọc để trả lời. Sửa ở đây là trợ lý dùng
+  bản mới ngay, không phải khởi động lại.
+</p>
+
+<div class="bao bao-luu" style="max-width:72ch">
+  Đây là <b>bản trong TramVot</b>. Bản gốc nằm ở thư mục
+  <code>giao-trinh-sua-vot/</code> bên ngoài. Sửa một bên không tự đổi bên kia —
+  sửa ở đâu thì nhớ mình vừa sửa ở đâu.
+</div>
+
+{{range .Nhom}}
+<div class="the-nhom" style="margin-top:22px">
+  <h3>{{.Ten}}</h3>
+  <div class="cuon">
+    <table class="bang">
+      <thead>
+        <tr>
+          <th>Bài</th>
+          <th style="width:110px">Trạng thái</th>
+          <th style="width:90px">Cỡ</th>
+          <th style="width:80px"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Bai}}
+        <tr>
+          <td>
+            <a href="/qt/giao-trinh/bai/{{.Ma}}"><b>{{.Ten}}</b></a>
+            <div class="nho mo so" style="margin-top:4px">{{.Ma}}</div>
+          </td>
+          <td class="nho">
+            {{if .Thieu}}<span class="chip chip-tuchoi">Thiếu tệp</span>
+            {{else if .TrangThai}}{{.TrangThai}}
+            {{else}}<span class="mo">—</span>{{end}}
+          </td>
+          <td class="so nho">{{if .Thieu}}<span class="mo">—</span>{{else}}{{.Byte}} B{{end}}</td>
+          <td><a class="nut-nho" href="/qt/giao-trinh/bai/{{.Ma}}">Mở</a></td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+</div>
+{{else}}
+<div class="the" style="margin-top:22px;max-width:62ch">
+  <p class="mo">
+    Chưa có bài nào. Danh sách lấy từ <code>tai_lieu_nap</code> trong
+    <code>config.yaml</code>, lọc những dòng bắt đầu bằng
+    <code>vanhanh/giao-trinh/</code>. Thêm bài thì thêm dòng ở đó rồi khởi động lại.
+  </p>
+</div>
+{{end}}
+
+{{template "qt-chan" .}}
+{{end}}

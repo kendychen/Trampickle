@@ -1,0 +1,49 @@
+{{define "lienhe.html"}}
+{{template "html-dau" .}}
+
+<section class="hero">
+  <div class="khung">
+    <div class="nhan-nho">{{nd "lienhe.nhan"}}</div>
+    <h1 style="margin-top:16px">{{nd "lienhe.h1"}}</h1>
+    <p class="dan">{{ndd "lienhe.dan"}}</p>
+  </div>
+</section>
+
+<section>
+  <div class="khung doi-cot">
+    <div>
+      <div class="nhan-nho nhan-vach">{{nd "lienhe.gui.nhan"}}</div>
+      <h2 style="margin:16px 0 8px">{{nd "lienhe.gui.h2"}}</h2>
+      <p class="dan-lon" style="margin:0 0 20px">{{ndd "lienhe.gui.dan"}}</p>
+      {{template "form-yeu-cau" .}}
+      <p class="nho mo" style="margin-top:16px">{{ndd "lienhe.rieng-tu"}}</p>
+    </div>
+
+    <div class="canh">
+      {{if .LienHe.CoGiKhong}}
+      <div class="the">
+        <h3 style="margin-bottom:14px">{{nd "lienhe.lh.h3"}}</h3>
+        <dl class="kv">
+          {{if .LienHe.DienThoai}}<dt>{{nd "lienhe.lh.dt"}}</dt><dd><a href="tel:{{soGoi .LienHe.DienThoai}}">{{.LienHe.DienThoai}}</a></dd>{{end}}
+          {{if .LienHe.Zalo}}<dt>{{nd "lienhe.lh.zalo"}}</dt><dd><a href="https://zalo.me/{{.LienHe.Zalo}}">{{.LienHe.Zalo}}</a></dd>{{end}}
+          {{if .LienHe.Email}}<dt>{{nd "lienhe.lh.email"}}</dt><dd><a href="mailto:{{.LienHe.Email}}">{{.LienHe.Email}}</a></dd>{{end}}
+          {{if .LienHe.Facebook}}<dt>{{nd "lienhe.lh.fb"}}</dt><dd><a href="{{.LienHe.Facebook}}">{{.LienHe.Facebook}}</a></dd>{{end}}
+          {{if .LienHe.DiaChi}}<dt>{{nd "lienhe.lh.dia-chi"}}</dt><dd>{{.LienHe.DiaChi}}</dd>{{end}}
+          {{if .LienHe.GioLamVic}}<dt>{{nd "lienhe.lh.gio"}}</dt><dd>{{.LienHe.GioLamVic}}</dd>{{end}}
+        </dl>
+      </div>
+      {{else}}
+      <div class="bao bao-luu" style="margin:0">{{ndd "lienhe.trong"}}</div>
+      {{end}}
+
+      <div class="the">
+        <h3>{{nd "lienhe.don.h3"}}</h3>
+        <p class="nho mo" style="margin-top:8px">{{ndd "lienhe.don.chu"}}</p>
+        <p style="margin-top:14px"><a class="nut nut-vien" href="/tra-cuu">{{nd "chung.nut.tra-cuu"}}</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{{template "html-chan" .}}
+{{end}}

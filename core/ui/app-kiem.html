@@ -1,0 +1,139 @@
+{{define "app-kiem.html"}}<!doctype html>
+{{/* Trang soi máy. Không có trong menu nào, không ai vào nhầm — mở tay bằng
+     /app/kiem khi cần biết vì sao thẻ mời cài cứ hiện. Lý do phải có: chuyện
+     "đã cài rồi mà vẫn mời" chỉ xảy ra trên đúng cái máy của khách, mình ngồi
+     máy khác đoán mãi không ra. Trang này in thẳng những gì trình duyệt khai
+     báo, chụp màn hình là xong. */}}
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Soi máy — {{.Brand.Ten}}</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="{{iconURL}}" type="{{iconMIME}}">
+{{template "pwa-dau" .}}
+{{template "css" .}}
+</head>
+<body class="{{.LopThan}} la-app">
+
+<header class="app-dau app-dau-2">
+  <a class="app-lui" href="/app" aria-label="Quay lại">{{template "bt-lui"}}</a>
+  <b class="app-tieu">Soi máy</b>
+</header>
+
+<main class="app-than">
+  <div id="ket" class="bao">Đang xem...</div>
+
+  <div class="app-muc">
+    <h2 class="app-h2">Máy khai báo gì</h2>
+    <dl class="kiem-ds" id="ds"></dl>
+  </div>
+
+  <div class="app-nut-hang">
+    <button class="nut nut-vien" type="button" id="xoa">Xoá hết ghi nhớ</button>
+    <a class="nut nut-vien" href="/">Ra trang chủ thử</a>
+  </div>
+</main>
+
+<script>
+(function () {
+  function co(q) {
+    return !!(window.matchMedia && window.matchMedia(q).matches);
+  }
+  function doc(k) {
+    try { return localStorage.getItem(k); } catch (e) { return '(không đọc được)'; }
+  }
+  function laMayCam() {
+    var rong = window.innerWidth || document.documentElement.clientWidth || 0;
+    if (rong > 1024) { return false; }
+    var m = window.matchMedia;
+    if (m) { return m('(pointer: coarse)').matches; }
+    return (navigator.maxTouchPoints || 0) > 0;
+  }
+  function trongApp() {
+    return co('(display-mode: standalone)') || co('(display-mode: fullscreen)') ||
+           co('(display-mode: minimal-ui)') || window.navigator.standalone === true;
+  }
+
+  var daCai = doc('tram-da-cai');
+  var boQua = doc('tram-khong-cai');
+  var conIm = 0;
+  if (boQua) {
+    var t = parseInt(boQua, 10) || 0;
+    conIm = Math.max(0, Math.ceil((t + 7 * 864e5 - Date.now()) / 864e5));
+  }
+
+  var ua = navigator.userAgent || '';
+  var laIOS = /iPad|iPhone|iPod/.test(ua) ||
+              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var laSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
+
+  var hang = [
+    ['Đang mở trong app?', trongApp() ? 'CÓ' : 'KHÔNG'],
+    ['display-mode: standalone', co('(display-mode: standalone)') ? 'khớp' : 'không'],
+    ['display-mode: fullscreen', co('(display-mode: fullscreen)') ? 'khớp' : 'không'],
+    ['display-mode: minimal-ui', co('(display-mode: minimal-ui)') ? 'khớp' : 'không'],
+    ['display-mode: browser', co('(display-mode: browser)') ? 'khớp' : 'không'],
+    ['navigator.standalone', String(window.navigator.standalone)],
+    ['Ghi nhớ "đã cài"', daCai === '1' ? 'CÓ' : 'chưa có'],
+    ['Ghi nhớ "bỏ qua"', conIm > 0 ? ('còn im ' + conIm + ' ngày') : 'không'],
+    ['Máy cầm tay?', laMayCam() ? 'CÓ' : 'KHÔNG (máy tính)'],
+    ['Bề ngang cửa sổ', String(window.innerWidth) + 'px' + (window.innerWidth > 1024 ? ' (quá rộng, coi là máy tính)' : '')],
+    ['pointer: coarse', co('(pointer: coarse)') ? 'khớp' : 'không'],
+    ['Số điểm chạm', String(navigator.maxTouchPoints)],
+    ['Máy iOS?', laIOS ? 'có' : 'không'],
+    ['Safari?', laSafari ? 'có' : 'không'],
+    ['Có beforeinstallprompt?', ('onbeforeinstallprompt' in window) ? 'có (máy Android)' : 'không'],
+    ['Service worker?', ('serviceWorker' in navigator) ? 'có' : 'không (vì chưa HTTPS)'],
+    ['Đang mở địa chỉ', location.href],
+    ['Trình duyệt', ua]
+  ];
+
+  var ds = document.getElementById('ds');
+  for (var i = 0; i < hang.length; i++) {
+    var dt = document.createElement('dt'); dt.textContent = hang[i][0];
+    var dd = document.createElement('dd'); dd.textContent = hang[i][1];
+    ds.appendChild(dt); ds.appendChild(dd);
+  }
+
+  // Tính lại đúng cái luật trong pwa.html, nhưng cho TRANG CHỦ chứ không phải
+  // trang này — trang này mang lớp la-app nên bao giờ cũng im.
+  var ket = document.getElementById('ket');
+  var loi, ok;
+  if (trongApp()) {
+    ok = true; loi = 'Máy đang chạy trong app. Trang chủ sẽ KHÔNG mời cài.';
+  } else if (daCai === '1') {
+    ok = true; loi = 'Máy đã ghi nhớ là cài rồi. Trang chủ sẽ KHÔNG mời cài.';
+  } else if (conIm > 0) {
+    ok = true; loi = 'Đã bấm bỏ qua, còn im ' + conIm + ' ngày nữa.';
+  } else if (!laMayCam()) {
+    ok = true; loi = 'Đây là máy tính (con trỏ chuột). Trang chủ sẽ KHÔNG mời cài — ' +
+      'app chỉ mời trên máy cầm tay.';
+  } else if (laIOS && laSafari) {
+    ok = false; loi = 'Trang chủ SẼ mời cài. Vì: máy iPhone mở bằng Safari, ' +
+      'không dấu hiệu nào cho biết đang ở trong app, và chưa có ghi nhớ nào. ' +
+      'Cái icon ngoài màn hình chính chỉ là dấu trang chứ chưa phải app thật ' +
+      '— trang chưa có HTTPS thì iPhone không cài được app thật.';
+  } else {
+    ok = true; loi = 'Trang chủ sẽ KHÔNG mời cài (máy này không vào nhánh iPhone, ' +
+      'và Android chỉ mời khi trang đã có HTTPS).';
+  }
+  ket.textContent = loi;
+  ket.className = 'bao ' + (ok ? 'bao-ok' : 'bao-loi');
+
+  document.getElementById('xoa').addEventListener('click', function () {
+    try {
+      localStorage.removeItem('tram-da-cai');
+      localStorage.removeItem('tram-khong-cai');
+    } catch (e) {}
+    location.reload();
+  });
+})();
+</script>
+
+{{template "thanh-app" .}}
+
+{{template "pwa-chan" .}}
+</body>
+</html>
+{{end}}

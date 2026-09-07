@@ -1,0 +1,107 @@
+{{define "qt-thongke.html"}}
+{{template "qt-dau" .}}
+{{$tk := .TK}}
+
+<div class="qt-dau-trang">
+  <h1>Thống kê</h1>
+  <div class="phai"><a class="nut nut-vien" href="/qt/don">Danh sách đơn</a></div>
+</div>
+
+<p class="mo" style="max-width:64ch;margin-bottom:20px">
+  Doanh thu chỉ tính trên đơn <b>đã giao</b>. Đơn đang sửa chưa phải tiền —
+  vợt còn trên bàn thì khách vẫn có quyền đổi ý.
+</p>
+
+<div class="luoi-so" style="margin-bottom:22px">
+  <div class="o-so"><div class="v">{{$tk.TongDon}}</div><div class="t">tổng đơn</div></div>
+  <div class="o-so"><div class="v">{{$tk.DangChay}}</div><div class="t">đang trên bàn</div></div>
+  <div class="o-so {{if $tk.QuaHan}}canh-bao{{end}}"><div class="v">{{$tk.QuaHan}}</div><div class="t">quá hẹn trả</div></div>
+  <div class="o-so"><div class="v">{{$tk.TyLeTuChoi}}%</div><div class="t">tỷ lệ từ chối</div></div>
+  <div class="o-so"><div class="v" style="font-size:19px">{{tien $tk.ConNoTong}}</div><div class="t">khách còn nợ</div></div>
+</div>
+
+<div class="ct-2cot">
+  <div>
+    <div class="the-nhom">
+      <h3>Doanh thu 12 tháng gần nhất</h3>
+      <div class="noi">
+        {{if $tk.DoanhThuThang}}
+        <div class="bieu-do">
+          {{$cn := .CaoNhat}}{{$dp := .DinhPhi}}
+          {{range $tk.DoanhThuThang}}
+          <div class="dong">
+            <span class="mo">{{thangDep .Thang}}</span>
+            <span style="display:block"><span class="cot" style="display:block;height:14px;width:{{ptram .DoanhThu $cn}}%"></span></span>
+            <span class="st">{{tien .DoanhThu}}</span>
+          </div>
+          {{end}}
+        </div>
+        {{if $dp}}
+        <p class="nho mo" style="margin-top:16px">
+          Định phí một tháng đang khai trong bảng giá là {{tien $dp}}. Tháng nào cột
+          ngắn hơn con số đó là tháng trạm ăn vào vốn.
+        </p>
+        {{end}}
+        {{else}}
+        <p class="nho mo">Chưa có đơn nào giao xong.</p>
+        {{end}}
+      </div>
+    </div>
+
+    <div class="the-nhom">
+      <h3>Chi tiết theo tháng</h3>
+      <div class="cuon">
+        <table class="bang">
+          <thead><tr><th>Tháng</th><th class="p">Đơn đã giao</th><th class="p">Doanh thu</th><th class="p">Đã thu</th></tr></thead>
+          <tbody>
+            {{range $tk.DoanhThuThang}}
+            <tr>
+              <td>{{thangDep .Thang}}</td>
+              <td class="p">{{.SoDon}}</td>
+              <td class="p">{{tien .DoanhThu}}</td>
+              <td class="p">{{tien .DaThu}}</td>
+            </tr>
+            {{else}}
+            <tr><td colspan="4" class="mo">Chưa có gì.</td></tr>
+            {{end}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="the-nhom">
+      <h3>Đơn theo trạng thái</h3>
+      <div class="noi">
+        <dl class="kv">
+          {{range $tk.TheoTrangThai}}
+          <dt>{{.Ten}}</dt><dd class="so">{{.So}}</dd>
+          {{end}}
+        </dl>
+      </div>
+    </div>
+
+    <div class="the-nhom">
+      <h3>Đọc mấy con số này thế nào</h3>
+      <div class="noi doc">
+        <p class="nho">
+          <b>Tỷ lệ từ chối</b> thấp quá cũng là dấu hiệu xấu: nghĩa là đang nhận cả
+          vợt đáng ra phải trả lại. Trạm mới mở, một phần tư số vợt bị từ chối là
+          bình thường.
+        </p>
+        <p class="nho">
+          <b>Khách còn nợ</b> là tiền của đơn đang chạy chưa thu. Con số này lớn dần
+          mà doanh thu không tăng nghĩa là đang làm nhiều mà thu ít.
+        </p>
+        <p class="nho">
+          <b>Quá hẹn trả</b> là thứ giết uy tín nhanh nhất. Trễ thì nhắn khách trước
+          khi khách phải hỏi.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{template "qt-chan" .}}
+{{end}}

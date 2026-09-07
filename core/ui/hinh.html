@@ -1,0 +1,429 @@
+{{/* ==========================================================================
+     Đồ họa minh họa — vẽ bằng SVG, không dùng ảnh.
+
+     Lý do vẽ thay vì chụp: trạm chưa có kho ảnh, mà thứ cần minh họa lại là
+     thứ ảnh chụp không thấy được — lõi tổ ong nằm dưới lớp carbon, vùng ứng
+     suất trên mặt vợt. Bản vẽ nói được, ảnh thì không.
+
+     Màu lấy từ biến CSS (--sv-*) nên tự đổi theo nền sáng/tối và theo hero.
+
+     Luật khi thêm hình mới: chừa lề trong viewBox cho nhãn. Nhãn tràn ra
+     ngoài đường bao hình là lỗi hay gặp nhất — chữ đè lên nét vẽ.
+     ========================================================================== */}}
+
+
+{{/* Vợt bổ đôi: nửa trái nguyên vẹn, nửa phải bóc lớp mặt lộ lõi tổ ong.
+     Hình chính của trang chủ — vừa trang trí vừa dạy người xem cây vợt có gì
+     bên trong, thứ quyết định sửa được hay không. */}}
+{{define "hinh-vot-bo"}}
+<svg class="sv" viewBox="0 0 520 530" role="img" aria-label="Sơ đồ cấu tạo vợt pickleball: lớp mặt carbon, lõi tổ ong polymer và viền bảo vệ">
+  <defs>
+    <pattern id="to-ong" width="26" height="45" patternUnits="userSpaceOnUse" patternTransform="scale(.66)">
+      <path d="M13 0 L26 7.5 L26 22.5 L13 30 L0 22.5 L0 7.5 Z M13 30 L26 37.5 M13 30 L0 37.5"
+            fill="none" stroke="var(--sv-net)" stroke-width="1.6" opacity=".62"/>
+    </pattern>
+    <clipPath id="nua-phai"><rect x="260" y="20" width="130" height="310"/></clipPath>
+    <clipPath id="nua-trai"><rect x="130" y="20" width="130" height="310"/></clipPath>
+    <clipPath id="trong-mat"><rect x="146" y="30" width="228" height="288" rx="30"/></clipPath>
+  </defs>
+
+  {{/* Lõi tổ ong: chỉ hiện ở nửa phải, bị cắt trong đường bao mặt vợt */}}
+  <g clip-path="url(#trong-mat)">
+    <g clip-path="url(#nua-phai)">
+      <rect x="146" y="30" width="228" height="288" fill="var(--sv-to)"/>
+      <rect x="146" y="30" width="228" height="288" fill="url(#to-ong)"/>
+    </g>
+    {{/* Nửa trái: thớ sợi carbon chạy chéo dưới lớp phủ. Phải kẹp vào nửa trái,
+         nếu không thớ chạy đè lên cả phần lõi tổ ong bên phải. */}}
+    <g opacity=".45" clip-path="url(#nua-trai)">
+      <path d="M120 336 L392 4 M100 376 L372 44 M80 416 L352 84 M140 296 L412 -36"
+            stroke="var(--sv-mo)" stroke-width="1.3" fill="none"/>
+    </g>
+  </g>
+
+  {{/* Đường bóc lớp: mép rách chạy dọc giữa mặt vợt */}}
+  <path d="M260 30 L266 62 L254 92 L267 124 L253 154 L265 186 L254 216 L266 248 L256 280 L260 318"
+        fill="none" stroke="var(--sv-nhan)" stroke-width="2.6" stroke-linejoin="round"/>
+
+  {{/* Đường bao mặt vợt + viền bảo vệ */}}
+  <rect x="146" y="30" width="228" height="288" rx="30" fill="none" stroke="var(--sv-net)" stroke-width="2.6"/>
+  <rect x="138" y="22" width="244" height="304" rx="36" fill="none" stroke="var(--sv-net)" stroke-width="6.5" opacity=".4"/>
+
+  {{/* Cổ vợt và cán */}}
+  <path d="M228 318 L228 350 Q228 362 236 364 L236 496 Q236 510 250 510 L270 510 Q284 510 284 496 L284 364 Q292 362 292 350 L292 318"
+        fill="none" stroke="var(--sv-net)" stroke-width="2.6" stroke-linejoin="round"/>
+  <g stroke="var(--sv-mo)" stroke-width="1.7" fill="none" opacity=".85">
+    <path d="M237 386 L283 374 M237 408 L283 396 M237 430 L283 418 M237 452 L283 440 M237 474 L283 462 M237 496 L283 484"/>
+  </g>
+
+  {{/* Nhãn có đường dẫn — kiểu bản vẽ kỹ thuật. Chữ nằm hẳn ngoài hình. */}}
+  <g>
+    <circle cx="322" cy="112" r="3.6" fill="var(--sv-nhan)"/>
+    <path d="M322 112 L398 112" stroke="var(--sv-nhan)" stroke-width="1.5"/>
+    <text x="402" y="108" class="sv-chu">LÕI TỔ ONG</text>
+
+    <circle cx="196" cy="216" r="3.6" fill="var(--sv-nhan)"/>
+    <path d="M196 216 L120 216" stroke="var(--sv-nhan)" stroke-width="1.5"/>
+    <text x="116" y="212" class="sv-chu" text-anchor="end">LỚP MẶT</text>
+
+    <circle cx="142" cy="68" r="3.6" fill="var(--sv-nhan)"/>
+    <path d="M142 68 L98 68" stroke="var(--sv-nhan)" stroke-width="1.5"/>
+    <text x="94" y="64" class="sv-chu" text-anchor="end">VIỀN</text>
+
+    <circle cx="292" cy="440" r="3.6" fill="var(--sv-nhan)"/>
+    <path d="M292 440 L372 440" stroke="var(--sv-nhan)" stroke-width="1.5"/>
+    <text x="376" y="436" class="sv-chu">CÁN</text>
+  </g>
+</svg>
+{{end}}
+
+
+{{/* Mặt cắt ngang tấm mặt vợt. Dùng trong bài viết chỗ giải thích tách lớp. */}}
+{{define "hinh-cat-lop"}}
+<svg class="sv" viewBox="-56 0 632 280" role="img" aria-label="Mặt cắt ngang mặt vợt: hai lớp carbon ép lên lõi tổ ong ở giữa, keo đã rời ra ở mép phải">
+  <defs>
+    <pattern id="to-ong-2" width="26" height="45" patternUnits="userSpaceOnUse" patternTransform="scale(.54)">
+      <path d="M13 0 L26 7.5 L26 22.5 L13 30 L0 22.5 L0 7.5 Z M13 30 L26 37.5 M13 30 L0 37.5"
+            fill="none" stroke="var(--sv-net)" stroke-width="1.7" opacity=".62"/>
+    </pattern>
+  </defs>
+
+  <rect x="130" y="86"  width="380" height="22" fill="var(--sv-to)" stroke="var(--sv-net)" stroke-width="2"/>
+  <rect x="130" y="108" width="380" height="80" fill="none"         stroke="var(--sv-net)" stroke-width="2"/>
+  <rect x="131" y="109" width="378" height="78" fill="url(#to-ong-2)"/>
+  <rect x="130" y="188" width="380" height="22" fill="var(--sv-to)" stroke="var(--sv-net)" stroke-width="2"/>
+
+  {{/* Viền bọc quanh mép trái */}}
+  <path d="M130 86 Q108 86 108 108 L108 188 Q108 210 130 210"
+        fill="none" stroke="var(--sv-net)" stroke-width="6" opacity=".45"/>
+
+  {{/* Chỗ tách lớp: keo rời ra ở mép phải, vẽ thành khe hở cyan */}}
+  <path d="M382 108 Q440 100 510 103" fill="none" stroke="var(--sv-nhan)" stroke-width="3.2"/>
+  <circle cx="452" cy="102" r="3.6" fill="var(--sv-nhan)"/>
+  <path d="M452 102 L452 46 L512 46" stroke="var(--sv-nhan)" stroke-width="1.5" fill="none"/>
+  <text x="512" y="40" class="sv-chu" text-anchor="end">KEO RỜI — TÁCH LỚP</text>
+
+  <g>
+    <path d="M104 97 L74 97"   stroke="var(--sv-nhan)" stroke-width="1.5"/>
+    <text x="70" y="93"  class="sv-chu" text-anchor="end">MẶT TRÊN</text>
+    <path d="M104 148 L74 148" stroke="var(--sv-nhan)" stroke-width="1.5"/>
+    <text x="70" y="144" class="sv-chu" text-anchor="end">LÕI TỔ ONG</text>
+    <path d="M104 199 L74 199" stroke="var(--sv-nhan)" stroke-width="1.5"/>
+    <text x="70" y="195" class="sv-chu" text-anchor="end">MẶT DƯỚI</text>
+  </g>
+
+  {{/* Vạch đo chiều dày, kiểu bản vẽ */}}
+  <g opacity=".8">
+    <path d="M130 236 L510 236 M130 230 L130 242 M510 230 L510 242"
+          stroke="var(--sv-mo)" stroke-width="1.5" fill="none"/>
+    <text x="320" y="262" class="sv-chu" text-anchor="middle">TẤM MẶT DÀY 13 – 16 mm</text>
+  </g>
+</svg>
+{{end}}
+
+
+{{/* Bản đồ vùng hỏng trên mặt vợt: chỗ nào cứu được, chỗ nào không. */}}
+{{define "hinh-vung-hong"}}
+<svg class="sv" viewBox="-64 0 664 360" role="img" aria-label="Bản đồ vùng hư hại trên mặt vợt: viền và mép sửa được, tâm mặt và vùng nối cán thì không">
+  <defs>
+    <pattern id="gach-cheo" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="var(--sv-canh)" stroke-width="2.6" opacity=".45"/>
+    </pattern>
+  </defs>
+
+  <ellipse cx="260" cy="160" rx="64" ry="74" fill="url(#gach-cheo)" stroke="var(--sv-canh)" stroke-width="2" stroke-dasharray="7 5"/>
+  <rect x="222" y="262" width="76" height="48" rx="10" fill="url(#gach-cheo)" stroke="var(--sv-canh)" stroke-width="2" stroke-dasharray="7 5"/>
+
+  <rect x="146" y="34" width="228" height="252" rx="28" fill="none" stroke="var(--sv-net)" stroke-width="2.6"/>
+  <rect x="138" y="26" width="244" height="268" rx="34" fill="none" stroke="var(--sv-ok)" stroke-width="6.5" opacity=".6"/>
+  <path d="M228 286 L228 310 Q228 322 236 324 L236 340 M292 286 L292 310 Q292 322 284 324 L284 340"
+        fill="none" stroke="var(--sv-net)" stroke-width="2.6"/>
+
+  <g>
+    <circle cx="142" cy="62" r="3.6" fill="var(--sv-ok)"/>
+    <path d="M142 62 L96 62" stroke="var(--sv-ok)" stroke-width="1.5"/>
+    <text x="92" y="58" class="sv-chu sv-chu-ok" text-anchor="end">VIỀN · SỬA ĐƯỢC</text>
+
+    <circle cx="260" cy="160" r="3.6" fill="var(--sv-canh)"/>
+    <path d="M260 160 L400 160" stroke="var(--sv-canh)" stroke-width="1.5"/>
+    <text x="404" y="156" class="sv-chu sv-chu-canh">TÂM MẶT · KHÔNG</text>
+
+    <circle cx="298" cy="286" r="3.6" fill="var(--sv-canh)"/>
+    <path d="M298 286 L400 286" stroke="var(--sv-canh)" stroke-width="1.5"/>
+    <text x="404" y="282" class="sv-chu sv-chu-canh">NỐI CÁN · KHÔNG</text>
+
+    <circle cx="146" cy="250" r="3.6" fill="var(--sv-ok)"/>
+    <path d="M146 250 L96 250" stroke="var(--sv-ok)" stroke-width="1.5"/>
+    <text x="92" y="246" class="sv-chu sv-chu-ok" text-anchor="end">MÉP · SỬA ĐƯỢC</text>
+  </g>
+</svg>
+{{end}}
+
+
+{{/* Cân điện tử. Cam kết duy nhất khách kiểm chứng được bằng đồ nhà bếp. */}}
+{{define "hinh-can"}}
+<svg class="sv" viewBox="-24 0 408 250" role="img" aria-label="Cân điện tử hiển thị khối lượng vợt trước khi sửa">
+  <g opacity=".92">
+    <rect x="126" y="30" width="104" height="66" rx="16" fill="none" stroke="var(--sv-net)" stroke-width="2.3"/>
+    <path d="M166 96 L166 122 M190 96 L190 122" stroke="var(--sv-net)" stroke-width="2.3"/>
+  </g>
+  <path d="M52 126 L308 126 L294 194 L66 194 Z" fill="var(--sv-to)" stroke="var(--sv-net)" stroke-width="2.5" stroke-linejoin="round"/>
+  <rect x="118" y="140" width="124" height="38" rx="6" fill="var(--sv-man)" stroke="var(--sv-net)" stroke-width="1.9"/>
+  <text x="180" y="166" class="sv-so" text-anchor="middle">231.4 g</text>
+  <path d="M80 194 L80 210 M280 194 L280 210" stroke="var(--sv-net)" stroke-width="3.2" stroke-linecap="round"/>
+  <g>
+    <path d="M52 228 L308 228" stroke="var(--sv-mo)" stroke-width="1.3" opacity=".55"/>
+    <text x="180" y="222" class="sv-chu" text-anchor="middle">CÂN TRƯỚC · CÂN SAU · GHI LÊN PHIẾU</text>
+  </g>
+</svg>
+{{end}}
+
+
+{{/* Giày cắt lớp đế. Mảng thay đế giày. */}}
+{{define "hinh-de-giay"}}
+<svg class="sv" viewBox="-60 0 512 272" role="img" aria-label="Giày thể thao nhìn ngang: thân giày, đế giữa và đế ngoài đã bong ở mũi">
+  {{/* Thân giày: gót cao bên trái, cổ giày, lưỡi gà chéo, mũi thấp bên phải */}}
+  <path d="M64 168 L64 104 C64 74 78 63 104 60 L140 56 C155 55 164 61 170 72
+           L196 116 C204 130 218 138 238 143 L316 162 C344 169 358 168 366 165 L366 172 L64 172 Z"
+        fill="var(--sv-to)" stroke="var(--sv-net)" stroke-width="2.4" stroke-linejoin="round"/>
+  {{/* Cổ giày và lưỡi gà */}}
+  <path d="M104 60 C118 76 128 92 136 110" fill="none" stroke="var(--sv-net)" stroke-width="1.9" opacity=".7"/>
+  {{/* Dây giày: từng cặp bắt chéo. Ba vạch song song trông như vết xước. */}}
+  <g stroke="var(--sv-mo)" stroke-width="1.8" fill="none" opacity=".8" stroke-linecap="round">
+    <path d="M112 76 L140 90 M140 76 L112 90"/>
+    <path d="M118 94 L146 108 M146 94 L118 108"/>
+    <path d="M126 112 L152 126 M152 112 L126 126"/>
+  </g>
+
+  {{/* Đế giữa */}}
+  <path d="M58 172 L370 172 L370 192 L58 192 Z" fill="none" stroke="var(--sv-net)" stroke-width="2.2"/>
+  {{/* Đế ngoài — dính ở gót, bong hở dần về phía mũi */}}
+  <path d="M58 192 L210 192 L300 197 C336 200 358 197 372 191 L372 212
+           C352 220 322 221 296 218 L56 212 Z"
+        fill="var(--sv-to)" stroke="var(--sv-net)" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M240 194 Q306 204 372 191" fill="none" stroke="var(--sv-nhan)" stroke-width="3.2"/>
+
+  <g>
+    <circle cx="308" cy="199" r="3.6" fill="var(--sv-nhan)"/>
+    <path d="M308 199 L308 238" stroke="var(--sv-nhan)" stroke-width="1.5" fill="none"/>
+    <text x="308" y="256" class="sv-chu" text-anchor="middle">ĐẾ NGOÀI BONG — THAY ĐƯỢC</text>
+    <path d="M54 182 L26 182" stroke="var(--sv-nhan)" stroke-width="1.5"/>
+    <text x="22" y="178" class="sv-chu" text-anchor="end">ĐẾ GIỮA</text>
+  </g>
+</svg>
+{{end}}
+
+
+{{/* Vợt lớn cho hero trang chủ. Khác mọi hình khác ở ba điểm:
+
+     - Không nhãn. Hero không phải chỗ dạy học, chữ nằm ở cột bên trái rồi.
+     - Mỗi nét mang class "net" và pathLength="1" để CSS cho nét chạy dần khi
+       tải trang (xem .sv-ve trong css.html). Nét nào thiếu pathLength thì hiện
+       ngay từ đầu, phá mất thứ tự vẽ.
+     - Chia ba lớp: lop1 (bao ngoài) → lop2 (cán, viền trong) → lop3 (chi tiết),
+       vẽ nối tiếp nhau. Lõi tổ ong trong mảng .cham hiện sau cùng.
+
+     Bọc trong .sv-ve ở nơi gọi, không bọc sẵn ở đây — chỗ nào cần hình tĩnh
+     thì gọi trần là được. */}}
+{{define "hinh-vot-hero"}}
+{{/* Cây vợt nằm trên bàn thợ, đang khám dở — không phải hình minh hoạ cấu tạo.
+     Bản cũ cắt vợt làm đôi để lộ lõi tổ ong: đẹp nhưng nói về VẬT LIỆU, mà
+     trang này bán VIỆC SỬA. Bản này giữ lại đúng một mảnh tổ ong ở góc đang mở
+     và dồn phần còn lại vào bốn dấu hiệu thợ nhìn là hiểu ngay:
+
+       góc dưới trái — viền bóc lên, lộ lõi bên dưới
+       mép phải      — dải viền mới đang dán, đoạn cuối còn dở
+       mặt trên phải — điểm thủng đã khâu vá, khoanh lại
+       trên trái     — vùng tách lớp, khoanh lại
+       cổ cán        — vết nứt và cái nẹp bắc qua
+
+     Ba vòng khoanh nét đứt để ở lớp "cham" (hiện sau khi nét vẽ xong): chúng là
+     ghi chú của thợ chứ không phải cây vợt, xuất hiện sau thì mắt đọc đúng thứ
+     tự — vợt trước, chỗ hỏng sau. */}}
+<svg class="sv" viewBox="0 0 440 570" role="img" aria-label="Bản vẽ cây vợt pickleball đang được sửa: một góc viền bóc lên lộ lõi tổ ong, mép đang dán dải viền mới, mặt vợt có điểm thủng đã khâu vá và một vùng tách lớp được khoanh lại, cổ cán nứt được nẹp">
+  <defs>
+    <pattern id="to-ong-hero" width="26" height="45" patternUnits="userSpaceOnUse" patternTransform="scale(.82)">
+      <path d="M13 0 L26 7.5 L26 22.5 L13 30 L0 22.5 L0 7.5 Z M13 30 L26 37.5 M13 30 L0 37.5"
+            fill="none" stroke="var(--sv-net)" stroke-width="1.5" opacity=".55"/>
+    </pattern>
+    <clipPath id="hero-mat"><rect x="64" y="34" width="312" height="372" rx="46"/></clipPath>
+    {{/* Chỉ một góc mở ra, không phải nửa cây vợt. */}}
+    <clipPath id="hero-boc"><path d="M64 268 L202 406 L64 406 Z"/></clipPath>
+  </defs>
+
+  <g class="cham" clip-path="url(#hero-mat)">
+    <g clip-path="url(#hero-boc)">
+      <rect x="64" y="34" width="312" height="372" fill="var(--sv-to)"/>
+      <rect x="64" y="34" width="312" height="372" fill="url(#to-ong-hero)"/>
+    </g>
+  </g>
+
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    {{/* Lớp 1 — đường bao mặt vợt */}}
+    <rect class="net" pathLength="1" x="64" y="34" width="312" height="372" rx="46"
+          stroke="var(--sv-net)" stroke-width="2.6"/>
+
+    {{/* Lớp 2 — cán liền cổ, viền trong, và thước đo dọc mép trái */}}
+    <path class="net lop2" pathLength="1"
+          d="M188 406 L188 452 C188 461 184 464 184 473 L184 536 C184 547 192 553 204 553
+             L236 553 C248 553 256 547 256 536 L256 473 C256 464 252 461 252 452 L252 406"
+          stroke="var(--sv-net)" stroke-width="2.6"/>
+    <rect class="net lop2" pathLength="1" x="82" y="52" width="276" height="336" rx="32"
+          stroke="var(--sv-mo)" stroke-width="1.5"/>
+    {{/* Thước đo: thứ duy nhất trong hình không thuộc về cây vợt mà thuộc về
+         cái bàn thợ. Đủ để cả bản vẽ đọc ra "đang đo đạc" chứ không phải
+         "ảnh sản phẩm". */}}
+    <g opacity=".55">
+      <path class="net lop2" pathLength="1"
+            d="M44 60 L44 380 M38 60 L50 60 M38 380 L50 380
+               M40 140 L48 140 M40 220 L48 220 M40 300 L48 300"
+            stroke="var(--sv-mo)" stroke-width="1.4"/>
+    </g>
+
+    {{/* Lớp 3 — bốn dấu hiệu sửa chữa.
+         a) mép viền bóc lên ở góc dưới trái, kẹp trong đường bao vì hai đầu
+            đường chéo rơi đúng vào chỗ mặt vợt bo góc r=46 */}}
+    <g clip-path="url(#hero-mat)">
+      <path class="net lop3" pathLength="1" d="M64 268 L202 406"
+            stroke="var(--sv-nhan)" stroke-width="2.2"/>
+      {{/* Mấy nét ngắn vuông góc mép bóc — chỗ lớp mặt vừa được tách khỏi lõi.
+           Từng thử vẽ nguyên mảnh viền cong lật lên: nó đọc ra thành cái vảy
+           dính trên mặt vợt chứ không ra chỗ đang mở. */}}
+      <path class="net lop3" pathLength="1"
+            d="M92 286 L102 276 M116 310 L126 300 M140 334 L150 324 M164 358 L174 348"
+            stroke="var(--sv-mo)" stroke-width="1.5"/>
+    </g>
+
+    {{/* b) dải viền MỚI đang dán dọc mép phải: đoạn đã dán vẽ liền, đoạn còn
+           lại nét đứt — cây vợt bắt được đúng khoảnh khắc làm dở */}}
+    <path class="net lop3" pathLength="1"
+          d="M362 116 L362 288"
+          stroke="var(--sv-nhan)" stroke-width="3.4" opacity=".9"/>
+    <path class="net lop3" pathLength="1"
+          d="M362 288 L362 352"
+          stroke="var(--sv-nhan)" stroke-width="3.4" stroke-dasharray="7 8" opacity=".5"/>
+    <path class="net lop3" pathLength="1"
+          d="M352 116 L372 116 M352 352 L372 352"
+          stroke="var(--sv-mo)" stroke-width="1.4"/>
+
+    {{/* c) chỗ thủng đã vá: vết rách dọc, và mũi khâu chữ chi bắc qua nó.
+           Bản đầu vẽ lỗ tròn với bốn nét chéo quanh — nhìn ra dấu X trong vòng
+           tròn, tức là nút đóng, đúng thứ không nên có trên trang bán hàng. */}}
+    <path class="net lop3" pathLength="1" d="M271 130 L271 172"
+          stroke="var(--sv-nhan)" stroke-width="2.2"/>
+    <path class="net lop3" pathLength="1"
+          d="M259 140 L283 132 M259 152 L283 144 M259 164 L283 156 M259 174 L283 166"
+          stroke="var(--sv-net)" stroke-width="1.6"/>
+
+    {{/* d) vùng tách lớp: mấy gợn sóng nằm ngang, kiểu lớp mặt đang phồng khỏi lõi */}}
+    <g opacity=".65">
+      <path class="net lop3" pathLength="1"
+            d="M112 104 q14 -9 28 0 t28 0 t28 0
+               M112 124 q14 -9 28 0 t28 0 t28 0
+               M112 144 q14 -9 28 0 t28 0 t28 0"
+            stroke="var(--sv-mo)" stroke-width="1.5"/>
+    </g>
+
+    {{/* e) cổ cán nứt, và cái nẹp bắc qua vết nứt */}}
+    <path class="net lop3" pathLength="1"
+          d="M186 466 L202 460 L216 470 L234 461 L254 468"
+          stroke="var(--sv-nhan)" stroke-width="1.8"/>
+    <path class="net lop3" pathLength="1"
+          d="M178 500 L262 500 M178 512 L262 512"
+          stroke="var(--sv-mo)" stroke-width="1.4"/>
+  </g>
+
+  {{/* Ghi chú của thợ: ba vòng khoanh nét đứt và cái nẹp, hiện sau cùng */}}
+  <g class="cham" fill="none">
+    <circle cx="271" cy="151" r="34" stroke="var(--sv-nhan)"
+            stroke-width="1.4" stroke-dasharray="3 5" opacity=".85"/>
+    <ellipse cx="154" cy="124" rx="60" ry="40" stroke="var(--sv-nhan)"
+             stroke-width="1.4" stroke-dasharray="3 5" opacity=".7"/>
+    <rect x="174" y="450" width="92" height="34" rx="10" stroke="var(--sv-nhan)"
+          stroke-width="1.4" stroke-dasharray="3 5" opacity=".7"/>
+    {{/* Chấm đánh dấu ở góc đang mở — chỗ thợ đang đặt tay */}}
+    <circle cx="118" cy="352" r="3.6" fill="var(--sv-nhan)" stroke="none"/>
+  </g>
+</svg>
+{{end}}
+
+
+{{/* --------------------------------------------------------------------------
+     Biểu tượng thẻ dịch vụ. Khung 24×24, nét 1.6, không tô.
+
+     Mỗi hình phải nói đúng việc đó làm gì — chín thẻ chữ giống nhau là chín
+     thẻ không ai đọc, nhưng chín ô vuông chung chung cũng vậy.
+     -------------------------------------------------------------------------- */}}
+
+{{/* Dán / thay viền: đường bao ngoài hở một đoạn ở góc — chỗ viền bong */}}
+{{define "bt-vien"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="3"/><path d="M15.5 2.6 L18 2.6 A3.4 3.4 0 0 1 21.4 6 L21.4 8.5"/><path d="M8.5 21.4 L6 21.4 A3.4 3.4 0 0 1 2.6 18 L2.6 15.5"/><path d="M2.6 8.5 L2.6 6 A3.4 3.4 0 0 1 6 2.6 L8.5 2.6" stroke-dasharray="1.6 2.2"/><path d="M21.4 15.5 L21.4 18 A3.4 3.4 0 0 1 18 21.4 L15.5 21.4" stroke-dasharray="1.6 2.2"/></svg>{{end}}
+
+{{/* Thay viền toàn bộ: cuộn viền mới đang được kéo ra. Phải khác hẳn bt-vien —
+     hai thẻ dịch vụ cạnh nhau mà cùng một hình thì cái hình mất tác dụng. */}}
+{{define "bt-vien-moi"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7.6" cy="8.6" r="5"/><circle cx="7.6" cy="8.6" r="1.7"/><path d="M12.6 8.6 L17.4 8.6 A3 3 0 0 1 20.4 11.6 L20.4 20.4"/><path d="M18 18.4 L20.4 20.8 L22.8 18.4"/></svg>{{end}}
+
+{{/* Quấn grip: cán vợt với băng quấn chéo */}}
+{{define "bt-grip"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2.6 L15 2.6 L15 7"/><rect x="7.6" y="7" width="8.8" height="14.4" rx="3"/><path d="M7.8 11 L16.2 8.8 M7.8 14.6 L16.2 12.4 M7.8 18.2 L16.2 16"/></svg>{{end}}
+
+{{/* Vá mặt thủng: mặt vợt có lỗ, quanh lỗ là mũi vá */}}
+{{define "bt-mat"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="2.4"/><path d="M12 6.4 L12 8.4 M12 15.6 L12 17.6 M6.4 12 L8.4 12 M15.6 12 L17.6 12" stroke-dasharray="1.4 1.6"/></svg>{{end}}
+
+{{/* Hàn cán: cán vợt nứt ngang, mối nối bắc qua vết nứt */}}
+{{define "bt-can"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.4 2.6 L14.6 2.6 L14.6 10.2 M9.4 13.8 L9.4 21.4 L14.6 21.4 L14.6 13.8 M9.4 10.2 L9.4 2.6"/><path d="M6.4 10.6 L17.6 10.6 M6.4 13.4 L17.6 13.4"/><path d="M8 12 L16 12" stroke-dasharray="1.4 1.8"/></svg>{{end}}
+
+{{/* Tách lớp: ba lớp chồng, lớp trên bị nhấc hở ra */}}
+{{define "bt-lop"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.4 L12 5.2 L21 9.4 L14.5 12.4"/><path d="M3 13.4 L12 17.6 L21 13.4"/><path d="M3 17.4 L12 21.6 L21 17.4"/><path d="M15.4 8.2 L21.4 5.4" stroke-dasharray="1.4 1.8"/></svg>{{end}}
+
+{{/* Lead tape: dải băng chì dán lên mép vợt, có dấu cộng khối lượng */}}
+{{define "bt-nang"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.6" y="8.8" width="12.8" height="6.4" rx="1.8"/><path d="M6.4 8.8 L6.4 15.2 M10.2 8.8 L10.2 15.2"/><path d="M19.4 8.4 L19.4 14.4 M16.4 11.4 L22.4 11.4"/></svg>{{end}}
+
+{{/* Thay đế giày */}}
+{{define "bt-giay"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.4 15.4 L2.4 9.6 C2.4 8.2 3.2 7.6 4.6 7.5 L7 7.3 C8 7.2 8.6 7.6 9 8.4 L10.6 11 C11.2 11.9 12.2 12.4 13.4 12.7 L18.6 14 C20.4 14.5 21.6 14.8 21.6 15.4 Z"/><path d="M2.4 17.6 L21.6 17.6 C21.6 19 20.8 19.6 19.4 19.6 L4.6 19.6 C3.2 19.6 2.4 19 2.4 17.6 Z" stroke-dasharray="2 1.8"/><path d="M5 9 L7.2 10.4 M4.8 11.4 L7 12.8"/></svg>{{end}}
+
+{{/* Vệ sinh: mặt vợt được lau, có vệt sáng */}}
+{{define "bt-sach"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.4" y="3.4" width="13.2" height="13.2" rx="4"/><path d="M6.6 13.4 C8.4 10.4 10.8 8.6 14 7.8"/><path d="M19.4 3.4 L19.4 7 M17.6 5.2 L21.2 5.2 M18.6 19 L18.6 21.4 M17.4 20.2 L19.8 20.2"/></svg>{{end}}
+
+{{/* Gửi ảnh hỏi: khung ảnh với dấu hỏi. Dùng cho ô cuối lưới dịch vụ. */}}
+{{define "bt-hoi"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.6" y="4.6" width="18.8" height="14.8" rx="3"/><path d="M2.6 15.6 L8.4 10.4 L13 14.4"/><path d="M9.8 11.2 C9.8 9.4 11 8.4 12.6 8.4 C14.2 8.4 15.2 9.4 15.2 10.6 C15.2 12.4 13.2 12.4 13.2 14"/><circle cx="13.2" cy="16.2" r=".9" fill="currentColor" stroke="none"/></svg>{{end}}
+
+{{/* Chọn biểu tượng theo mã dịch vụ. Mã lạ rơi về hình lớp — vẫn hợp lý hơn
+     là để trống một ô. */}}
+{{define "bt-dich-vu"}}
+{{- if eq . "DAN_VIEN"}}{{template "bt-vien"}}
+{{- else if eq . "THAY_VIEN"}}{{template "bt-vien-moi"}}
+{{- else if eq . "QUAN_GRIP"}}{{template "bt-grip"}}
+{{- else if eq . "VA_MAT"}}{{template "bt-mat"}}
+{{- else if eq . "HAN_CAN"}}{{template "bt-can"}}
+{{- else if eq . "TACH_LOP"}}{{template "bt-lop"}}
+{{- else if eq . "LEAD_TAPE"}}{{template "bt-nang"}}
+{{- else if eq . "THAY_DE_GIAY"}}{{template "bt-giay"}}
+{{- else if eq . "VE_SINH"}}{{template "bt-sach"}}
+{{- else}}{{template "bt-lop"}}{{end}}
+{{end}}
+
+{{/* Ba biểu tượng cho thanh đáy của màn hình app. Cùng nét, cùng khung 24 như
+     dàn bt-* ở trên, để đứng cạnh nhau không lệch. */}}
+{{define "bt-tim"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.6" cy="10.6" r="6.6"/><path d="M15.4 15.4 L20.8 20.8"/></svg>{{end}}
+
+{{define "bt-goi"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.2 3.4 L9 3.4 L10.6 7.8 L8.4 9.2 C9.4 11.6 12.4 14.6 14.8 15.6 L16.2 13.4 L20.6 15 L20.6 17.8 C20.6 19.4 19.4 20.6 17.8 20.6 C10.2 20.2 3.8 13.8 3.4 6.2 C3.4 4.6 4.6 3.4 6.2 3.4 Z"/></svg>{{end}}
+
+{{define "bt-chat"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.6 12 C20.6 16.2 16.8 19.6 12 19.6 C10.8 19.6 9.6 19.4 8.6 19 L3.4 20.6 L5 15.8 C4 14.7 3.4 13.4 3.4 12 C3.4 7.8 7.2 4.4 12 4.4 C16.8 4.4 20.6 7.8 20.6 12 Z"/><path d="M8.6 11.8 L11 11.8 M13 11.8 L15.4 11.8" stroke-dasharray="0"/></svg>{{end}}
+
+{{define "bt-nha"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.4 10.7 L12 3.7 L20.6 10.7"/><path d="M5.9 9.6 V20.2 h12.2 V9.6"/><path d="M9.7 20.2 v-5.6 h4.6 v5.6"/></svg>{{end}}
+
+{{define "bt-anh"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.6 8.2h2.7l1.5-2.3h6.4l1.5 2.3h2.7a1.5 1.5 0 0 1 1.5 1.5v8.3a1.5 1.5 0 0 1-1.5 1.5H4.6a1.5 1.5 0 0 1-1.5-1.5V9.7a1.5 1.5 0 0 1 1.5-1.5z"/><circle cx="12" cy="13.7" r="3.4"/></svg>{{end}}
+
+{{/* Nút Chia sẻ của iOS: ô vuông có mũi tên chĩa lên. Vẽ đúng hình thật vì
+     khách phải nhận ra nó trên thanh dưới của Safari, không phải đọc chữ. */}}
+{{define "bt-chia-se"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2 V14.4"/><path d="M8.3 6.9 L12 3.2 L15.7 6.9"/><path d="M7.9 10.2H5.6v10.4h12.8V10.2h-2.3"/></svg>{{end}}
+
+{{/* Mũi tên lùi ở đầu các màn hình con của app. */}}
+{{define "bt-lui"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.6 4.8 L7.4 12 L14.6 19.2"/></svg>{{end}}
+
+{{/* Mũi chỉ xuống của mấy khối gấp trong app. Mở ra thì CSS lật ngược nó lên,
+     nên chỉ cần một hình cho cả hai trạng thái. */}}
+{{define "bt-xuong"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.8 8.8 L12 16 L19.2 8.8"/></svg>{{end}}
+
+{{define "bt-thu-vien"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><rect x="7.4" y="3.6" width="13" height="13" rx="2.6"/><path d="M8.4 14.2 L11.6 10.6 L14 12.8 L16.6 9.6 L19.4 13.2"/><path d="M16.6 19.2 a2.6 2.6 0 0 1 -2.6 1.2 H6.2 A2.6 2.6 0 0 1 3.6 17.8 V8.6"/></svg>{{end}}
+
+{{define "bt-xong"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/><path d="M7.8 12.3 L10.8 15.2 L16.2 9.2"/></svg>{{end}}

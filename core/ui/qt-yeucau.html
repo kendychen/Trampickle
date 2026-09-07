@@ -1,0 +1,74 @@
+{{define "qt-yeucau.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang">
+  <h1>Yêu cầu từ web</h1>
+  <div class="phai"><a class="nut nut-vien" href="/qt/don">Danh sách đơn</a></div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+
+<p class="mo" style="max-width:64ch;margin-bottom:20px">
+  Khách điền form ở trang chủ thì rơi vào đây. Tạo đơn là chép sẵn tên, liên hệ,
+  hãng vợt và mô tả sang đơn mới — đỡ gõ lại số điện thoại, mà gõ sai số thì
+  khách không tra cứu được đơn của mình.
+</p>
+
+{{if .YeuCau}}
+<div class="doc" style="gap:12px">
+  {{range .YeuCau}}
+  <div class="the yc {{if .DaXuLy}}mo{{end}}" style="margin:0">
+    <div class="hang" style="align-items:flex-start;gap:18px">
+      <div style="flex:1;min-width:0">
+        <div class="nho mo so">{{.Ma}} · {{.Ngay}}</div>
+        <div style="margin-top:6px">
+          <b>{{if .Ten}}{{.Ten}}{{else}}Không để tên{{end}}</b>
+          <span class="so" style="margin-left:8px">{{.LienHe}}</span>
+        </div>
+        {{if .Email}}<div class="nho" style="margin-top:4px">Email: <a href="mailto:{{.Email}}">{{.Email}}</a></div>{{end}}
+        {{if .VotHang}}<div class="nho" style="margin-top:4px">Vợt: {{.VotHang}}</div>{{end}}
+        {{if .MoTa}}<p style="margin-top:8px;white-space:pre-wrap">{{.MoTa}}</p>{{end}}
+        {{if .Tep}}
+        <div class="anh-luoi" style="margin-top:12px">
+          {{$ma := .Ma}}
+          {{range .Tep}}
+          {{$url := printf "/qt/yeu-cau/%s/tep/%s" $ma .}}
+          <div class="anh-o">
+            {{if eq (xemTep .) "video"}}
+              <video src="{{$url}}" controls preload="metadata"></video>
+              <div class="duoi">Video khách gửi</div>
+            {{else if eq (xemTep .) "anh"}}
+              <a href="{{$url}}" target="_blank"><img src="{{$url}}" alt="Ảnh khách gửi" loading="lazy"></a>
+              <div class="duoi">Ảnh khách gửi</div>
+            {{else}}
+              <a href="{{$url}}" target="_blank" style="display:block;height:130px;display:grid;place-items:center;font-size:12px">Ảnh HEIC — mở/tải về</a>
+              <div class="duoi">iPhone (HEIC)</div>
+            {{end}}
+          </div>
+          {{end}}
+        </div>
+        {{end}}
+      </div>
+      <div class="doc" style="flex:0 0 auto;gap:8px;align-items:flex-end">
+        {{if .MaDon}}
+          <a class="nut nut-vien" href="/qt/don/{{.MaDon}}">Đơn {{.MaDon}}</a>
+        {{else if .DaXuLy}}
+          <span class="chip chip-trung">Đã bỏ qua</span>
+        {{else}}
+          <form method="post" action="/qt/yeu-cau/{{.Ma}}/tao-don"><button type="submit">Tạo đơn</button></form>
+          <form method="post" action="/qt/yeu-cau/{{.Ma}}/bo-qua"><button type="submit" class="nut-phu">Bỏ qua</button></form>
+        {{end}}
+      </div>
+    </div>
+  </div>
+  {{end}}
+</div>
+{{else}}
+<div class="the trong">
+  <b>Chưa có yêu cầu nào</b>
+  Khi khách điền form ở trang chủ, tin nhắn sẽ hiện tại đây.
+</div>
+{{end}}
+
+{{template "qt-chan" .}}
+{{end}}

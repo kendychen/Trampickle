@@ -1,0 +1,71 @@
+{{define "quytrinh.html"}}
+{{template "html-dau" .}}
+
+<section class="hero">
+  <div class="khung">
+    <div class="nhan-nho">{{nd "quytrinh.nhan"}}</div>
+    <h1 style="margin-top:16px">{{nd "quytrinh.h1"}}</h1>
+    <p class="dan">{{ndd "quytrinh.dan"}}</p>
+  </div>
+</section>
+
+<section>
+  <div class="khung doc-lon">
+    <div class="buoc">
+      <div><span class="n">{{nd "quytrinh.b1.n"}}</span><h4>{{nd "quytrinh.b1.h4"}}</h4><p>{{ndd "quytrinh.b1.chu"}}</p></div>
+      <div><span class="n">{{nd "quytrinh.b2.n"}}</span><h4>{{nd "quytrinh.b2.h4"}}</h4><p>{{ndd "quytrinh.b2.chu"}}</p></div>
+      <div><span class="n">{{nd "quytrinh.b3.n"}}</span><h4>{{nd "quytrinh.b3.h4"}}</h4><p>{{ndd "quytrinh.b3.chu"}}</p></div>
+      <div><span class="n">{{nd "quytrinh.b4.n"}}</span><h4>{{nd "quytrinh.b4.h4"}}</h4><p>{{ndd "quytrinh.b4.chu"}}</p></div>
+      {{/* Bước cân nằm ngang hết hàng: 5 ô trong lưới 4 (hoặc 2 ở theme kem)
+           thì ô lẻ cuối cùng đứng cụt một góc. Cho nó trải hết hàng vừa
+           hết cụt, vừa đúng vai trò — đây là bước duy nhất khách kiểm tra
+           lại được bằng cái cân nhà bếp. */}}
+      <div class="buoc-rong"><span class="n">{{nd "quytrinh.b5.n"}}</span><h4>{{nd "quytrinh.b5.h4"}}</h4><p>{{ndx "quytrinh.b5.chu" "nguong" (nd "chung.can.muc")}}</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="nen2">
+  <div class="khung doi-cot">
+    <div class="doc-lon">
+      <div>
+        <div class="nhan-nho nhan-vach">{{nd "quytrinh.duong.nhan"}}</div>
+        <h2 style="margin-top:16px">{{nd "quytrinh.duong.h2"}}</h2>
+      </div>
+      <div class="luoi-vach">
+        <div style="padding:22px;display:grid;gap:9px;align-content:start">
+          <h3>{{nd "quytrinh.duong.den-h3"}}</h3>
+          <p class="nho mo">{{ndd "quytrinh.duong.den-chu"}}</p>
+        </div>
+        <div style="padding:22px;display:grid;gap:9px;align-content:start">
+          <h3>{{nd "quytrinh.duong.gui-h3"}}</h3>
+          <p class="nho mo">{{ndd "quytrinh.duong.gui-chu"}}</p>
+        </div>
+      </div>
+
+      {{/* Phí ship nói rõ ở đây chứ không giấu xuống chân trang: khách gửi từ
+           xa hỏi câu này trước cả câu hỏi giá sửa. */}}
+      <div class="the">
+        <h3>{{nd "quytrinh.ship.h3"}}</h3>
+        <p class="nho mo" style="margin-top:10px">{{ndx "quytrinh.ship.chu-1" "nguong" (tien .Nguong.FreeShipVeTuDong)}}</p>
+        <p class="nho mo" style="margin-top:8px">{{ndd "quytrinh.ship.chu-2"}}</p>
+      </div>
+    </div>
+
+    <div class="canh">
+      <div class="the">
+        <h3>{{nd "quytrinh.theo.h3"}}</h3>
+        <p class="nho mo" style="margin-top:10px">{{ndd "quytrinh.theo.chu"}}</p>
+        <p style="margin-top:16px"><a class="nut nut-chinh" href="/tra-cuu">{{nd "chung.nut.tra-cuu"}}</a></p>
+      </div>
+      <div class="the">
+        <h3>{{nd "quytrinh.chua.h3"}}</h3>
+        <p class="nho mo" style="margin-top:10px">{{ndd "quytrinh.chua.chu"}}</p>
+        <p style="margin-top:16px"><a class="nut nut-vien" href="/#gui-yeu-cau">{{nd "chung.nut.gui-anh"}}</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{{template "html-chan" .}}
+{{end}}

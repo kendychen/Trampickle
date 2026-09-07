@@ -1,0 +1,116 @@
+{{define "qt-nguoidung.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang">
+  <h1>Tài khoản</h1>
+  <div class="phai"><a class="nut nut-vien" href="/qt/mat-khau">Đổi mật khẩu của tôi</a></div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<div class="ct-2cot">
+  <div>
+    <div class="the-nhom">
+      <h3>Người đang có tài khoản</h3>
+      <div class="cuon">
+        <table class="bang">
+          <thead><tr><th>Tên đăng nhập</th><th>Họ tên</th><th>Vai trò</th><th>Trạng thái</th><th></th></tr></thead>
+          <tbody>
+            {{range .DS}}
+            <tr>
+              <td class="so">{{.Ten}}</td>
+              <td>{{if .HoTen}}{{.HoTen}}{{else}}<span class="mo">—</span>{{end}}</td>
+              <td>
+                {{if .LaChu}}<span class="chip chip-nhan">Chủ</span>{{else}}<span class="chip chip-trung">Thợ</span>{{end}}
+              </td>
+              <td>{{if .Tat}}<span class="chip chip-tuchoi">Đã khoá</span>{{else}}<span class="mo nho">đang dùng</span>{{end}}</td>
+              <td>
+                <form method="post" action="/qt/nguoi-dung" class="hang" style="gap:6px;align-items:center">
+                  <input type="hidden" name="viec" value="vai_tro">
+                  <input type="hidden" name="ten" value="{{.Ten}}">
+                  <select name="vai_tro" style="flex:0 0 auto;padding:5px 8px;font-size:13px">
+                    <option value="tho" {{if not .LaChu}}selected{{end}}>Thợ</option>
+                    <option value="chu" {{if .LaChu}}selected{{end}}>Chủ</option>
+                  </select>
+                  <select name="tat" style="flex:0 0 auto;padding:5px 8px;font-size:13px">
+                    <option value="0" {{if not .Tat}}selected{{end}}>Đang dùng</option>
+                    <option value="1" {{if .Tat}}selected{{end}}>Khoá</option>
+                  </select>
+                  <button type="submit" class="nut-nho" style="flex:0 0 auto">Đổi</button>
+                </form>
+              </td>
+            </tr>
+            {{end}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="the-nhom">
+      <h3>Đặt lại mật khẩu cho một người</h3>
+      <div class="noi">
+        <form method="post" action="/qt/nguoi-dung">
+          <input type="hidden" name="viec" value="mat_khau">
+          <div class="hang" style="align-items:flex-end">
+            <label style="margin:0" class="co-hep">Tài khoản
+              <select name="ten">{{range .DS}}<option value="{{.Ten}}">{{.Ten}}</option>{{end}}</select>
+            </label>
+            <label style="margin:0">Mật khẩu mới<input name="mat_khau" type="text" minlength="8" required></label>
+            <button type="submit" style="flex:0 0 auto">Đặt lại</button>
+          </div>
+        </form>
+        <p class="nho mo" style="margin-top:10px">
+          Để dạng chữ thường nhìn thấy được là cố ý: đặt xong thì đọc cho người ta
+          ngay tại chỗ, rồi bảo họ tự đổi ở trang đổi mật khẩu.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="the-nhom">
+      <h3>Thêm người</h3>
+      <div class="noi">
+        <form method="post" action="/qt/nguoi-dung" class="doc">
+          <input type="hidden" name="viec" value="them">
+          <label>Tên đăng nhập
+            <span class="hd">Chữ thường, không dấu, không khoảng trắng.</span>
+            <input name="ten" maxlength="32" required>
+          </label>
+          <label>Họ tên<input name="ho_ten" maxlength="80"></label>
+          <label>Mật khẩu
+            <span class="hd">Ít nhất 8 ký tự.</span>
+            <input name="mat_khau" type="text" minlength="8" required>
+          </label>
+          <label>Vai trò
+            <select name="vai_tro">
+              <option value="tho">Thợ — chỉ thấy đơn mình cầm</option>
+              <option value="chu">Chủ — thấy hết, kể cả doanh thu</option>
+            </select>
+          </label>
+          <button type="submit">Thêm tài khoản</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="the-nhom">
+      <h3>Hai vai trò khác nhau chỗ nào</h3>
+      <div class="noi doc">
+        <p class="nho">
+          <b>Thợ</b> mở được đơn mình phụ trách và đơn chưa ai nhận. Không thấy
+          thống kê, không thấy trang này.
+        </p>
+        <p class="nho">
+          <b>Chủ</b> thấy mọi đơn, doanh thu tháng, và quản được tài khoản.
+        </p>
+        <p class="nho">
+          Khoá tài khoản không xoá đơn người đó đã làm — lịch sử vẫn giữ nguyên tên.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{template "qt-chan" .}}
+{{end}}

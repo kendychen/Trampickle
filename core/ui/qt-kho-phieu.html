@@ -1,0 +1,65 @@
+{{define "qt-kho-phieu.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang">
+  <h1>Sổ phiếu kho</h1>
+  <div class="phai">
+    <a class="nut nut-vien" href="/qt/kho">← Tồn kho</a>
+    <a class="nut nut-chinh" href="/qt/kho/phieu/moi?loai=xuat">+ Ghi phiếu</a>
+  </div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<p class="mo" style="max-width:70ch;margin-bottom:18px">
+  Tồn kho không được lưu ở đâu cả — nó là kết quả cộng dồn đúng những phiếu dưới
+  đây. Sửa một phiếu cũ là sửa lại con số tồn hôm nay, nên sửa xong nhớ nhìn lại
+  bảng tồn.
+</p>
+
+<div class="hang-nut" style="margin:0 0 18px">
+  {{range .LoaiPhieu}}
+  {{if or (ne .Loai "nhap") $.NguoiDung.LaChu}}
+  <a class="nut nut-vien" href="/qt/kho/phieu/moi?loai={{.Loai}}">+ {{.Ten}}</a>
+  {{end}}
+  {{end}}
+</div>
+
+{{if .Phieu}}
+<div class="the-nhom">
+  <div class="cuon">
+    <table class="bang">
+      <thead>
+        <tr><th>Mã</th><th>Loại</th><th>Ngày</th><th>Đơn / nhà cung cấp</th><th>Vật tư</th><th>Người ghi</th>{{if .NguoiDung.LaChu}}<th class="p">Tiền</th>{{end}}</tr>
+      </thead>
+      <tbody>
+      {{range .Phieu}}
+        <tr class="co-link">
+          <td><a href="/qt/kho/phieu/{{.Ma}}" class="so">{{.Ma}}</a></td>
+          <td class="nho">{{.TenLoai}}</td>
+          <td class="nho mo">{{ngaydep .Ngay}}</td>
+          <td class="nho">
+            {{if .MaDon}}<a href="/qt/don/{{.MaDon}}" class="so">{{.MaDon}}</a>{{else if .NhaCungCap}}{{.NhaCungCap}}{{else}}<span class="mo">—</span>{{end}}
+          </td>
+          <td class="nho mo">
+            {{range $i, $d := .Dong}}{{if lt $i 3}}{{if $i}}, {{end}}{{tenvt $d.MaVatTu}}{{end}}{{end}}
+            {{if gt (len .Dong) 3}}…{{end}}
+          </td>
+          <td class="nho mo">{{.Nguoi}}</td>
+          {{if $.NguoiDung.LaChu}}<td class="p">{{if .TongTien}}{{tien .TongTien}}{{else}}<span class="mo">—</span>{{end}}</td>{{end}}
+        </tr>
+      {{end}}
+      </tbody>
+    </table>
+  </div>
+</div>
+{{else}}
+<div class="the trong">
+  <b>Chưa có phiếu nào</b>
+  Phiếu đầu tiên thường là phiếu nhập: mua gì về thì ghi vào đây.
+</div>
+{{end}}
+
+{{template "qt-chan" .}}
+{{end}}

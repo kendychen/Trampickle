@@ -1,0 +1,94 @@
+{{define "qt-giaotrinh-sua.html"}}
+{{template "qt-dau" .}}
+
+<style>
+/* Hai cột bằng nhau: soạn bên trái, xem thử bên phải. Màn hẹp thì xếp dọc,
+   vì một ô soạn rộng 300px là không soạn được gì. */
+.gt-2cot { display: grid; gap: 18px; grid-template-columns: minmax(0,1fr) minmax(0,1fr); align-items: start; }
+@media (max-width: 1100px) { .gt-2cot { grid-template-columns: 1fr; } }
+.gt-xem { border: 1px solid var(--vien); border-radius: 10px; padding: 18px; max-height: 720px; overflow-y: auto; }
+</style>
+
+<div class="qt-dau-trang">
+  <h1>{{.Bai.Ten}}</h1>
+  <div class="phai hang" style="gap:8px">
+    <a class="nut nut-vien" href="/qt/giao-trinh">← Danh sách bài</a>
+  </div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<p class="nho mo so">{{.Bai.Tep}}{{if .Bai.TrangThai}} · {{.Bai.TrangThai}}{{end}}</p>
+
+<div class="bao bao-luu" style="max-width:78ch">
+  Lưu ở đây chỉ đổi bản trong TramVot. Bản gốc ngoài <code>giao-trinh-sua-vot/</code>
+  vẫn nguyên như cũ. Trợ lý kỹ thuật đọc bản này, nên lưu xong là nó dùng ngay.
+</div>
+
+<form method="post" action="/qt/giao-trinh/luu" id="f-gt" style="margin-top:18px">
+  <input type="hidden" name="ma" value="{{.Bai.Ma}}">
+
+  <div class="the-nhom">
+    <h3>Nội dung bài</h3>
+    <div class="noi">
+      <div class="gt-2cot">
+        <div>
+          <textarea name="than" id="o-than" rows="34" spellcheck="false"
+                    style="font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.7">{{.Than}}</textarea>
+          <div class="hang" style="gap:10px;margin-top:12px">
+            <button type="button" id="nut-xem" class="phu" style="flex:0 0 auto">Xem thử</button>
+            <button type="submit" style="flex:0 0 auto">Lưu bài</button>
+            <span class="nho mo" id="bao-xem"></span>
+          </div>
+          <p class="nho mo" style="margin-top:10px">
+            Ctrl+Enter cũng dựng xem thử. Bảng markdown nhớ dòng
+            <code>|---|---|</code> ngay dưới hàng đầu.
+          </p>
+        </div>
+
+        <div>
+          <div class="nhan-nho">Xem thử</div>
+          <div id="khung-xem" class="bai gt-xem">
+            <p class="mo nho">Bấm <b>Xem thử</b> để dựng ra bài đã định dạng.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+{{/* Xem thử dựng ở server, dùng đúng trình dựng markdown của trang bài viết —
+     dựng hai nơi là hai kết quả khác nhau. */}}
+<script>
+(function () {
+  var nut = document.getElementById('nut-xem');
+  var o = document.getElementById('o-than');
+  var khung = document.getElementById('khung-xem');
+  var bao = document.getElementById('bao-xem');
+  nut.addEventListener('click', function () {
+    bao.textContent = 'đang dựng…';
+    var d = new URLSearchParams();
+    d.append('than', o.value);
+    fetch('/qt/giao-trinh/xem-thu', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+      body: d.toString()
+    }).then(function (res) {
+      if (!res.ok) throw new Error(res.status);
+      return res.text();
+    }).then(function (h) {
+      khung.innerHTML = h;
+      bao.textContent = 'dựng lúc ' + new Date().toLocaleTimeString('vi-VN');
+    }).catch(function (e) {
+      bao.textContent = 'không dựng được: ' + e.message;
+    });
+  });
+  o.addEventListener('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); nut.click(); }
+  });
+})();
+</script>
+
+{{template "qt-chan" .}}
+{{end}}

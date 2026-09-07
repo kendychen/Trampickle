@@ -1,0 +1,89 @@
+{{define "qt-anhtrangchu.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang"><h1>Ảnh trang chủ</h1></div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<p class="mo" style="max-width:62ch">
+  Băng ảnh chạy ở phần đầu trang chủ, chỗ đang là bản vẽ cây vợt. Có ảnh thì
+  băng ảnh thay chỗ bản vẽ; xoá hết ảnh thì bản vẽ quay lại. Tối đa
+  {{.ToiDa}} ảnh.
+</p>
+
+<form method="post" action="/qt/anh-trang-chu/them" enctype="multipart/form-data"
+      class="the" style="max-width:640px;margin-top:22px">
+  <label>Chọn ảnh
+    <span class="hd">JPG, PNG hoặc WEBP, mỗi ảnh dưới 8MB. Ảnh nằm ngang hợp
+      hơn ảnh dọc — khung hiển thị là khung ngang.</span>
+    <input type="file" name="anh" accept="image/*" multiple required>
+  </label>
+  <label style="margin-top:12px">Chú thích
+    <span class="hd">Không bắt buộc. Hiện ở góc dưới ảnh, ví dụ "Dán lại viền
+      bong — xong trong ngày".</span>
+    <input name="chu_thich" maxlength="120">
+  </label>
+  <button type="submit" style="margin-top:14px">Thêm ảnh</button>
+</form>
+
+{{if .Anh}}
+<h2 style="margin-top:32px">Đang chạy — {{len .Anh}} ảnh</h2>
+<p class="nho mo">Thứ tự trong danh sách là thứ tự chạy.</p>
+
+<div class="anh-ds">
+  {{range $i, $a := .Anh}}
+  <div class="anh-o">
+    <img src="/anh-trang-chu/{{$a.Ten}}" alt="">
+    <div class="anh-viec">
+      <p class="nho mo" style="margin:0 0 6px">Treo ở: <b>{{if $a.Noi}}Về chúng tôi{{else}}Trang chủ{{end}}</b></p>
+      <form method="post" action="/qt/anh-trang-chu/sua" class="anh-ct">
+        <input type="hidden" name="ten" value="{{$a.Ten}}">
+        <input type="hidden" name="viec" value="chu-thich">
+        <input name="chu_thich" value="{{$a.ChuThich}}" maxlength="120" placeholder="Chú thích">
+        <button class="phu nho" type="submit">Lưu</button>
+      </form>
+      <div class="anh-nut">
+        <form method="post" action="/qt/anh-trang-chu/sua">
+          <input type="hidden" name="ten" value="{{$a.Ten}}">
+          <input type="hidden" name="viec" value="len">
+          <button class="phu nho" type="submit" {{if eq $i 0}}disabled{{end}}>↑</button>
+        </form>
+        <form method="post" action="/qt/anh-trang-chu/sua">
+          <input type="hidden" name="ten" value="{{$a.Ten}}">
+          <input type="hidden" name="viec" value="xuong">
+          <button class="phu nho" type="submit" {{if eq (cong $i 1) (len $.Anh)}}disabled{{end}}>↓</button>
+        </form>
+        {{/* Chỗ treo: một nút bập bênh chứ không phải ô chọn, vì chỉ có hai
+             nơi. Nhãn nút là nơi ảnh SẼ tới, không phải nơi nó đang ở. */}}
+        <form method="post" action="/qt/anh-trang-chu/sua">
+          <input type="hidden" name="ten" value="{{$a.Ten}}">
+          <input type="hidden" name="viec" value="noi">
+          <input type="hidden" name="noi" value="{{if $a.Noi}}{{else}}tram{{end}}">
+          <button class="phu nho" type="submit">→ {{if $a.Noi}}Trang chủ{{else}}Về chúng tôi{{end}}</button>
+        </form>
+        <form method="post" action="/qt/anh-trang-chu/sua"
+              onsubmit="return confirm('Xoá ảnh này khỏi trang chủ?')">
+          <input type="hidden" name="ten" value="{{$a.Ten}}">
+          <input type="hidden" name="viec" value="xoa">
+          <button class="phu nho" type="submit">Xoá</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {{end}}
+</div>
+{{else}}
+<p class="mo" style="margin-top:26px">
+  Chưa có ảnh nào. Trang chủ đang chạy bản vẽ cây vợt.
+</p>
+{{end}}
+
+<p class="nho mo" style="margin-top:22px;max-width:62ch">
+  Ảnh lưu trong <code>data/anh-trang-chu/</code>, thứ tự và chú thích trong
+  <code>data/anh-trang-chu.yaml</code>. Đổi là có hiệu lực ngay, không cần chạy
+  lại server.
+</p>
+
+{{template "qt-chan" .}}
+{{end}}

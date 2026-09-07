@@ -1,0 +1,123 @@
+{{define "qt-kho-vattu.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang">
+  <h1>Danh mục &amp; định mức</h1>
+  <div class="phai"><a class="nut nut-vien" href="/qt/kho">← Tồn kho</a></div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<div class="the-nhom">
+  <h3>Vật tư</h3>
+  <div class="noi doc" style="padding-bottom:0">
+    <p class="nho mo" style="margin:0">
+      Bảng này chỉ khai <b>có những thứ gì</b> — không có cột tồn, vì tồn cộng từ
+      phiếu. Ngưỡng tối thiểu là mức chạm tới thì trang kho kêu cần mua.
+      Thứ không dùng nữa thì để <b>Ngừng</b>, đừng xoá dòng: phiếu cũ còn trỏ vào nó.
+    </p>
+  </div>
+  <form method="post" action="/qt/kho/vat-tu">
+    <div class="cuon">
+      <table class="bang">
+        <thead>
+          <tr>
+            <th style="min-width:200px">Tên</th><th style="width:110px">Đơn vị</th>
+            <th style="width:130px">Tối thiểu</th><th style="min-width:150px">Nhà cung cấp</th>
+            <th style="min-width:150px">Ghi chú</th><th style="width:120px">Dùng nữa?</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{range .VatTu}}
+          <tr>
+            <td>
+              <input type="hidden" name="ma" value="{{.Ma}}">
+              <input name="ten" maxlength="120" value="{{.Ten}}" style="width:100%">
+              <div class="nho mo so">{{.Ma}}</div>
+            </td>
+            <td><input name="don_vi" maxlength="20" value="{{.DonVi}}" style="width:100%"></td>
+            <td><input name="ton_toi_thieu" inputmode="decimal" value="{{if .TonToiThieu}}{{sl .TonToiThieu}}{{end}}" style="width:100%"></td>
+            <td><input name="nha_cung_cap" maxlength="120" value="{{.NhaCungCap}}" style="width:100%"></td>
+            <td><input name="ghi_chu" maxlength="200" value="{{.GhiChu}}" style="width:100%"></td>
+            <td>
+              <select name="ngung" style="width:100%">
+                <option value="0" {{if not .Ngung}}selected{{end}}>Đang dùng</option>
+                <option value="1" {{if .Ngung}}selected{{end}}>Ngừng</option>
+              </select>
+            </td>
+          </tr>
+          {{end}}
+          {{range lap 3}}
+          <tr>
+            <td><input type="hidden" name="ma" value=""><input name="ten" maxlength="120" placeholder="thêm vật tư mới" style="width:100%"></td>
+            <td><input name="don_vi" maxlength="20" placeholder="mét, cuộn, cái" style="width:100%"></td>
+            <td><input name="ton_toi_thieu" inputmode="decimal" style="width:100%"></td>
+            <td><input name="nha_cung_cap" maxlength="120" style="width:100%"></td>
+            <td><input name="ghi_chu" maxlength="200" style="width:100%"></td>
+            <td>
+              <select name="ngung" style="width:100%">
+                <option value="0" selected>Đang dùng</option>
+                <option value="1">Ngừng</option>
+              </select>
+            </td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+    </div>
+    <div class="noi"><button type="submit">Lưu danh mục</button></div>
+  </form>
+</div>
+
+<div class="the-nhom">
+  <h3>Định mức — mỗi dịch vụ ăn hết bao nhiêu</h3>
+  <div class="noi doc" style="padding-bottom:0">
+    <p class="nho mo" style="margin:0">
+      Khai ở đây để khi đóng đơn, phiếu xuất kho được <b>dựng sẵn</b> cho thợ sửa
+      lại rồi bấm xác nhận. Không có chuyện máy tự trừ kho theo mấy con số này —
+      vợt nào cũng ăn khác nhau, số dựng sẵn chỉ để đỡ phải gõ.
+    </p>
+  </div>
+  {{if .VatTu}}
+  <form method="post" action="/qt/kho/dinh-muc" class="noi">
+    {{$dm := .DinhMuc}}
+    {{$vt := .VatTu}}
+    {{range .DichVu}}
+    {{$mad := .Ma}}
+    <div style="border-top:1px solid var(--vien);padding:14px 0">
+      <div class="nhan-nho" style="margin-bottom:8px">{{.Ten}}</div>
+      {{range index $dm $mad}}
+      <div class="hang" style="margin:0 0 6px">
+        <input type="hidden" name="dv" value="{{$mad}}">
+        <label style="margin:0">Vật tư
+          <select name="vt">
+            <option value="">— bỏ dòng này —</option>
+            {{$mv := .MaVatTu}}
+            {{range $vt}}<option value="{{.Ma}}" {{if eq .Ma $mv}}selected{{end}}>{{.Ten}} ({{.DonVi}})</option>{{end}}
+          </select>
+        </label>
+        <label style="margin:0" class="co-hep">Số lượng<input name="sl" inputmode="decimal" value="{{slo .SoLuong}}"></label>
+      </div>
+      {{end}}
+      <div class="hang" style="margin:0">
+        <input type="hidden" name="dv" value="{{$mad}}">
+        <label style="margin:0">Vật tư
+          <select name="vt">
+            <option value="">— thêm dòng —</option>
+            {{range $vt}}<option value="{{.Ma}}">{{.Ten}} ({{.DonVi}})</option>{{end}}
+          </select>
+        </label>
+        <label style="margin:0" class="co-hep">Số lượng<input name="sl" inputmode="decimal"></label>
+      </div>
+    </div>
+    {{end}}
+    <div class="hang-nut"><button type="submit">Lưu định mức</button></div>
+  </form>
+  {{else}}
+  <div class="noi"><p class="nho mo" style="margin:0">Khai vật tư ở bảng trên trước đã.</p></div>
+  {{end}}
+</div>
+
+{{template "qt-chan" .}}
+{{end}}

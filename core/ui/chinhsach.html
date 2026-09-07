@@ -1,0 +1,58 @@
+{{define "chinhsach.html"}}
+{{template "html-dau" .}}
+
+<section class="hero">
+  <div class="khung hep">
+    <div class="nhan-nho">{{nd "chinhsach.nhan"}}</div>
+    <h1 style="margin-top:16px">{{nd "chinhsach.h1"}}</h1>
+    <p class="dan">{{ndx "chinhsach.dan" "ten" .Brand.Ten}}</p>
+  </div>
+</section>
+
+<section>
+  <div class="khung hep doc-lon">
+    <div class="the">
+      <h3>{{nd "chinhsach.m1.h3"}}</h3>
+      <ul style="margin:12px 0 0;padding-left:20px;display:grid;gap:8px">
+        <li>{{ndd "chinhsach.m1.y1"}}</li>
+        <li>{{ndd "chinhsach.m1.y2"}}</li>
+        <li>{{ndd "chinhsach.m1.y3"}}</li>
+      </ul>
+    </div>
+
+    <div class="the">
+      <h3>{{nd "chinhsach.m2.h3"}}</h3>
+      <p class="mo" style="margin-top:10px">{{ndd "chinhsach.m2.chu"}}</p>
+    </div>
+
+    <div class="the">
+      <h3>{{nd "chinhsach.m3.h3"}}</h3>
+      <p class="mo" style="margin-top:10px">{{ndd "chinhsach.m3.chu"}}</p>
+    </div>
+
+    <div class="the">
+      <h3>{{nd "chinhsach.m4.h3"}}</h3>
+      <p class="mo" style="margin-top:10px">{{ndd "chinhsach.m4.chu"}}</p>
+    </div>
+
+    <div class="the">
+      <h3>{{nd "chinhsach.m5.h3"}}</h3>
+      <p class="mo" style="margin-top:10px">{{ndd "chinhsach.m5.chu-1"}}</p>
+      <p class="nho mo" style="margin-top:10px">{{ndd "chinhsach.m5.chu-2"}}</p>
+    </div>
+
+    {{/* Mục này nói về đường truyền — thứ có thể thôi cần nói nữa. Kendy xoá
+         trắng hai ô ấy trong /qt/noi-dung là mục biến mất hẳn, chứ không để
+         lại một cái thẻ trắng có viền nằm trơ cuối trang. */}}
+    {{$m6h := nd "chinhsach.m6.h3"}}{{$m6c := nd "chinhsach.m6.chu"}}
+    {{if or $m6h $m6c}}
+    <div class="the">
+      {{if $m6h}}<h3>{{nd "chinhsach.m6.h3"}}</h3>{{end}}
+      {{if $m6c}}<p class="mo" style="margin-top:10px">{{ndd "chinhsach.m6.chu"}}</p>{{end}}
+    </div>
+    {{end}}
+  </div>
+</section>
+
+{{template "html-chan" .}}
+{{end}}

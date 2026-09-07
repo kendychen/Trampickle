@@ -1,0 +1,29 @@
+# --- BÍ MẬT: không bao giờ commit ---------------------------------------
+# data/bi-mat.yaml chứa khoá Gemini và khoá Resend.
+.env
+.env.*
+data/bi-mat.yaml
+
+# --- Dữ liệu vận hành ----------------------------------------------------
+# data/ chỉ sống trên VPS: đơn hàng, sổ tiền, bài viết, tài khoản.
+# Deploy chỉ đẩy binary, không bao giờ đồng bộ thư mục này.
+data/
+!data/.gitkeep
+
+# --- Binary --------------------------------------------------------------
+tramvot
+tramvot.exe
+tramvotdesktop.exe
+build/
+desktop/build/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# --- Tạm -----------------------------------------------------------------
+*.tmp
+*.log
+*.test
+.DS_Store
+Thumbs.db

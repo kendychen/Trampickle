@@ -1,0 +1,122 @@
+{{define "qt-giaodien.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang"><h1>Giao diện</h1></div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<p class="mo" style="max-width:62ch">
+  Đổi mặt tiền của web khách. Không đụng đến nội dung, giá, hay đơn hàng: vẫn
+  đúng từng ấy chữ, từng ấy khối, đúng thứ tự đó. Khác nhau ở màu, ở dáng chữ,
+  và ở cách xếp — mỗi bộ dựng lại toàn bộ trang chủ theo một kiểu riêng, từ
+  tấm đầu trang xuống tới chân trang, nên chiều dài trang cũng khác nhau.
+  Bấm chọn rồi lưu, mở web khách ở tab khác để xem.
+</p>
+
+<form method="post" action="/qt/giao-dien" style="max-width:760px;margin-top:22px">
+  <div class="chon-gd">
+    {{range .DanhSach}}
+    <label class="gd-o{{if eq .Ma $.DangDung}} dang-dung{{end}}">
+      <input type="radio" name="theme" value="{{.Ma}}" {{if eq .Ma $.DangDung}}checked{{end}}>
+      <span class="gd-mau gd-mau-{{.Ma}}"></span>
+      <span class="gd-chu">
+        <b>{{.Ten}}</b>
+        {{if eq .Ma $.DangDung}}<span class="chip chip-nhan">đang dùng</span>{{end}}
+        <span class="nho mo">{{.MoTa}}</span>
+      </span>
+    </label>
+    {{end}}
+  </div>
+  <div style="display:flex;gap:12px;align-items:center;margin-top:20px;flex-wrap:wrap">
+    <button type="submit">Dùng giao diện này</button>
+    <a class="nho" href="/" target="_blank">Mở trang khách ở tab khác ↗</a>
+  </div>
+</form>
+
+<p class="nho mo" style="margin-top:18px;max-width:62ch">
+  Lựa chọn ghi vào <code>data/giao-dien.yaml</code> và có hiệu lực ngay, không
+  cần chạy lại server. Khách đang mở sẵn trang thì phải tải lại mới thấy.
+</p>
+
+<h2 style="margin-top:38px">Logo và biểu tượng tab</h2>
+<p class="mo" style="max-width:62ch">
+  Chưa tải gì thì trang dùng logo T-PIC vẽ sẵn trong code — bản đó tự đổi màu
+  theo giao diện đang bật. Tải tệp riêng lên thì màu là màu của tệp, giao diện
+  không đụng vào được nữa; nền tối mà logo chữ đen là không đọc ra, nên tệp
+  nên có nền trong suốt hoặc chọn màu nhìn được trên cả nền sáng lẫn nền tối.
+  Nhận SVG, PNG, WEBP, JPG (biểu tượng tab nhận thêm ICO), dưới 2 MB.
+</p>
+
+<div class="chon-gd" style="max-width:760px;margin-top:18px">
+  <div class="gd-o" style="display:block">
+    <b>Logo đầu trang</b>
+    <p class="nho mo" style="margin:6px 0 12px">
+      Hiện cạnh tên trạm, ở cả trang khách lẫn trang quản lý. Cao 34px, nên
+      dùng bản NGANG; bản vuông sẽ bị thu bé xíu.
+    </p>
+    <div style="background:#0e1417;border-radius:8px;padding:14px 16px;display:flex;align-items:center;min-height:64px">
+      {{if .LogoURL}}<img src="{{.LogoURL}}" alt="Logo đang dùng" style="height:34px;width:auto;max-width:240px">
+      {{else}}{{template "logo-dau"}}{{end}}
+    </div>
+    <p class="nho mo" style="margin:10px 0 0">
+      {{if .LogoTen}}Đang dùng tệp <code>data/logo/{{.LogoTen}}</code>.
+      {{else}}Đang dùng bản vẽ sẵn trong code.{{end}}
+    </p>
+    <form method="post" action="/qt/giao-dien/logo" enctype="multipart/form-data"
+          style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px">
+      <input type="hidden" name="loai" value="logo">
+      <input type="file" name="tep" accept=".svg,.png,.webp,.jpg,.jpeg,image/*" required>
+      <button type="submit">Tải lên</button>
+    </form>
+    {{if .LogoTen}}
+    <form method="post" action="/qt/giao-dien/logo-xoa" style="margin-top:10px">
+      <input type="hidden" name="loai" value="logo">
+      <button class="phu nho" type="submit">Bỏ tệp, quay về logo mặc định</button>
+    </form>
+    {{end}}
+  </div>
+
+  <div class="gd-o" style="display:block">
+    <b>Biểu tượng tab (favicon)</b>
+    <p class="nho mo" style="margin:6px 0 12px">
+      Hình nhỏ trên tab trình duyệt và khi khách lưu trang. Vuông, tối thiểu
+      32×32; ảnh chữ nhật sẽ bị bóp méo.
+    </p>
+    <div style="background:#0e1417;border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:14px;min-height:64px">
+      <img src="{{.IconURL}}" alt="Biểu tượng đang dùng" style="height:32px;width:32px;object-fit:contain">
+      <img src="{{.IconURL}}" alt="" style="height:16px;width:16px;object-fit:contain">
+      <span class="nho mo">32px và 16px — cỡ 16 mới là cỡ khách thật sự nhìn thấy.</span>
+    </div>
+    <p class="nho mo" style="margin:10px 0 0">
+      {{if .IconTen}}Đang dùng tệp <code>data/logo/{{.IconTen}}</code>.
+      {{else}}Đang dùng <code>favicon.svg</code> nhúng trong code.{{end}}
+    </p>
+    <p class="nho mo" style="margin:8px 0 0">
+      Tệp vuông từ 512px trở lên thì Android lấy luôn làm icon màn hình chính.
+      Nhớ để nền phủ kín khung và chừa lề quanh hình khoảng một phần mười cạnh
+      — máy Android cắt icon thành hình tròn, hình sát mép sẽ bị xén mất.
+    </p>
+    <form method="post" action="/qt/giao-dien/logo" enctype="multipart/form-data"
+          style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px">
+      <input type="hidden" name="loai" value="bieu-tuong">
+      <input type="file" name="tep" accept=".svg,.png,.webp,.jpg,.jpeg,.ico,image/*" required>
+      <button type="submit">Tải lên</button>
+    </form>
+    {{if .IconTen}}
+    <form method="post" action="/qt/giao-dien/logo-xoa" style="margin-top:10px">
+      <input type="hidden" name="loai" value="bieu-tuong">
+      <button class="phu nho" type="submit">Bỏ tệp, quay về biểu tượng mặc định</button>
+    </form>
+    {{end}}
+  </div>
+</div>
+
+<p class="nho mo" style="margin-top:18px;max-width:62ch">
+  Tệp ghi vào <code>data/logo/</code>, không nằm trong binary — chép chương
+  trình sang máy khác thì phải chép cả thư mục <code>data/</code>, không thì
+  logo quay về bản mặc định.
+</p>
+
+{{template "qt-chan" .}}
+{{end}}

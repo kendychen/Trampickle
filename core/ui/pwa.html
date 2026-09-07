@@ -1,0 +1,234 @@
+{{/* Các thẻ khai báo app, nhét vào <head> của MỌI trang. Khách hay vào trang
+     chủ trước chứ ít ai gõ thẳng /app, nên lời mời cài phải bám theo cả web
+     chứ không riêng màn hình app. */}}
+{{define "pwa-dau"}}
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="{{mauNhan .Theme}}">
+{{/* iOS bỏ qua manifest. Ba thẻ dưới đây là cách duy nhất bảo Safari mở toàn
+     màn hình và lấy đúng tên khi khách tự thêm vào màn hình chính. */}}
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="{{.Brand.Ten}}">
+<link rel="apple-touch-icon" href="{{iconURL}}">
+{{end}}
+
+
+{{/* Thanh đáy kiểu app. Dùng ở CẢ /app lẫn web trên điện thoại: khách vào
+     bằng đường nào cũng thấy một bộ điều khiển như nhau, không phải học lại.
+     Trên màn hình rộng thì ẩn đi, vì ở đó đã có nav trên đầu.
+
+     Bốn nút dẫn vào /app/... chứ không vào trang web tương ứng. Cùng một dữ
+     liệu, khác cái vỏ: bản /app bỏ nav bảy mục và chân trang bốn cột, đổi lại
+     ô nhập to bằng ngón tay. Bản web vẫn còn nguyên ở /tra-cuu, /quy-trinh
+     cho Google và cho người ngồi máy tính. */}}
+{{define "thanh-app"}}
+<nav class="app-chan" aria-label="Thanh điều hướng">
+  <a href="/app"{{if eq .Trang "app"}} class="dang"{{end}}>{{template "bt-nha"}}<span>{{nd "app.nut.trang-chu"}}</span></a>
+  <a href="/app/tra-cuu"{{if eq .Trang "tra-cuu"}} class="dang"{{end}}>{{template "bt-tim"}}<span>{{nd "app.nut.tra-cuu"}}</span></a>
+
+  {{/* Nút giữa nhô lên: thứ khách cần nhất là gọi được người sửa. In thẳng số
+       ra dưới nút chứ không để chữ "Liên hệ" — khách nhìn thấy số thật thì mới
+       tin là gọi được, và ai muốn lưu danh bạ cũng đọc được luôn. Bấm là máy
+       quay số. Chưa điền số thì lùi về chữ và dẫn sang trang liên hệ chứ không
+       để nút chết. */}}
+  <a class="app-chan-tron" href="{{if .LienHe.DienThoai}}tel:{{soGoi .LienHe.DienThoai}}{{else}}/lien-he{{end}}">
+    <span class="tron">{{template "bt-goi"}}</span>
+    {{if .LienHe.DienThoai}}
+    <span class="app-chan-so">{{soGoi .LienHe.DienThoai}}</span>
+    {{else}}
+    <span>{{nd "app.nut.lien-he"}}</span>
+    {{end}}
+  </a>
+
+  <a href="/app/gui-anh"{{if eq .Trang "gui-anh"}} class="dang"{{end}}>{{template "bt-anh"}}<span>{{nd "app.nut.gui-anh"}}</span></a>
+  {{if .LienHe.Zalo}}
+  <a href="https://zalo.me/{{.LienHe.Zalo}}">{{template "bt-chat"}}<span>{{nd "app.nut.zalo"}}</span></a>
+  {{else}}
+  <a href="/app/quy-trinh"{{if eq .Trang "quy-trinh"}} class="dang"{{end}}>{{template "bt-sach"}}<span>{{nd "app.nut.quy-trinh"}}</span></a>
+  {{end}}
+</nav>
+{{end}}
+
+
+{{/* Thẻ mời cài + đăng ký service worker. Đặt cuối <body>. */}}
+{{define "pwa-chan"}}
+<div class="moi-nen" id="moi-nen" hidden></div>
+<div class="moi-cai" id="moi-cai" role="dialog" aria-modal="true" aria-labelledby="moi-ten" hidden>
+  <button class="moi-dong" id="moi-thoi" aria-label="{{nd "caiapp.bo-qua"}}">&times;</button>
+  <div class="moi-anh">{{template "logo-o-dau"}}</div>
+  <b id="moi-ten">{{ndx "caiapp.tieu-de" "ten" .Brand.Ten}}</b>
+  <span id="moi-mo-ta">{{nd "caiapp.chu"}}</span>
+
+  <button class="nut nut-chinh moi-nut" id="moi-ok">{{nd "caiapp.nut"}}</button>
+
+  {{/* Nhánh iPhone. Safari không có API cài — hai bước dưới đây là đường duy
+       nhất, nên vẽ đúng cái biểu tượng Chia sẻ ra thay vì tả bằng chữ. */}}
+  <div class="moi-ios" id="moi-ios" hidden>
+    <p><span class="moi-so">1</span>{{nd "caiapp.ios-b1"}} <span class="moi-ios-bt">{{template "bt-chia-se"}}</span></p>
+    <p><span class="moi-so">2</span>{{nd "caiapp.ios-b2"}}</p>
+    <div class="moi-mui" aria-hidden="true">↓</div>
+  </div>
+
+  <button class="moi-sau" id="moi-sau">{{nd "caiapp.bo-qua"}}</button>
+</div>
+
+<script>
+(function () {
+  var KHOA_BO = 'tram-khong-cai';
+  var NGAY_IM = 7;   // bấm bỏ qua thì im bằng ấy ngày, đừng hỏi lại mỗi lần vào
+
+  var KHOA_CAI = 'tram-da-cai';
+
+  // Cửa sổ app thì không có thanh địa chỉ. Chrome/Edge báo qua display-mode,
+  // Safari qua navigator.standalone. Bắt cả fullscreen lẫn minimal-ui: có máy
+  // Android mở app ở hai chế độ ấy chứ không đúng standalone, mà khách thì
+  // vẫn đang đứng trong app.
+  function trongApp() {
+    var m = window.matchMedia;
+    if (m && (m('(display-mode: standalone)').matches ||
+              m('(display-mode: fullscreen)').matches ||
+              m('(display-mode: minimal-ui)').matches)) { return true; }
+    return window.navigator.standalone === true;
+  }
+
+  // Đã cài rồi thì thôi, và nhớ bền chứ không hỏi lại mỗi lần. Lý do phải nhớ:
+  // trang chưa có HTTPS thì Chrome không cài app thật, nó chỉ tạo lối tắt —
+  // bấm icon ngoài màn hình chính là mở ra tab trình duyệt bình thường, không
+  // display-mode, không navigator.standalone, không dấu hiệu nào cả. Cái cờ
+  // này là thứ duy nhất phân biệt được khách đã cài với khách mới vào.
+  function daCai() {
+    if (trongApp()) { return true; }
+    try { return localStorage.getItem(KHOA_CAI) === '1'; } catch (e) { return false; }
+  }
+  function ghiDaCai() {
+    try { localStorage.setItem(KHOA_CAI, '1'); } catch (e) {}
+  }
+
+  // Máy cầm tay hay máy để bàn. Hỏi bằng con trỏ chứ không bằng bề ngang màn
+  // hình: người ngồi máy tính thu nhỏ cửa sổ lại vẫn là người ngồi máy tính,
+  // còn iPad để ngang thì rộng hơn cả cái cửa sổ ấy mà vẫn là máy cầm tay.
+  function laMayCam() {
+    // Cửa sổ rộng quá thì dứt khoát không phải điện thoại. Chặn bằng bề ngang
+    // trước, vì đây là điều kiện không trình duyệt nào cãi được: laptop màn
+    // hình cảm ứng, máy tính bảng cắm bàn phím, cửa sổ mở chế độ giả lập điện
+    // thoại trong DevTools — mấy thứ đó đều khai là "chạm được".
+    var rong = window.innerWidth || document.documentElement.clientWidth || 0;
+    if (rong > 1024) { return false; }
+    var m = window.matchMedia;
+    if (m) { return m('(pointer: coarse)').matches; }
+    return (navigator.maxTouchPoints || 0) > 0;   // trình duyệt cũ không biết pointer
+  }
+  function dangIm() {
+    try {
+      var t = parseInt(localStorage.getItem(KHOA_BO) || '0', 10);
+      return t > 0 && (Date.now() - t) < NGAY_IM * 864e5;
+    } catch (e) { return false; }
+  }
+  function imDi() {
+    try { localStorage.setItem(KHOA_BO, String(Date.now())); } catch (e) {}
+  }
+
+  var the = document.getElementById('moi-cai');
+  var nen = document.getElementById('moi-nen');
+  var nutOK = document.getElementById('moi-ok');
+  var nutThoi = document.getElementById('moi-thoi');
+  var nutSau = document.getElementById('moi-sau');
+  var khoiIOS = document.getElementById('moi-ios');
+  if (!the) { return; }
+
+  function dong() { the.hidden = true; nen.hidden = true; imDi(); }
+  nutThoi.addEventListener('click', dong);
+  nutSau.addEventListener('click', dong);
+  nen.addEventListener('click', dong);
+
+  // --- Service worker ------------------------------------------------
+  // Chỉ chạy trên https:// và localhost. Chỗ khác trình duyệt không có
+  // navigator.serviceWorker, nên nhánh này im lặng bỏ qua.
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('/sw.js').catch(function () {});
+    });
+  }
+
+  // Đang ở trong app rồi thì mời cài nữa là vô nghĩa — và trên chính màn hình
+  // app cũng không mời, chỗ đó là để làm việc chứ không phải để quảng cáo.
+  // Nhớ lại lần này để lần sau khách mở bằng lối tắt cũng không bị hỏi.
+  if (trongApp()) { ghiDaCai(); }
+  if (daCai() || document.body.classList.contains('la-app')) { return; }
+
+  // Máy tính thì thôi. Cái app này để cầm tay: một cột, thanh đáy, ô nhập cỡ
+  // ngón tay. Người ngồi máy tính đã có nguyên bản web với nav bảy mục — mời
+  // họ cài một cửa sổ điện thoại thu nhỏ lên màn hình 24 inch là mời sai
+  // người, mà thẻ vẫn cứ chặn giữa màn hình.
+  if (!laMayCam()) { return; }
+
+  // --- Android / Chrome: mời cài thật --------------------------------
+  var loiMoi = null;
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    loiMoi = e;
+    if (dangIm()) { return; }
+    // Bật hộp thoại của máy luôn. Trình duyệt nào chặn vì khách chưa chạm vào
+    // gì thì rơi xuống thẻ mời có nút — vẫn một cú bấm là xong.
+    moiNgay();
+  });
+
+  // Cài xong thì đưa luôn sang màn hình app, đừng để khách đứng lại ở trang
+  // web rồi tự đi tìm icon vừa hiện ra.
+  window.addEventListener('appinstalled', function () {
+    ghiDaCai();
+    the.hidden = true; nen.hidden = true;
+    location.href = '/app';
+  });
+
+  function moiNgay() {
+    if (!loiMoi) { return; }
+    var p;
+    try { p = loiMoi.prompt(); } catch (e) { hienThe(); return; }
+    if (!p || !p.then) { hienThe(); return; }
+    p.then(function () {
+      return loiMoi.userChoice;
+    }).then(function (kq) {
+      loiMoi = null;
+      the.hidden = true; nen.hidden = true;
+      if (kq && kq.outcome === 'dismissed') { imDi(); }
+    }).catch(function () { hienThe(); });
+  }
+
+  function hienThe() {
+    if (dangIm()) { return; }
+    the.hidden = false;
+    nen.hidden = false;
+  }
+
+  nutOK.addEventListener('click', function () {
+    if (loiMoi) { moiNgay(); return; }
+    // Nhánh iPhone: chỉ xong đường đi là hết phần việc của mình. Ghi im luôn —
+    // khách xem hướng dẫn rồi thì lần vào sau không có gì để nói thêm, mà thẻ
+    // vẫn nhảy ra chặn giữa màn hình thì thành phiền.
+    hienIOS();
+    imDi();
+  });
+
+  function hienIOS() {
+    document.getElementById('moi-mo-ta').textContent = {{nd "caiapp.ios"}};
+    khoiIOS.hidden = false;
+    nutOK.hidden = true;
+  }
+
+  // --- iPhone / Safari -----------------------------------------------
+  // Apple không cho web tự gọi hộp thoại cài; tra lại tháng 9/2026 vẫn thế.
+  // Chỉ hiện được lối đi: nút Chia sẻ → Thêm vào Màn hình chính. Ngày nào
+  // Safari mở API ra thì nhánh beforeinstallprompt ở trên tự lo, xoá chỗ này
+  // đi là xong.
+  var ua = navigator.userAgent || '';
+  var laIOS = /iPad|iPhone|iPod/.test(ua) ||
+              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var laSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
+  if (laIOS && laSafari) {
+    hienIOS();
+    hienThe();
+  }
+})();
+</script>
+{{end}}

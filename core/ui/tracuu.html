@@ -1,0 +1,163 @@
+{{define "tracuu.html"}}
+{{template "html-dau" .}}
+
+<section class="hero">
+  <div class="khung">
+    <div class="nhan-nho">{{nd "tracuu.nhan"}}</div>
+    <h1 style="margin-top:16px">{{nd "tracuu.h1"}}</h1>
+    <p class="dan">{{ndd "tracuu.dan"}}</p>
+  </div>
+</section>
+
+<section>
+  <div class="khung doc-lon">
+    {{if .Loi}}<div class="bao bao-loi" style="margin:0">{{.Loi}}</div>{{end}}
+
+    <form method="post" action="/tra-cuu" class="the" style="max-width:620px">
+      <div class="hang">
+        <label>{{nd "tracuu.ma-nhan"}}<input name="ma" value="{{.Ma}}" placeholder="{{nd "tracuu.ma-goi-y"}}" maxlength="40" required></label>
+        <label class="co-hep">{{nd "tracuu.dt-nhan"}}<input name="dien_thoai" value="{{.DienThoai}}" inputmode="numeric" maxlength="12" required></label>
+      </div>
+      <button type="submit">{{nd "tracuu.nut"}}</button>
+    </form>
+
+    {{/* Yêu cầu gửi ảnh chưa thành đơn: chưa có thợ, chưa có tiền, chưa có
+         ngày hẹn. Hiện đúng những gì có thật, đừng dựng khung đơn rỗng rồi
+         để khách nhìn một loạt dấu gạch ngang. */}}
+    {{if and .YeuCau (not .Don)}}
+    {{with .YeuCau}}
+    <div class="the-nhom" style="max-width:620px">
+      <h3>{{nd "tracuu.yc.tieu"}} <span class="so">{{.Ma}}</span> {{nd "tracuu.yc.ngay"}} {{ngaydep .Ngay}}</h3>
+      <div class="noi doc">
+        <div>
+          {{if .DaXuLy}}
+            <span class="chip chip-nhan">{{nd "tracuu.yc.xong-chip"}}</span>
+            <p style="margin-top:10px">{{ndd "tracuu.yc.xong-chu"}}</p>
+          {{else}}
+            <span class="chip chip-cho">{{nd "tracuu.yc.cho-chip"}}</span>
+            <p style="margin-top:10px">{{ndd "tracuu.yc.cho-chu"}}</p>
+          {{end}}
+        </div>
+
+        <dl class="kv">
+          {{if .Ten}}<dt>{{nd "tracuu.yc.k-ten"}}</dt><dd>{{.Ten}}</dd>{{end}}
+          {{if .VotHang}}<dt>{{nd "tracuu.k-vot"}}</dt><dd>{{.VotHang}}</dd>{{end}}
+          {{if .MoTa}}<dt>{{nd "tracuu.yc.k-mota"}}</dt><dd>{{.MoTa}}</dd>{{end}}
+          {{if .Tep}}<dt>{{nd "tracuu.yc.k-tep"}}</dt><dd>{{len .Tep}} {{nd "tracuu.yc.tep-dv"}}</dd>{{end}}
+        </dl>
+      </div>
+    </div>
+    <p class="nho mo" style="margin-top:16px;max-width:62ch">{{ndd "tracuu.yc.duoi"}}</p>
+    {{end}}
+    {{end}}
+
+    {{with .Don}}
+    <div class="ct-2cot">
+      <div>
+        <div class="the-nhom">
+          <h3>{{nd "tracuu.don.tieu"}} {{.Ma}} {{nd "tracuu.don.ngay"}} {{ngaydep .Ngay}}</h3>
+          <div class="noi doc">
+            {{$t := tt .TrangThai}}
+            <div>
+              <span class="chip chip-{{$t.Mau}}">{{$t.Ten}}</span>
+              <p style="margin-top:10px">{{$t.TenKhach}}</p>
+            </div>
+
+            <dl class="kv">
+              {{if .VotHang}}<dt>{{nd "tracuu.k-vot"}}</dt><dd>{{.VotHang}}</dd>{{end}}
+              {{if .ChanDoan}}<dt>{{nd "tracuu.don.k-chan"}}</dt><dd>{{.ChanDoan}}</dd>{{end}}
+              {{if .HenTraNgay}}<dt>{{nd "tracuu.don.k-hen"}}</dt><dd>{{ngaydep .HenTraNgay}}</dd>{{end}}
+              {{if .BaoHanhDen}}<dt>{{nd "tracuu.don.k-bh"}}</dt><dd>{{ngaydep .BaoHanhDen}}</dd>{{end}}
+            </dl>
+            {{if $.YeuCau}}
+            <p class="nho mo">{{nd "tracuu.don.tu-yc-1"}} <span class="so">{{$.YeuCau.Ma}}</span> {{nd "tracuu.don.tu-yc-2"}} {{ngaydep $.YeuCau.Ngay}}.</p>
+            {{end}}
+          </div>
+        </div>
+
+        {{if .LichSu}}
+        <div class="the-nhom">
+          <h3>{{nd "tracuu.don.dien-bien"}}</h3>
+          <div class="noi">
+            <div class="moc">
+              {{range .LichSu}}
+              <div>
+                <div class="khi">{{.Luc}}</div>
+                {{(tt .TrangThai).TenKhach}}
+              </div>
+              {{end}}
+            </div>
+          </div>
+        </div>
+        {{end}}
+      </div>
+
+      <div>
+        {{if .DongTien}}
+        <div class="the-nhom">
+          <h3>{{nd "tracuu.tien.h3"}}</h3>
+          <div class="cuon">
+            <table class="bang">
+              <tbody>
+              {{range .DongTien}}<tr><td>{{.Ten}}</td><td class="p">{{tien .SoTien}}</td></tr>{{end}}
+              <tr><td><b>{{nd "tracuu.tien.tong"}}</b></td><td class="p">{{tien .TongTien}}</td></tr>
+              <tr><td class="mo">{{nd "tracuu.tien.da-thu"}}</td><td class="p mo">{{tien .DaThu}}</td></tr>
+              <tr><td><b>{{nd "tracuu.tien.con"}}</b></td><td class="p">{{tien .ConNo}}</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {{end}}
+
+        <div class="the">
+          <h3>{{nd "tracuu.sai.h3"}}</h3>
+          <p class="nho mo" style="margin-top:8px">{{ndd "tracuu.sai.chu"}}</p>
+          <p style="margin-top:14px"><a class="nut nut-vien" href="/lien-he">{{nd "chung.nut.lien-he"}}</a></p>
+        </div>
+      </div>
+    </div>
+
+    {{/* Ảnh trước/sau. Để ngoài .ct-2cot chứ không nhét vào một cột: hai
+         hàng ảnh chỉ so sánh được khi chúng cùng bề ngang. Link ảnh đi qua
+         token của đơn, không qua /qt/anh — khách không đăng nhập được. */}}
+    {{if .Anh}}
+    {{$t := .Token}}{{$m := .Ma}}
+    <div class="the-nhom" style="margin-top:24px">
+      <h3>{{nd "tracuu.anh.h3"}}</h3>
+      <div class="noi doc">
+        {{if .AnhTruoc}}
+        <div>
+          <div class="nhan-nho">{{nd "tracuu.anh.truoc"}}</div>
+          <div class="anh-luoi" style="margin-top:10px">
+            {{range .AnhTruoc}}
+            <div class="anh-o">
+              <a href="/don-anh/{{$t}}/{{.}}" target="_blank" rel="noopener"><img src="/don-anh/{{$t}}/{{.}}" alt="{{nd "tracuu.anh.alt-truoc"}} — đơn {{$m}}" loading="lazy"></a>
+            </div>
+            {{end}}
+          </div>
+        </div>
+        {{end}}
+
+        {{if .AnhSau}}
+        <div>
+          <div class="nhan-nho">{{nd "tracuu.anh.sau"}}</div>
+          <div class="anh-luoi" style="margin-top:10px">
+            {{range .AnhSau}}
+            <div class="anh-o">
+              <a href="/don-anh/{{$t}}/{{.}}" target="_blank" rel="noopener"><img src="/don-anh/{{$t}}/{{.}}" alt="{{nd "tracuu.anh.alt-sau"}} — đơn {{$m}}" loading="lazy"></a>
+            </div>
+            {{end}}
+          </div>
+        </div>
+        {{end}}
+
+        <p class="nho mo" style="margin:0">{{ndd "tracuu.anh.chu"}}</p>
+      </div>
+    </div>
+    {{end}}
+    {{end}}
+  </div>
+</section>
+
+{{template "html-chan" .}}
+{{end}}

@@ -1,0 +1,151 @@
+{{define "qt-don-moi.html"}}
+{{template "qt-dau" .}}
+{{$d := .Truoc}}
+
+<div class="qt-dau-trang">
+  <h1>Tạo đơn mới</h1>
+  <div class="phai"><a class="nut nut-vien" href="/qt/don">Huỷ</a></div>
+</div>
+
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<form method="post" action="/qt/don-moi" class="doc" style="gap:18px;max-width:820px">
+
+  <div class="the-nhom">
+    <h3>Khách</h3>
+    <div class="noi">
+      <div class="hang">
+        <label>Tên khách<input name="khach_ten" maxlength="100" value="{{if $d}}{{$d.KhachTen}}{{end}}" autofocus></label>
+        <label>Điện thoại / Zalo *
+          <span class="hd">Khách tra cứu đơn bằng 4 số cuối của số này.</span>
+          <input name="khach_lien_he" maxlength="60" value="{{if $d}}{{$d.KhachLienHe}}{{end}}" required>
+        </label>
+      </div>
+      <div class="hang">
+        <label>Nhận vợt qua
+          <select name="kenh_nhan">
+            <option value="truc_tiep">Trực tiếp</option>
+            <option value="ship">Gửi từ xa</option>
+            <option value="web">Từ web</option>
+          </select>
+        </label>
+        {{if .NguoiDung.LaChu}}
+        <label>Thợ phụ trách
+          <select name="tho">
+            {{range .Tho}}<option value="{{.Ten}}" {{if eq .Ten $.NguoiDung.Ten}}selected{{end}}>{{.TenHienThi}}</option>{{end}}
+          </select>
+        </label>
+        {{end}}
+      </div>
+    </div>
+  </div>
+
+  <div class="the-nhom">
+    <h3>Vợt</h3>
+    <div class="noi">
+      <div class="hang">
+        <label>Hãng / đời vợt<input name="vot_hang" maxlength="100" value="{{if $d}}{{$d.VotHang}}{{end}}" placeholder="Joola Perseus 16mm"></label>
+        <label class="co-hep">Giá trị vợt khách khai
+          <span class="hd">Quyết định có nhận gửi xa không.</span>
+          <input name="vot_gia_tri" inputmode="numeric" value="{{if $d}}{{oso $d.VotGiaTri}}{{end}}">
+        </label>
+        <label class="co-hep">Cân trước (g) *
+          <span class="hd">Cân ngay lúc nhận.</span>
+          <input name="can_truoc" inputmode="decimal" value="{{if $d}}{{oso $d.CanTruocG}}{{end}}">
+        </label>
+      </div>
+      <label>Khách mô tả tình trạng<textarea name="tinh_trang" maxlength="3000">{{if $d}}{{$d.TinhTrang}}{{end}}</textarea></label>
+      <label>Thợ chẩn đoán<textarea name="chan_doan" maxlength="3000">{{if $d}}{{$d.ChanDoan}}{{end}}</textarea></label>
+    </div>
+  </div>
+
+  <div class="the-nhom">
+    <h3>Việc và tiền</h3>
+    <div class="noi">
+      <p class="nho mo" style="margin-bottom:14px">
+        Tick dịch vụ là lấy đúng giá trong bảng giá. Việc ngoài bảng thì gõ tay ở dưới.
+      </p>
+      <div class="luoi" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">
+        {{range .DichVu}}
+        <label class="the" style="margin:0;display:flex;align-items:flex-start;gap:10px;padding:12px 14px">
+          <input type="checkbox" name="dv" value="{{.Ma}}" class="tick-dv" data-tien="{{giaso .}}" style="margin-top:4px">
+          <span style="flex:1">
+            <b>{{.Ten}}</b>
+            <span class="nho mo" style="display:block">{{gia .}}</span>
+          </span>
+        </label>
+        {{end}}
+      </div>
+
+      <div class="nhan-nho" style="margin:22px 0 10px">Dòng gõ tay</div>
+      <div class="hang"><label style="margin:0">Nội dung<input name="dong_ten" maxlength="120"></label><label style="margin:0" class="co-hep">Tiền<input name="dong_tien" inputmode="numeric" class="tay"></label></div>
+      <div class="hang"><label style="margin:0">Nội dung<input name="dong_ten" maxlength="120"></label><label style="margin:0" class="co-hep">Tiền<input name="dong_tien" inputmode="numeric" class="tay"></label></div>
+      <div class="hang"><label style="margin:0">Nội dung<input name="dong_ten" maxlength="120"></label><label style="margin:0" class="co-hep">Tiền<input name="dong_tien" inputmode="numeric" class="tay"></label></div>
+
+
+      <div class="nhan-nho" style="margin:22px 0 10px">Giảm giá</div>
+      <div class="hang">
+        <label style="margin:0" class="co-hep">Bớt cho khách<input name="giam_gia" inputmode="numeric" class="giam" placeholder="0"></label>
+        <label style="margin:0">Vì sao<input name="giam_ly_do" maxlength="80" placeholder="khách quen, làm lại lần 2, sai hẹn…"></label>
+      </div>
+      <p class="nho mo" style="margin-top:8px">Gõ số dương. Bớt quá tổng thì hệ thống kẹp lại bằng tổng — đơn không bao giờ âm.</p>
+
+      <div class="hang" style="margin-top:18px;border-top:1px solid var(--vien);padding-top:16px">
+        <div><div class="nhan-nho">Tổng tạm tính</div><div class="so" id="tong" style="font-size:22px;font-weight:700">0đ</div></div>
+        <label style="margin:0" class="co-hep">Khách đưa trước<input name="da_thu" inputmode="numeric"></label>
+        <label style="margin:0" class="co-hep">Bằng
+          <select name="phuong_thuc">
+            <option value="tien_mat">Tiền mặt</option>
+            <option value="chuyen_khoan">Chuyển khoản</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="the-nhom">
+    <h3>Hẹn và ghi chú</h3>
+    <div class="noi">
+      <div class="hang">
+        <label>Hẹn trả ngày<input type="date" name="hen_tra" value="{{if $d}}{{$d.HenTraNgay}}{{end}}"></label>
+        <label>Bảo hành đến<input type="date" name="bao_hanh_den" value="{{if $d}}{{$d.BaoHanhDen}}{{end}}"></label>
+      </div>
+      <label>Ghi chú nội bộ
+        <span class="hd">Khách không thấy phần này.</span>
+        <textarea name="ghi_chu" maxlength="3000">{{if $d}}{{$d.GhiChu}}{{end}}</textarea>
+      </label>
+    </div>
+  </div>
+
+  <div class="hang-nut">
+    <button type="submit">Tạo đơn</button>
+    <a class="nut nut-vien" href="/qt/don">Huỷ</a>
+  </div>
+</form>
+
+<script>
+// Cộng các con số đã chốt để người nhập thấy tổng ngay. Đây là cộng sổ,
+// không phải định giá — mọi con số ở đây đều do bảng giá hoặc do thợ gõ.
+function dinhDang(n){ return n.toLocaleString('vi-VN') + 'đ'; }
+function tinhTong(){
+  var t = 0;
+  document.querySelectorAll('.tick-dv:checked').forEach(function(e){ t += parseInt(e.dataset.tien || '0', 10) || 0; });
+  document.querySelectorAll('.tay').forEach(function(e){
+    var s = (e.value || '').replace(/[^0-9]/g, '');
+    if (s) { t += parseInt(s, 10); }
+  });
+  var g = 0;
+  document.querySelectorAll('.giam').forEach(function(e){
+    var s = (e.value || '').replace(/[^0-9]/g, '');
+    if (s) { g += parseInt(s, 10); }
+  });
+  if (g > t) { g = t; }
+  document.getElementById('tong').textContent = dinhDang(t - g);
+}
+document.addEventListener('input', tinhTong);
+document.addEventListener('change', tinhTong);
+tinhTong();
+</script>
+
+{{template "qt-chan" .}}
+{{end}}

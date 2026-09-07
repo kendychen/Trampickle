@@ -1,0 +1,83 @@
+{{define "qt-noidung.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang">
+  <h1>Chữ trên trang</h1>
+  <div class="phai"><a class="nut nut-vien" href="/" target="_blank">Xem trang khách ↗</a></div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<p class="mo" style="max-width:70ch">
+  Mọi câu chữ khách đọc được đều sửa ở đây, kể cả nhãn nút và câu gợi ý dưới ô
+  nhập. Lưu xong là đổi ngay trên trang, không phải build lại.
+  {{if .SoDoi}}Đang có <b>{{.SoDoi}}</b> chỗ khác chữ mặc định.{{end}}
+</p>
+
+<div class="hang" style="flex-wrap:wrap;gap:8px;margin:20px 0 4px">
+  {{range .Tab}}
+  <a class="nut-nho{{if .Day}} day{{end}}" href="/qt/noi-dung/{{.Ma}}"
+     {{if .Day}}style="outline:2px solid var(--sang);outline-offset:2px"{{end}}>
+    {{.Ten}}{{if .So}} · {{.So}}{{end}}
+  </a>
+  {{end}}
+</div>
+
+{{if .Hien.MoTa}}<p class="nho mo" style="max-width:70ch;margin-top:14px">{{.Hien.MoTa}}</p>{{end}}
+
+<form method="post" action="/qt/noi-dung/luu" id="f-nd">
+  <input type="hidden" name="ma" value="{{.Hien.Ma}}">
+
+  {{range .Nhom}}
+  <div class="the-nhom">
+    <h3>{{.Ten}}</h3>
+    <div class="noi doc">
+      {{range .Muc}}
+      <div style="margin-bottom:20px">
+        <label style="margin:0">{{.Nhan}}
+          {{if .Dai}}
+          <textarea name="k.{{.Khoa}}" rows="3" maxlength="4000">{{.GiaTri}}</textarea>
+          {{else}}
+          <input name="k.{{.Khoa}}" value="{{.GiaTri}}" maxlength="400">
+          {{end}}
+        </label>
+        <div class="hang nho mo" style="gap:10px;align-items:center;margin-top:6px">
+          <code>{{.Khoa}}</code>
+          {{if .DaSua}}
+          <span>· đã đổi</span>
+          {{/* Nút nằm trong form lưu nhưng gửi sang form khôi phục nhờ
+               thuộc tính form=. Lồng form trong form là HTML sai, mà tách nút
+               ra khỏi ô nhập thì Kendy phải đi tìm nó ở đâu đó dưới trang. */}}
+          <button class="phu nho" type="submit" form="f-kp" name="khoa" value="{{.Khoa}}">
+            trả về mặc định
+          </button>
+          {{end}}
+        </div>
+        {{if .DaSua}}
+        <div class="nho mo" style="margin-top:4px">Mặc định: “{{.Mac}}”</div>
+        {{end}}
+      </div>
+      {{end}}
+    </div>
+  </div>
+  {{end}}
+
+  <div class="hang" style="gap:10px;margin:18px 0 30px">
+    <button type="submit" style="flex:0 0 auto">Lưu trang này</button>
+    <span class="nho mo">Chỉ lưu những ô đang hiện trên tab này.</span>
+  </div>
+</form>
+
+<form method="post" action="/qt/noi-dung/khoi-phuc" id="f-kp" hidden>
+  <input type="hidden" name="ma" value="{{.Hien.Ma}}">
+</form>
+
+<p class="nho mo" style="max-width:70ch">
+  Phần đã sửa nằm trong <code>data/noi-dung.yaml</code>, chỉ gồm những dòng khác
+  mặc định. Mang binary lên máy khác mà quên chép <code>data/</code> thì chữ quay
+  về bản mặc định trong code chứ không mất trang.
+</p>
+
+{{template "qt-chan" .}}
+{{end}}

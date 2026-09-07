@@ -1,0 +1,222 @@
+{{define "app.html"}}<!doctype html>
+{{/* Màn hình app. Không dùng chung khung với web: đầu trang web có bảy mục
+     nav và chân trang có bốn cột — trên một màn hình 5 inch mở từ icon, ngần
+     ấy chữ đẩy phần việc thật xuống dưới nếp gấp. Ở đây chỉ có việc làm được
+     với cây vợt, và một thanh dưới đáy để gọi.
+
+     Thứ tự khối xếp theo hai loại người mở app. Người chưa gửi vợt hỏi "trạm
+     làm được việc của tôi không" — lưới việc trả lời. Người đã gửi rồi mở app
+     ngày mấy lượt chỉ để hỏi "xong chưa" — thẻ đơn máy nhớ giùm nằm ngay trên
+     cùng trả lời họ trong một lần chạm, và ô tra đơn ở dưới lo cho lượt đầu
+     tiên khi máy chưa nhớ gì. */}}
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{.Brand.Ten}}</title>
+{{if .MoTa}}<meta name="description" content="{{.MoTa}}">{{end}}
+<meta name="robots" content="noindex">
+<link rel="icon" href="{{iconURL}}" type="{{iconMIME}}">
+{{template "pwa-dau" .}}
+{{template "css" .}}
+</head>
+<body class="{{.LopThan}} la-app">
+
+{{/* Bảng hiệu, không phải thanh điều hướng. Trang con của app mới cần thanh
+     dính trên đỉnh với nút lùi; ở màn hình đầu thì cái dính trên đỉnh chỉ ăn
+     mất một dải màn hình suốt lúc cuộn, mà đường về đã có sẵn nút Trang chủ
+     dưới thanh đáy. Đổi lại, chỗ này được rộng: logo, tên trạm cỡ lớn, dòng
+     nghề — ba thứ xếp giữa thành một tấm biển, khách mở app ra nhìn phát
+     biết mình đang ở đâu. */}}
+<header class="app-bia">
+  <a class="app-bia-lk" href="/app">
+    {{template "logo-o-dau"}}
+    <b class="app-bia-ten">{{.Brand.Ten}}</b>
+    {{if .Brand.DongMoTa}}<span class="app-bia-mo">{{.Brand.DongMoTa}}</span>{{end}}
+  </a>
+</header>
+
+<main class="app-than">
+
+  {{/* Đơn đã tra ở màn tra cứu, đọc từ chính máy này. Ẩn sẵn: chưa có gì thì
+       JS không mở, và máy tắt JS cũng không thấy một thẻ rỗng. Không tự nhảy
+       sang trang tra cứu như màn tra đơn vẫn làm — vào app mà bị đá đi ngay
+       thì người muốn xem bảng việc không kịp thấy gì. */}}
+  <div class="app-luu" id="nha-luu" hidden>
+    <button type="button" class="app-luu-mo" id="nha-mo">
+      {{template "bt-tim"}}
+      <span>{{nd "app.tra.luu-nhan"}}<b class="so" id="nha-luu-ma"></b></span>
+    </button>
+    <button type="button" class="app-luu-quen" id="nha-quen">{{nd "app.tra.quen"}}</button>
+  </div>
+
+  {{/* Câu đầu tiên khách đọc khi mở app. Tên thương hiệu trên đầu trang là
+       tên riêng, không nói ra nghề; dòng này nói thẳng trạm làm gì với cây
+       vợt, để người mới cài xong bấm vào là biết mình đang đứng ở đâu. */}}
+  <section class="app-hero">
+    <h1>{{nd "app.hero.h1"}}</h1>
+    <p class="app-hero-chu">{{ndd "app.hero.chu"}}</p>
+  </section>
+
+  {{/* Nhãn nhóm, không phải tiêu đề mục. Câu dẫn dưới nó đã bỏ: tấm hero
+       ngay trên vừa nói xong trạm làm gì, nhắc lại lần nữa cách đó ba dòng
+       thì thành hai đoạn văn chồng nhau, mà lưới việc thì bị đẩy khuất. */}}
+  <div class="app-nhan-nhom">{{nd "app.luoi.h2"}}</div>
+
+  {{/* Lưới cỡ nhỏ: ba cột, chỉ biểu tượng với tên việc. Số ngày làm bỏ xuống
+       trang từng dịch vụ — ở màn đầu nó ăn mất một dòng của mỗi ô, mà đổi lại
+       cả lưới không lọt vào màn hình cùng mấy khối dưới. */}}
+  <div class="app-luoi app-luoi-nho">
+    {{range .DichVu}}
+    <a class="app-o" href="/app/dich-vu/{{.Ma}}">
+      <span class="app-bt">{{template "bt-dich-vu" .Ma}}</span>
+      <span class="app-ten">{{.Ten}}</span>
+      {{if .LeadTimeNgay}}<span class="app-phu">{{.LeadTimeNgay}} ngày</span>{{end}}
+    </a>
+    {{/* Ô ngang: biểu tượng trong khung tròn bên trái, tên việc bên phải.
+         Hai cột thay vì ba — tên dịch vụ dài như "Thay viền toàn bộ" ở ba
+         cột phải gãy làm ba dòng chữ mười hai chấm, còn hai cột thì đọc
+         thẳng một hơi. */}}
+    {{end}}
+
+    {{/* Ô cuối, không phải dịch vụ: khách quét hết lưới mà không thấy việc
+         của mình thì đang đứng đúng chỗ cần hỏi. */}}
+    <a class="app-o app-o-hoi" href="/app/gui-anh">
+      <span class="app-bt">{{template "bt-hoi"}}</span>
+      <span class="app-ten">{{nd "app.o-khac"}}</span>
+      <span class="app-phu">{{nd "app.o-khac-phu"}}</span>
+    </a>
+  </div>
+
+  {{if not .DichVu}}<p class="app-trong">{{ndd "app.trong"}}</p>{{end}}
+
+  {{/* Bốn câu hỏi khách hỏi theo đúng thứ tự này: có làm được việc của tôi
+       không → làm thế nào → vợt tôi gửi rồi thì tới đâu → gọi ai. Lưới ở trên
+       trả lời câu một; ba khối dưới trả lời ba câu còn lại, không bắt khách
+       nhảy sang web.
+
+       Ba khối ấy gấp lại thành ba dòng bấm-mở. Mở hết ra là hơn chín trăm
+       điểm ảnh, khách phải cuộn ba lần mới thấy hết màn hình chính; gấp lại
+       thì cả app nằm gọn trong một màn, mà không mất chữ nào — ai cần khối
+       nào thì bấm đúng khối ấy. Dùng <details> của trình duyệt, không JS:
+       máy tắt JavaScript vẫn bấm mở được. Thuộc tính name= cho ba khối cùng
+       một tên nên mở cái này là cái kia tự đóng, màn hình không dài ra;
+       trình duyệt cũ chưa hiểu name= thì mở được nhiều cái, vẫn dùng tốt. */}}
+  <details class="app-gap" name="app-gap">
+    <summary>
+      <span class="app-gap-bt">{{template "bt-sach"}}</span>
+      <span class="app-gap-ten">{{nd "app.lam.h2"}}</span>
+      <span class="app-gap-mui">{{template "bt-xuong"}}</span>
+    </summary>
+    <div class="app-gap-than">
+    <ol class="app-buoc">
+      <li><b>{{nd "app.lam.b1"}}</b><span>{{nd "app.lam.b1-chu"}}</span></li>
+      <li><b>{{nd "app.lam.b2"}}</b><span>{{nd "app.lam.b2-chu"}}</span></li>
+      <li><b>{{nd "app.lam.b3"}}</b><span>{{nd "app.lam.b3-chu"}}</span></li>
+    </ol>
+    <div class="app-nut-hang">
+      <a class="nut nut-chinh" href="/app/gui-anh">{{nd "app.lam.nut"}}</a>
+      <a class="nut nut-vien" href="/app/quy-trinh">{{nd "app.lam.nut-2"}}</a>
+    </div>
+    </div>
+  </details>
+
+  {{/* Ô tra đơn ngay tại đây chứ không chỉ để cái nút sang màn khác: hai ô
+       nhập này là toàn bộ việc của màn tra cứu, chép sang tốn mười dòng mà
+       tiết kiệm cho khách một lượt chạm ở việc họ làm nhiều nhất. Gửi thẳng
+       tới /app/tra-cuu — cùng một handler, cùng một luật chặn dò mã. */}}
+  <details class="app-gap" name="app-gap" id="tra-don">
+    <summary>
+      <span class="app-gap-bt">{{template "bt-tim"}}</span>
+      <span class="app-gap-ten">{{nd "app.tra.h2"}}</span>
+      <span class="app-gap-mui">{{template "bt-xuong"}}</span>
+    </summary>
+    <div class="app-gap-than">
+    <p class="nho mo">{{ndd "app.tra.chu"}}</p>
+    <form method="post" action="/app/tra-cuu" id="nha-form">
+      <div class="app-tra-doi">
+        <label>{{nd "tracuu.ma-nhan"}}
+          <input name="ma" id="nha-ma" placeholder="{{nd "tracuu.ma-goi-y"}}" maxlength="40"
+                 autocomplete="off" autocapitalize="off" spellcheck="false" required>
+        </label>
+        <label>{{nd "tracuu.dt-nhan"}}
+          <input name="dien_thoai" id="nha-dt" inputmode="numeric" maxlength="12"
+                 autocomplete="off" required>
+        </label>
+      </div>
+      <button class="app-nut-to" type="submit">{{nd "tracuu.nut"}}</button>
+    </form>
+    </div>
+  </details>
+
+  <details class="app-gap" name="app-gap" id="lien-he">
+    <summary>
+      <span class="app-gap-bt">{{template "bt-goi"}}</span>
+      <span class="app-gap-ten">{{nd "app.lh.h2"}}</span>
+      <span class="app-gap-mui">{{template "bt-xuong"}}</span>
+    </summary>
+    <div class="app-gap-than">
+    {{if .LienHe.DienThoai}}
+    <a class="app-so" href="tel:{{soGoi .LienHe.DienThoai}}">{{template "bt-goi"}}<span>{{.LienHe.DienThoai}}</span></a>
+    {{end}}
+    <div class="app-lh-hang">
+      {{if .LienHe.Zalo}}<a class="nut nut-vien" href="https://zalo.me/{{.LienHe.Zalo}}">{{nd "app.lh.zalo"}}</a>{{end}}
+      {{if .LienHe.Facebook}}<a class="nut nut-vien" href="{{.LienHe.Facebook}}">Facebook</a>{{end}}
+    </div>
+    <dl class="app-lh-ds">
+      {{if .LienHe.DiaChi}}<dt>{{nd "app.lh.dia-chi"}}</dt><dd>{{.LienHe.DiaChi}}</dd>{{end}}
+      {{if .LienHe.GioLamVic}}<dt>{{nd "app.lh.gio"}}</dt><dd>{{.LienHe.GioLamVic}}</dd>{{end}}
+    </dl>
+    {{/* Chưa điền số lẫn Zalo thì tiêu đề "Gọi cho trạm" thành lời hứa suông.
+         Đừng để khách đứng trước một mục rỗng: chỉ luôn đường gửi ảnh. */}}
+    {{if and (not .LienHe.DienThoai) (not .LienHe.Zalo)}}
+    <p class="app-trong">{{ndd "app.lh.chua-co"}}</p>
+    <div class="app-nut-hang"><a class="nut nut-chinh" href="/app/gui-anh">{{nd "app.lam.nut"}}</a></div>
+    {{end}}
+    </div>
+  </details>
+</main>
+
+{{template "thanh-app" .}}
+
+<script>
+// Mã đơn máy nhớ giùm. Cùng một khoá localStorage với màn tra cứu — nhớ ở
+// bên kia thì bên này thấy, quên ở bên này thì bên kia mất. Chỉ đọc và xoá,
+// việc ghi để nguyên cho màn tra cứu: chỉ nó mới biết mã ấy có tra ra thật
+// hay không.
+(function () {
+  var the = document.getElementById('nha-luu');
+  var form = document.getElementById('nha-form');
+  if (!the || !form) { return; }
+
+  var luu = null;
+  try { luu = JSON.parse(localStorage.getItem('tram-don') || 'null'); } catch (e) { luu = null; }
+  if (!luu || !luu.ma) { return; }
+
+  document.getElementById('nha-luu-ma').textContent = luu.ma;
+  the.hidden = false;
+
+  document.getElementById('nha-mo').addEventListener('click', function () {
+    document.getElementById('nha-ma').value = luu.ma;
+    var dt = document.getElementById('nha-dt');
+    dt.value = luu.dt || '';
+    // Thiếu số điện thoại thì đừng gửi đi cho nó trả về "không tìm thấy" —
+    // dừng ngay ở ô còn thiếu.
+    if (dt.value) { form.submit(); return; }
+    // Ô tra đơn giờ nằm trong khối gấp. Chưa mở khối ra mà đã đẩy con trỏ
+    // vào ô thì khách không thấy mình phải gõ gì ở đâu — mở khối trước.
+    var hop = document.getElementById("tra-don");
+    if (hop) { hop.open = true; }
+    dt.focus();
+  });
+  document.getElementById('nha-quen').addEventListener('click', function () {
+    try { localStorage.removeItem('tram-don'); } catch (e) {}
+    the.hidden = true;
+  });
+})();
+</script>
+
+{{template "pwa-chan" .}}
+</body>
+</html>
+{{end}}

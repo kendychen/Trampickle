@@ -1,0 +1,113 @@
+{{define "app-guianh.html"}}<!doctype html>
+{{/* Gửi ảnh, bản app. Cùng một cái form POST như trên web, nhưng xếp lại theo
+     thứ tự người cầm điện thoại làm việc: mở máy ảnh chụp cái chỗ nứt trước,
+     rồi mới nghĩ đến gõ chữ. Ba ô bắt buộc nằm trên, mấy ô "có thì tốt" gấp
+     vào một nếp — form dài chín ô trên màn hình 5 inch là khách bỏ giữa
+     chừng. */}}
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{nd "app.nut.gui-anh"}} — {{.Brand.Ten}}</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="{{iconURL}}" type="{{iconMIME}}">
+{{template "pwa-dau" .}}
+{{template "css" .}}
+</head>
+<body class="{{.LopThan}} la-app">
+
+<header class="app-dau app-dau-2">
+  <a class="app-lui" href="/app" aria-label="Quay lại">{{template "bt-lui"}}</a>
+  <b class="app-tieu">{{nd "app.nut.gui-anh"}}</b>
+</header>
+
+<main class="app-than">
+
+{{if .DaGui}}
+  {{/* Gửi xong thì dẹp form đi. Để nguyên đấy là có người bấm gửi lần nữa,
+       rồi trạm nhận hai yêu cầu giống hệt của cùng một cây vợt. */}}
+  <div class="app-xong">
+    <span class="app-xong-bt">{{template "bt-xong"}}</span>
+    <div class="bao bao-ok" style="margin:0">{{ndd "trangchu.gui.ok"}}</div>
+    {{if .MaYeuCau}}
+    <div class="ma-yc">
+      <span>{{nd "trangchu.gui.ma-nhan"}}</span>
+      <b class="so">{{.MaYeuCau}}</b>
+    </div>
+    <p class="nho mo">
+      {{if .MailToi}}{{ndx "trangchu.gui.mail-co" "email" .MailToi}}{{else}}{{ndd "trangchu.gui.mail-khong"}}{{end}}
+      {{ndd "trangchu.gui.tra-cuu"}}
+    </p>
+    {{end}}
+    <div class="app-nut-hang">
+      <a class="nut nut-chinh" href="/app/tra-cuu">{{nd "chung.nut.tra-cuu"}}</a>
+      <a class="nut nut-vien" href="/app">{{nd "app.nut.trang-chu"}}</a>
+    </div>
+  </div>
+{{else}}
+
+  {{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+  <p class="app-dan">{{ndd "trangchu.gui.dan"}}</p>
+
+  <form method="post" action="/app/gui-anh" enctype="multipart/form-data" class="app-form">
+    {{/* Hai lối nạp ảnh, tách hẳn ra hai nút. Trước đây gộp một ô có
+         capture="environment": máy Android hiểu là "chỉ được chụp" và khoá
+         luôn đường vào thư viện, khách đã chụp sẵn ảnh cây vợt từ hôm qua thì
+         không lấy lên được. Cùng name="tep" nên chọn cả hai đường cũng gửi
+         lên một lượt. Bấm nhãn là mở, không cần JavaScript — ô input nấp
+         sau nhãn chứ không bị display:none, để bàn phím vẫn tới được. */}}
+    <span class="app-nhan">{{nd "form.tep"}}</span>
+    <span class="hd">{{ndd "form.tep-hd"}}</span>
+    <div class="app-tep">
+      <label class="app-tep-nut" for="tep-chup">
+        {{template "bt-anh"}}
+        <b>{{nd "app.gui.chup"}}</b>
+        <span>{{nd "app.gui.chup-phu"}}</span>
+      </label>
+      <input class="tep-an" id="tep-chup" type="file" name="tep" accept="image/*" capture="environment">
+
+      <label class="app-tep-nut" for="tep-may">
+        {{template "bt-thu-vien"}}
+        <b>{{nd "app.gui.may"}}</b>
+        <span>{{nd "app.gui.may-phu"}}</span>
+      </label>
+      <input class="tep-an" id="tep-may" type="file" name="tep" accept="image/*,video/*" multiple>
+    </div>
+    <div class="tep-ds" hidden></div>
+
+    <label>{{nd "form.lien-he"}}
+      <input name="lien_he" maxlength="100" required inputmode="tel" autocomplete="tel">
+    </label>
+
+    <label>{{nd "form.mo-ta"}}
+      <span class="hd">{{ndd "form.mo-ta-hd"}}</span>
+      <textarea name="mo_ta" maxlength="2000" required></textarea>
+    </label>
+
+    <details class="app-them">
+      <summary>{{nd "app.gui.them"}}</summary>
+      <div class="app-them-noi">
+        <label>{{nd "form.ten"}}<input name="ten" maxlength="100" autocomplete="name"></label>
+        <label>{{nd "form.hang"}}
+          <input name="vot_hang" maxlength="100" placeholder="{{nd "form.hang-goi-y"}}">
+        </label>
+        <label>{{nd "form.email"}}
+          <span class="hd">{{ndd "form.email-hd"}}</span>
+          <input type="email" name="email" maxlength="254" autocomplete="email" placeholder="{{nd "form.email-goi-y"}}">
+        </label>
+      </div>
+    </details>
+
+    <button class="app-nut-to" type="submit">{{nd "form.nut"}}</button>
+  </form>
+  {{template "js-tep" .}}
+{{end}}
+</main>
+
+{{template "thanh-app" .}}
+
+{{template "pwa-chan" .}}
+</body>
+</html>
+{{end}}

@@ -1,0 +1,181 @@
+{{define "qt-vot.html"}}
+{{template "qt-dau" .}}
+
+{{if .Loi}}
+<div class="qt-dau-trang"><h1>Danh mục vợt</h1></div>
+<div class="bao bao-loi">{{.Loi}}</div>
+{{else}}
+
+<div class="qt-dau-trang">
+  <h1>Danh mục vợt</h1>
+  <div class="phai nho">Cập nhật {{.Kho.CapNhat}}</div>
+</div>
+
+{{if not .DuTin}}
+<div class="bao bao-loi">
+  <b>Chưa có ca thật chống lưng cho bảng này.</b>
+  Mới {{.Kho.SoCaLamCoSo}}/{{.Kho.NguongTinDuoc}} ca. Cột <i>mức hay gặp</i> là
+  ước lượng từ thị trường, không phải đếm từ sổ. Vẫn phải gõ nghe tiếng và cân
+  vợt trước khi báo giá — con số ở đây không thay được hai việc đó.
+</div>
+{{end}}
+
+<div class="luoi-so" style="margin-bottom:18px">
+  <div class="o-so"><div class="v">{{.SoCay}}</div><div class="t">cây vợt</div></div>
+  <div class="o-so"><div class="v">{{len .Kho.DongVot}}</div><div class="t">dòng vợt</div></div>
+  <div class="o-so"><div class="v" id="so-hien">{{.SoCay}}</div><div class="t">đang hiện sau khi lọc</div></div>
+</div>
+
+<div class="the" style="margin-bottom:18px">
+  <div class="hang" style="align-items:flex-end">
+    <label style="margin:0;flex:1">Tìm
+      <input id="q" autofocus autocomplete="off"
+             placeholder="tên hãng, tên dòng, tên cây — gõ tới đâu lọc tới đó">
+    </label>
+    <label style="margin:0" class="co-hep">Mức hay gặp
+      <select id="f-gap">
+        <option value="">Tất cả</option>
+        <option value="rat_pho_bien">Rất phổ biến</option>
+        <option value="pho_bien">Phổ biến</option>
+        <option value="thinh_thoang">Thỉnh thoảng</option>
+        <option value="hiem">Hiếm</option>
+        <option value="rat_hiem">Rất hiếm</option>
+      </select>
+    </label>
+    <label style="margin:0" class="co-hep">Xuất xứ
+      <select id="f-nuoc">
+        <option value="">Tất cả</option>
+        <option value="vn">Thương hiệu Việt</option>
+        <option value="ngoai">Ngoài nước</option>
+      </select>
+    </label>
+  </div>
+  <div class="nho" style="margin-top:8px">
+    Bấm vào một cây để mở phần nhận sửa, kiểu hỏng và cảnh báo của dòng đó.
+  </div>
+</div>
+
+<div id="panel" class="the" style="display:none;margin-bottom:18px"></div>
+
+<div class="the-nhom">
+  <div class="cuon">
+    <table class="bang" id="bang-vot">
+      <thead>
+        <tr>
+          <th>Cây vợt</th><th>Lõi</th><th>Chế tạo</th>
+          <th class="p">Dày</th><th class="p">Nặng</th><th class="p">Nguồn số</th>
+          <th>Hay gặp</th>
+        </tr>
+      </thead>
+      <tbody>
+      {{range .Bang}}
+        <tr class="cay" data-ma="{{.MaDong}}" data-tim="{{.Tim}}"
+            data-gap="{{.MucGap}}" data-nuoc="{{if .TuVN}}vn{{else}}ngoai{{end}}"
+            data-ten="{{.Hang}} — {{.Ten}}"
+            {{if .GhiChu}}data-ghi="{{.GhiChu}}"{{end}}
+            {{if .CanhBao}}data-canhbao="{{.CanhBao}}"{{end}}>
+          <td>
+            <b>{{.Ten}}</b>{{if .GhiChu}} <span title="có ghi chú riêng cho cây này">⚠</span>{{end}}
+            <div class="nho">{{.Hang}} · {{.Dong}}{{if .Nam}} · {{.Nam}}{{end}}</div>
+          </td>
+          <td class="nho">{{.Loi}}</td>
+          <td class="nho">{{.CheTao}}</td>
+          <td class="p">{{.DoDay}}</td>
+          <td class="p">{{.KhoiLuong}}</td>
+          <td class="p nho">{{.NguonSo}}</td>
+          <td class="nho">{{.MucGapNhan}}</td>
+        </tr>
+      {{end}}
+      </tbody>
+    </table>
+  </div>
+  <div id="trong" class="nho" style="display:none;padding:18px">
+    Không có cây nào khớp. Vợt không có trong danh mục thì ghi "không rõ" vào
+    phiếu và xử theo ba phép thử, đừng đoán sang một dòng gần giống.
+  </div>
+</div>
+
+<script>var CT = {{.ChiTiet | json}};</script>
+
+<script>
+(function () {
+  var q = document.getElementById('q'),
+      fg = document.getElementById('f-gap'),
+      fn = document.getElementById('f-nuoc'),
+      hang = Array.prototype.slice.call(document.querySelectorAll('tr.cay')),
+      dem = document.getElementById('so-hien'),
+      trong = document.getElementById('trong'),
+      panel = document.getElementById('panel');
+
+  function bo_dau(s) {
+    return s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd');
+  }
+
+  function loc() {
+    var t = bo_dau(q.value.toLowerCase().trim()),
+        g = fg.value, n = fn.value, hien = 0;
+    for (var i = 0; i < hang.length; i++) {
+      var h = hang[i],
+          ok = (!t || bo_dau(h.dataset.tim).indexOf(t) >= 0) &&
+               (!g || h.dataset.gap === g) &&
+               (!n || h.dataset.nuoc === n);
+      h.style.display = ok ? '' : 'none';
+      if (ok) hien++;
+    }
+    dem.textContent = hien;
+    trong.style.display = hien ? 'none' : '';
+  }
+
+  function doan(nhan, giatri) {
+    if (!giatri) return '';
+    return '<div style="margin-bottom:10px"><b>' + nhan + '</b><br>' +
+           String(giatri).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                         .replace(/\n/g, '<br>') + '</div>';
+  }
+
+  function mo(h) {
+    var d = CT[h.dataset.ma];
+    if (!d) return;
+    var s = '';
+    s += '<div class="qt-dau-trang" style="margin-bottom:12px"><h3 style="margin:0">' +
+         h.dataset.ten + '</h3><div class="phai"><button class="phu nho" id="dong-panel">Đóng</button></div></div>';
+    s += '<div class="nho" style="margin-bottom:12px">' + d.hang + ' · ' + d.dong +
+         ' · ' + d.nuoc + ' · gặp ở mức: ' + d.muc_gap + '</div>';
+    if (h.dataset.canhbao) s += '<div class="bao bao-loi">' + h.dataset.canhbao + '</div>';
+    if (h.dataset.ghi) s += doan('Riêng cây này', h.dataset.ghi);
+    s += doan('Nhận sửa thế nào', d.nhan_sua);
+    if (d.hay_hong && d.hay_hong.length) s += doan('Hay hỏng', d.hay_hong.join(' · '));
+    if (d.canh_bao && d.canh_bao.length) {
+      for (var i = 0; i < d.canh_bao.length; i++)
+        s += '<div class="bao bao-loi">' + d.canh_bao[i] + '</div>';
+    }
+    s += doan('Lõi', d.loi + (d.loi_cau_tao ? ' — ' + d.loi_cau_tao : ''));
+    s += doan('Mặt / viền', d.mat + ' · ' + d.vien);
+    s += doan('Giá vợt mới tại VN (ước lượng, không phải giá sửa)', d.gia);
+    s += doan('Vì sao xếp mức này', d.co_so);
+    s += doan('Ghi chú', d.ghi_chu);
+    s += '<div class="nho">Độ tin của số liệu dòng này: <b>' + d.tin_cay + '</b>' +
+         (d.nguon && d.nguon.length ? ' · nguồn: ' + d.nguon.join(', ') : '') + '</div>';
+    panel.innerHTML = s;
+    panel.style.display = '';
+    panel.scrollIntoView({block: 'nearest'});
+    document.getElementById('dong-panel').onclick = function () {
+      panel.style.display = 'none';
+    };
+  }
+
+  q.addEventListener('input', loc);
+  fg.addEventListener('change', loc);
+  fn.addEventListener('change', loc);
+  for (var i = 0; i < hang.length; i++) {
+    hang[i].style.cursor = 'pointer';
+    hang[i].addEventListener('click', function () { mo(this); });
+  }
+  loc();
+})();
+</script>
+
+{{end}}
+
+{{template "qt-chan" .}}
+{{end}}

@@ -1,0 +1,45 @@
+{{define "baiviet-mot.html"}}
+{{template "html-dau" .}}
+
+<section class="hero">
+  <div class="khung">
+    <a href="/bai-viet" class="nhan-nho" style="text-decoration:none">{{nd "baivietmot.quay-lai"}}</a>
+    <h1 style="margin-top:16px;max-width:24ch">{{.Bai.TieuDe}}</h1>
+    <p class="dan" style="font-size:15px;color:var(--tren-dam-mo)">
+      {{nd "baivietmot.dang"}} {{ngaydep .Bai.Ngay}}{{if .Bai.Sua}} {{nd "baivietmot.cap-nhat"}} {{ngaydep .Bai.Sua}}{{end}}
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="khung doi-cot">
+    <article class="bai">{{.Than}}</article>
+
+    <div class="canh">
+      <div class="the">
+        <h3>{{nd "baivietmot.gui.h3"}}</h3>
+        <p class="nho mo" style="margin-top:8px">{{ndd "baivietmot.gui.chu"}}</p>
+        <p style="margin-top:14px"><a class="nut nut-chinh" href="/#gui-yeu-cau">{{nd "chung.nut.gui-anh"}}</a></p>
+      </div>
+      <div class="the">
+        <h3>{{nd "baivietmot.dv.h3"}}</h3>
+        <p class="nho mo" style="margin-top:8px">{{ndx "baivietmot.dv.chu" "so" (len .DichVu)}}</p>
+        <p style="margin-top:14px"><a class="nut nut-vien" href="/dich-vu">{{nd "chung.nut.dich-vu"}}</a></p>
+      </div>
+
+      {{if .Khac}}
+      <div class="the">
+        <h3>{{nd "baivietmot.tiep.h3"}}</h3>
+        <ul class="lien-quan">
+          {{range .Khac}}
+          <li><a href="/bai-viet/{{.Slug}}">{{.TieuDe}}</a></li>
+          {{end}}
+        </ul>
+      </div>
+      {{end}}
+    </div>
+  </div>
+</section>
+
+{{template "html-chan" .}}
+{{end}}

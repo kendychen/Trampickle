@@ -1,0 +1,50 @@
+{{define "dichvu.html"}}
+{{template "html-dau" .}}
+
+<section class="hero">
+  <div class="khung">
+    <div class="nhan-nho">{{nd "dichvu.nhan"}}</div>
+    <h1 style="margin-top:16px">{{ndx "dichvu.h1" "so" (len .DichVu)}}</h1>
+    <p class="dan">{{ndd "dichvu.dan"}}</p>
+  </div>
+</section>
+
+<section>
+  <div class="khung doc-lon">
+    <div class="luoi-vach">
+      {{range .DichVu}}
+      <a class="dv-the" href="/dich-vu/{{.Ma}}">
+        <div class="bt-o">{{template "bt-dich-vu" .Ma}}</div>
+        <div class="dau-the">
+          <h3>{{.Ten}}</h3>
+        </div>
+        <span class="chip chip-trung">{{nhom .Nhom}}</span>
+        {{if .DieuKien}}<div class="mota">{{.DieuKien}}</div>{{end}}
+        <div class="chan">
+          {{if .LeadTimeNgay}}<span>{{.LeadTimeNgay}} ngày</span>{{end}}
+          {{if .BaoHanhThang}}<span>BH {{.BaoHanhThang}} tháng</span>{{end}}
+        </div>
+      </a>
+      {{end}}
+
+      {{/* Ô cuối lưới, không phải dịch vụ. Trước đây là một thẻ rời nằm dưới
+           lưới; đưa vào trong để hàng cuối không hụt ô, và vì người quét hết
+           lưới mà không thấy việc của mình thì đang đọc đúng chỗ này. */}}
+      <a class="dv-the" href="/#gui-yeu-cau">
+        <div class="bt-o">{{template "bt-hoi"}}</div>
+        <div class="dau-the"><h3>{{nd "dichvu.hoi.h3"}}</h3></div>
+        <span class="chip chip-trung">{{nd "dichvu.hoi.chip"}}</span>
+        <div class="mota">{{ndd "dichvu.hoi.chu"}}</div>
+        <div class="chan"><span>{{nd "dichvu.hoi.chan"}}</span></div>
+      </a>
+    </div>
+
+    <div class="hero-nut">
+      <a class="nut nut-chinh" href="/#gui-yeu-cau">{{nd "chung.nut.gui-anh"}}</a>
+      <a class="nut nut-vien" href="/quy-trinh">{{nd "chung.nut.quy-trinh"}}</a>
+    </div>
+  </div>
+</section>
+
+{{template "html-chan" .}}
+{{end}}

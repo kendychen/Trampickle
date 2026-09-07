@@ -1,0 +1,101 @@
+{{define "app-dichvu.html"}}<!doctype html>
+{{/* Một dịch vụ, bản app. Bản web mở đầu bằng hero cao gần hết màn hình rồi
+     mới tới nội dung, và xếp quy trình cạnh một cột phụ — trên điện thoại cột
+     phụ rơi xuống cuối, khách cuộn ba màn mới thấy nút gửi ảnh. Ở đây đảo lại
+     theo thứ tự khách hỏi: việc này mất mấy ngày, bảo hành bao lâu → làm thế
+     nào → gửi ảnh. */}}
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{.DV.Ten}} — {{.Brand.Ten}}</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="{{iconURL}}" type="{{iconMIME}}">
+{{template "pwa-dau" .}}
+{{template "css" .}}
+</head>
+<body class="{{.LopThan}} la-app">
+
+<header class="app-dau app-dau-2">
+  <a class="app-lui" href="/app" aria-label="Quay lại">{{template "bt-lui"}}</a>
+  <b class="app-tieu">{{.DV.Ten}}</b>
+</header>
+
+<main class="app-than">
+
+  {{/* Biểu tượng to đặt cạnh tên: khách bấm từ lưới ngoài trang chủ vào đây,
+       thấy lại đúng hình vừa bấm thì biết mình không vào nhầm ô. */}}
+  <div class="app-dv-dau">
+    <span class="app-dv-bt">{{template "bt-dich-vu" .DV.Ma}}</span>
+    <div>
+      <h1 class="app-dv-ten">{{.DV.Ten}}</h1>
+      <span class="chip chip-trung">{{nhom .DV.Nhom}}</span>
+    </div>
+  </div>
+
+  {{if .DV.DieuKien}}
+  <div class="bao bao-luu">{{nd "dichvumot.dieu-kien"}} {{.DV.DieuKien}}</div>
+  {{end}}
+
+  {{/* Ba con số khách hỏi trước khi hỏi giá. Để ngay đầu, không bắt cuộn. */}}
+  <div class="app-so3">
+    <div>
+      <b>{{if .DV.LeadTimeNgay}}{{.DV.LeadTimeNgay}}{{else}}—{{end}}</b>
+      <span>{{nd "dichvumot.so.1-t"}}</span>
+    </div>
+    <div>
+      <b>{{if .DV.BaoHanhThang}}{{.DV.BaoHanhThang}}{{else}}—{{end}}</b>
+      <span>{{nd "dichvumot.so.2-t"}}</span>
+    </div>
+    <div>
+      <b>{{nd "chung.can.muc"}}</b>
+      <span>{{nd "dichvumot.so.3-t"}}</span>
+    </div>
+  </div>
+
+  {{/* Nút gửi ảnh đứng trên phần quy trình chứ không nằm cuối trang: người đã
+       biết mình cần gì thì bấm luôn, người còn phân vân thì cuộn tiếp. */}}
+  <div class="app-nut-hang app-nut-hang-doc">
+    <a class="nut nut-chinh app-nut-to" href="/app/gui-anh">{{nd "chung.nut.gui-anh"}}</a>
+  </div>
+  <p class="app-dan nho">{{ndd "dichvumot.gui.chu"}}</p>
+
+  <section class="app-muc">
+    <h2 class="app-h2">{{nd "dichvumot.qt.h2"}}</h2>
+    <ol class="app-ds-so">
+      <li>{{ndd "dichvumot.qt.b1"}}</li>
+      <li>{{ndd "dichvumot.qt.b2"}}</li>
+      <li>{{ndd "dichvumot.qt.b3"}}</li>
+      <li>{{ndx "dichvumot.qt.b4" "ten" .DV.Ten}}</li>
+      <li>{{ndd "dichvumot.qt.b5"}}</li>
+    </ol>
+    <div class="app-nut-hang">
+      <a class="nut nut-vien" href="/app/quy-trinh">{{nd "dichvumot.gui.nut-2"}}</a>
+    </div>
+  </section>
+
+  <section class="app-muc">
+    <h2 class="app-h2">{{nd "dichvumot.khac.nhan"}}</h2>
+    <div class="app-luoi">
+      {{range .Khac}}{{if ne .Ma $.DV.Ma}}
+      <a class="app-o" href="/app/dich-vu/{{.Ma}}">
+        <span class="app-bt">{{template "bt-dich-vu" .Ma}}</span>
+        <span class="app-ten">{{.Ten}}</span>
+        {{if .LeadTimeNgay}}<span class="app-phu">{{.LeadTimeNgay}} ngày</span>{{end}}
+      </a>
+      {{end}}{{end}}
+      <a class="app-o app-o-hoi" href="/app/gui-anh">
+        <span class="app-bt">{{template "bt-hoi"}}</span>
+        <span class="app-ten">{{nd "app.o-khac"}}</span>
+        <span class="app-phu">{{nd "app.o-khac-phu"}}</span>
+      </a>
+    </div>
+  </section>
+</main>
+
+{{template "thanh-app" .}}
+
+{{template "pwa-chan" .}}
+</body>
+</html>
+{{end}}

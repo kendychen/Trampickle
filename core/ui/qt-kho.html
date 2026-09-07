@@ -1,0 +1,133 @@
+{{define "qt-kho.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang">
+  <h1>Kho vật tư</h1>
+  <div class="phai">
+    <a class="nut nut-vien" href="/qt/kho/phieu">Sổ phiếu</a>
+    {{if .NguoiDung.LaChu}}<a class="nut nut-vien" href="/qt/kho/vat-tu">Danh mục &amp; định mức</a>{{end}}
+    <a class="nut nut-chinh" href="/qt/kho/phieu/moi?loai=xuat">+ Ghi phiếu</a>
+  </div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+{{if .ChuaKhai}}
+<div class="the trong">
+  <b>Chưa khai vật tư nào</b>
+  Kho trống thì mọi phiếu đều không có gì để chọn.
+  {{if .NguoiDung.LaChu}}
+  <div style="margin-top:20px"><a class="nut nut-chinh" href="/qt/kho/vat-tu">Khai danh mục vật tư</a></div>
+  {{else}}
+  <div style="margin-top:12px" class="nho">Nhờ chủ trạm khai ở trang danh mục.</div>
+  {{end}}
+</div>
+{{else}}
+
+<div class="luoi-so" style="margin-bottom:22px">
+  <div class="o-so"><div class="v">{{len .Bang}}</div><div class="t">thứ đang theo dõi</div></div>
+  <div class="o-so {{if .CanMua}}canh-bao{{end}}"><div class="v">{{.CanMua}}</div><div class="t">chạm ngưỡng, cần mua</div></div>
+  {{if .NguoiDung.LaChu}}
+  <div class="o-so"><div class="v" style="font-size:19px">{{tien .GiaTri}}</div><div class="t">giá trị hàng còn trong kho</div></div>
+  {{end}}
+</div>
+
+<div class="the-nhom">
+  <h3>Tồn kho</h3>
+  <div class="cuon">
+    <table class="bang">
+      <thead>
+        <tr>
+          <th>Vật tư</th><th class="p">Còn</th><th class="p">Dùng / ngày</th>
+          <th class="p">Đủ dùng</th><th class="p">Tối thiểu</th>
+          {{if .NguoiDung.LaChu}}<th class="p">Giá nhập</th><th class="p">Giá trị</th>{{end}}
+          <th>Nhà cung cấp</th>
+        </tr>
+      </thead>
+      <tbody>
+      {{range .Bang}}
+        <tr>
+          <td>
+            <b>{{.Ten}}</b>
+            {{if .Am}}<span class="chip chip-tuchoi">âm</span>{{else if .DuoiNguong}}<span class="chip chip-cho">cần mua</span>{{end}}
+            <div class="nho mo so">{{.Ma}}</div>
+          </td>
+          <td class="p so">{{sl .Ton}} {{.DonVi}}</td>
+          <td class="p nho mo">{{if .TieuThuNgay}}{{sl .TieuThuNgay}}{{else}}—{{end}}</td>
+          <td class="p nho {{if .Am}}mo{{end}}">{{if lt .ConDuNgay 0}}<span class="mo">chưa đoán được</span>{{else}}{{.ConDuNgay}} ngày{{end}}</td>
+          <td class="p nho mo">{{if .TonToiThieu}}{{sl .TonToiThieu}}{{else}}—{{end}}</td>
+          {{if $.NguoiDung.LaChu}}
+          <td class="p nho">{{if .GiaNhap}}{{tien .GiaNhap}}{{else}}<span class="mo">—</span>{{end}}</td>
+          <td class="p">{{if .GiaTri}}{{tien .GiaTri}}{{else}}<span class="mo">0đ</span>{{end}}</td>
+          {{end}}
+          <td class="nho mo">{{if .NhaCungCap}}{{.NhaCungCap}}{{else}}—{{end}}</td>
+        </tr>
+      {{end}}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{{$demua := false}}
+{{range .Bang}}{{if and .DeXuatNhap (not .Am)}}{{$demua = true}}{{end}}{{end}}
+{{if $demua}}
+<div class="the-nhom">
+  <h3>Gợi ý đặt hàng</h3>
+  <div class="noi">
+    <p class="nho mo" style="margin-top:0">
+      Tính từ tốc độ dùng 90 ngày gần nhất, mua đủ chạy thêm một tháng. Đây là
+      gợi ý để khỏi phải ngồi tính, không phải đơn đặt hàng — người quyết vẫn là
+      người đi mua.
+    </p>
+    <ul style="margin:12px 0 0;padding-left:20px;font-size:14.5px">
+      {{range .Bang}}{{if and .DeXuatNhap (not .Am)}}
+      <li><b>{{.Ten}}</b> — mua khoảng <span class="so">{{sl .DeXuatNhap}} {{.DonVi}}</span>{{if .NhaCungCap}}, chỗ {{.NhaCungCap}}{{end}}</li>
+      {{end}}{{end}}
+    </ul>
+  </div>
+</div>
+{{end}}
+
+{{end}}{{/* ChuaKhai */}}
+
+<div class="the-nhom">
+  <h3>Phiếu gần đây</h3>
+  <div class="noi">
+    <div class="hang-nut" style="margin-top:0;margin-bottom:14px">
+      {{range .LoaiPhieu}}
+      {{if or (ne .Loai "nhap") $.NguoiDung.LaChu}}
+      <a class="nut nut-vien" href="/qt/kho/phieu/moi?loai={{.Loai}}">+ {{.Ten}}</a>
+      {{end}}
+      {{end}}
+    </div>
+  </div>
+  {{if .Phieu}}
+  <div class="cuon">
+    <table class="bang">
+      <thead><tr><th>Mã</th><th>Loại</th><th>Ngày</th><th>Nội dung</th><th>Người ghi</th>{{if .NguoiDung.LaChu}}<th class="p">Tiền</th>{{end}}</tr></thead>
+      <tbody>
+        {{range .Phieu}}
+        <tr class="co-link">
+          <td><a href="/qt/kho/phieu/{{.Ma}}" class="so">{{.Ma}}</a></td>
+          <td class="nho">{{.TenLoai}}</td>
+          <td class="nho mo">{{ngaydep .Ngay}}</td>
+          <td class="nho">
+            {{if .MaDon}}<a href="/qt/don/{{.MaDon}}" class="so">{{.MaDon}}</a> {{end}}
+            {{if .NhaCungCap}}{{.NhaCungCap}} {{end}}
+            <span class="mo">{{len .Dong}} dòng</span>
+          </td>
+          <td class="nho mo">{{.Nguoi}}</td>
+          {{if $.NguoiDung.LaChu}}<td class="p">{{if .TongTien}}{{tien .TongTien}}{{else}}<span class="mo">—</span>{{end}}</td>{{end}}
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{else}}
+  <div class="noi"><p class="nho mo" style="margin:0">Chưa ghi phiếu nào. Tồn kho cộng từ phiếu, nên chưa có phiếu thì mọi thứ đang là 0.</p></div>
+  {{end}}
+</div>
+
+{{template "qt-chan" .}}
+{{end}}

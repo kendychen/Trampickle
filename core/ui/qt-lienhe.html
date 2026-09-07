@@ -1,0 +1,36 @@
+{{define "qt-lienhe.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang"><h1>Liên hệ</h1></div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<p class="mo" style="max-width:64ch">
+  Cụm này hiện ở ba chỗ cùng lúc: dòng địa chỉ ngay đầu trang chủ, chân mọi
+  trang, và trang Liên hệ. Ô nào bỏ trống thì web giấu hẳn dòng đó chứ không
+  hiện nhãn cụt.
+</p>
+<p class="nho mo" style="max-width:64ch">
+  Ghi ra <code>{{.Tep}}</code>. File này nằm trong <code>data/</code> nên mọi
+  lần đẩy bản mới lên máy chủ đều không đụng tới — gõ ở đây một lần là xong,
+  không phải nhờ deploy.
+</p>
+
+<form method="post" action="/qt/lien-he" style="max-width:760px;margin-top:24px">
+  {{range .O}}
+  <div class="o-nguong" style="border-left:3px solid var(--nhan,#d6f32f);padding:12px 0 12px 16px;margin:16px 0">
+    <label for="{{.Khoa}}"><b>{{.Nhan}}</b></label>
+    <div style="margin:8px 0">
+      <input id="{{.Khoa}}" name="{{.Khoa}}" value="{{.Gia}}" autocomplete="off"
+             style="width:100%;max-width:520px">
+    </div>
+    <div class="nho mo">{{.Goi}}</div>
+  </div>
+  {{end}}
+
+  <button class="nut nut-chinh" type="submit" style="margin-top:20px">Lưu</button>
+</form>
+
+{{template "qt-chan" .}}
+{{end}}

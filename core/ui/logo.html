@@ -1,0 +1,22 @@
+{{/* Logo T-PIC bản ngang — bộ đồ nghề bắt chéo với quả bóng, rồi tới chữ
+     T-PIC. Lấy nguyên từ assets/logo/logo-ngang.svg.
+
+     Nhúng thẳng vào HTML chứ không dùng <img>: màu của logo phải đổi theo
+     giao diện đang bật (tím và lá phải dùng bản một màu — volt đặt cạnh hai
+     màu đó là chói), mà ảnh ngoài thì CSS không với tới được. Ba màu là ba
+     biến: --lg-do (bộ đồ nghề), --lg-bong (quả bóng), --lg-chu (chữ T-PIC),
+     đặt trong css.html.
+
+     Lỗ quả bóng và khe cờ lê là lỗ thủng thật (mask + fill-rule="evenodd"),
+     nên nền nào cũng ra đúng hình. Không sửa toạ độ, không xoay, không kéo
+     méo, không tách chữ ra khỏi hình — assets/logo/README.md cấm. Đổi cỡ thì
+     đổi height trong CSS, tỉ lệ tự giữ.
+
+     Mã mask phải là duy nhất trong trang; mỗi trang chỉ có một cái đầu trang
+     nên một bản là đủ. */}}
+{{define "logo-dau"}}<svg class="logo-dau" viewBox="0 0 322 152" role="img" aria-label="T-PIC"><mask id="tp-logo-mask" maskUnits="userSpaceOnUse" x="-24" y="-24" width="200" height="200"><rect x="-24" y="-24" width="200" height="200" fill="#fff"/><circle cx="76" cy="76" r="28.5" fill="#000"/><g transform="translate(76 76) rotate(-45) scale(1.15)"><path d="M-7.5 41 H7.5 V58 H-7.5 Z" fill="#000"/></g></mask><g mask="url(#tp-logo-mask)"><g transform="translate(76 76) rotate(-45) scale(1.15)" fill="var(--lg-do)"><path d="M-5.5 -33 C-4 -14 -4 14 -5.5 33 L5.5 33 C4 14 4 -14 5.5 -33 Z"/><circle cx="0" cy="-38" r="13" fill="none" stroke="var(--lg-do)" stroke-width="7"/><circle cx="0" cy="38" r="13" fill="none" stroke="var(--lg-do)" stroke-width="7"/></g><g transform="translate(76 76) rotate(45) scale(1.15)" fill="var(--lg-do)"><path d="M-9.5 -53 H9.5 L7.5 -21 H-7.5 Z"/><path d="M-7.5 -19 H7.5 V-12 H-7.5 Z"/><path d="M-4 -12 H4 V36 H-4 Z"/><path d="M-6.5 34 H6.5 L5 53 H-5 Z"/></g></g><path fill-rule="evenodd" fill="var(--lg-bong)" d="M52.00 76.00 A24.00 24.00 0 1 1 100.00 76.00 A24.00 24.00 0 1 1 52.00 76.00 Z M73.24 76.00 A2.76 2.76 0 1 1 78.76 76.00 A2.76 2.76 0 1 1 73.24 76.00 Z M87.87 76.00 A2.23 2.76 0.0 1 1 92.34 76.00 A2.23 2.76 0.0 1 1 87.87 76.00 Z M81.94 86.28 A2.23 2.76 60.0 1 1 84.17 90.15 A2.23 2.76 60.0 1 1 81.94 86.28 Z M70.06 86.28 A2.23 2.76 120.0 1 1 67.83 90.15 A2.23 2.76 120.0 1 1 70.06 86.28 Z M64.13 76.00 A2.23 2.76 180.0 1 1 59.66 76.00 A2.23 2.76 180.0 1 1 64.13 76.00 Z M70.06 65.72 A2.23 2.76 240.0 1 1 67.83 61.85 A2.23 2.76 240.0 1 1 70.06 65.72 Z M81.94 65.72 A2.23 2.76 300.0 1 1 84.17 61.85 A2.23 2.76 300.0 1 1 81.94 65.72 Z M95.36 82.29 A1.21 2.76 18.0 1 1 97.67 83.04 A1.21 2.76 18.0 1 1 95.36 82.29 Z M87.97 92.47 A1.21 2.76 54.0 1 1 89.39 94.43 A1.21 2.76 54.0 1 1 87.97 92.47 Z M76.00 96.36 A1.21 2.76 90.0 1 1 76.00 98.78 A1.21 2.76 90.0 1 1 76.00 96.36 Z M64.03 92.47 A1.21 2.76 126.0 1 1 62.61 94.43 A1.21 2.76 126.0 1 1 64.03 92.47 Z M56.64 82.29 A1.21 2.76 162.0 1 1 54.33 83.04 A1.21 2.76 162.0 1 1 56.64 82.29 Z M56.64 69.71 A1.21 2.76 198.0 1 1 54.33 68.96 A1.21 2.76 198.0 1 1 56.64 69.71 Z M64.03 59.53 A1.21 2.76 234.0 1 1 62.61 57.57 A1.21 2.76 234.0 1 1 64.03 59.53 Z M76.00 55.64 A1.21 2.76 270.0 1 1 76.00 53.22 A1.21 2.76 270.0 1 1 76.00 55.64 Z M87.97 59.53 A1.21 2.76 306.0 1 1 89.39 57.57 A1.21 2.76 306.0 1 1 87.97 59.53 Z M95.36 69.71 A1.21 2.76 342.0 1 1 97.67 68.96 A1.21 2.76 342.0 1 1 95.36 69.71 Z"/><path fill="var(--lg-chu)" d="M164.096 63.41H152.81V57.2H182.726V63.41H171.44V95.0H164.096Z M187.296 78.044H206.304V84.2H187.296Z M213.574 57.2H237.28L243.058 63.032V76.262L237.226 82.148H220.918V95.0H213.574ZM233.932 75.992 235.822 74.102V65.246L233.932 63.356H220.918V75.992Z M250.328 57.2H257.672V95.0H250.328Z M266.022 88.79V63.41L272.232 57.2H290.7L296.802 63.302V69.08H289.458V66.002L286.92 63.464H276.12L273.366 66.218V85.982L276.12 88.736H286.92L289.458 86.198V83.12H296.802V88.898L290.7 95.0H272.232Z"/></svg>{{end}}
+
+{{/* Chỗ duy nhất quyết định đầu trang hiện logo nào: có tệp trong
+     data/logo/ thì dùng tệp đó, không thì dựng SVG trên. Để hai lời gọi ở
+     phan.html (trang khách và trang quản lý) khỏi phải nhớ luật này. */}}
+{{define "logo-o-dau"}}{{$u := logoURL}}{{if $u}}<img class="logo-dau logo-tep" src="{{$u}}" alt="">{{else}}{{template "logo-dau"}}{{end}}{{end}}

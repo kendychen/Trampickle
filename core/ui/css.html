@@ -1,0 +1,3775 @@
+{{define "css"}}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* ==========================================================================
+   Bảng màu: HAI TẦNG, mỗi theme tự khai một bộ
+   --------------------------------------------------------------------------
+   :root dưới đây chỉ là bộ dự phòng khi thẻ body chưa mang lớp theme nào.
+   Bộ đang chạy nằm ở khối body.theme-* phía cuối tệp; mặc định là theme-tpic,
+   dựng từ đúng bốn màu logo (xem ghi chú ở khối đó).
+
+   Tầng nền  --th-dam / --th : màu tối của theme, chiếm các MẢNG LỚN — đầu
+                               trang, hero, dải số, chân trang, cột trái quản trị.
+   Tầng nhấn --sang          : chỉ dùng cho thứ cần bấm hoặc cần đọc trước:
+                               nút chính, link, số liệu, mục đang mở. Không
+                               bao giờ trải thành mảng lớn.
+
+   Hai luật đi theo mọi theme:
+   1. Màu thương hiệu tách hẳn khỏi ba màu trạng thái. Xanh lá = nhận/đã giao,
+      hổ phách = chờ, đỏ = từ chối. Nhìn một vệt màu thương hiệu là biết đang
+      nói về trạm, không phải về đơn.
+   2. Nền --sang luôn đi với chữ --tren-sang. --sang của mọi theme đều là màu
+      chói (volt của T-PIC chỉ được 1.3:1 với trắng), đặt chữ trắng lên là
+      không đọc nổi. Khi --sang phải làm CHỮ trên nền sáng thì dùng --sang-muc.
+   ========================================================================== */
+:root {
+  --nen:        #EDF3F8;   /* nền trang: trắng ngả xanh, không phải trắng giấy */
+  --nen-2:      #E1EBF3;
+  --the:        #FFFFFF;
+  --muc:        #0B1F2C;
+  --muc-mo:     #526C7E;
+  --vien:       #D7E3EC;
+  --vien-dam:   #B4C8D8;
+
+  --th:         #0B3C5D;   /* navy nền: mảng lớn */
+  --th-2:       #12547E;   /* navy nhạt hơn: gradient, hover trên nền tối */
+  --th-dam:     #062A42;   /* navy sâu nhất: đầu trang, chân trang, dải số */
+  --th-nen:     #DCEAF4;   /* nền nhạt của tông xanh: mục đang mở, hàng hover */
+  --th-vien:    #C2D8E7;
+
+  --sang:       #00A6D6;   /* nhấn: nút chính, gạch chân mục đang mở */
+  --sang-muc:   #0A5C87;   /* nhấn dạng CHỮ trên nền sáng — đủ tương phản */
+  --tren-sang:  #04222F;   /* chữ đặt trên nền cyan */
+
+  --tren-th:    #FFFFFF;   /* chữ trên nền navy */
+  --tren-dam:   #DCEAF3;
+  --tren-dam-mo:#8FB0C6;
+
+  --nhan:       #1C6B57;   /* TRẠNG THÁI: nhận / đã giao */
+  --nhan-nen:   #E2EFE9;
+  --tuchoi:     #B23A22;   /* TRẠNG THÁI: từ chối */
+  --tuchoi-nen: #FAE9E4;
+  --cho:        #8A6512;   /* TRẠNG THÁI: đang chờ */
+  --cho-nen:    #F8EEDA;
+
+  --nhan-manh:  #0B1F2C;
+  --bong:       0 1px 2px rgba(6,42,66,.06), 0 12px 28px -14px rgba(6,42,66,.32);
+  --bong-cao:   0 2px 4px rgba(6,42,66,.07), 0 22px 44px -20px rgba(6,42,66,.42);
+  --r:          10px;
+  --r-nho:      6px;
+  --r-lon:      18px;
+
+  /* Màu cho bản vẽ SVG. Tách riêng khỏi màu giao diện vì hình còn phải chạy
+     trên nền navy của hero, chỗ mà --muc và --vien đều sai. */
+  --sv-net:  #2E5F80;   /* nét chính */
+  --sv-mo:   #9BB8CC;   /* nét phụ, thớ vật liệu */
+  --sv-to:   #E4EFF7;   /* mảng tô nhạt */
+  --sv-man:  #0B3C5D;   /* mặt hiển thị của cân */
+  --sv-nhan: #0A7FA8;   /* đường dẫn nhãn, chi tiết cần chú ý */
+  --sv-ok:   #1C6B57;   /* vùng sửa được */
+  --sv-canh: #B23A22;   /* vùng không sửa */
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --nen:        #071722;
+    --nen-2:      #04121B;
+    --the:        #0E2533;
+    --muc:        #E4F0F7;
+    --muc-mo:     #93AFC0;
+    --vien:       #1C3848;
+    --vien-dam:   #2E4E63;
+
+    --th:         #0D3B57;
+    --th-2:       #17587F;
+    --th-dam:     #04121C;
+    --th-nen:     #11344B;
+    --th-vien:    #1F4761;
+
+    --sang:       #35C3EE;
+    --sang-muc:   #6FD0F2;
+    --tren-sang:  #04222F;
+
+    --tren-th:    #F2F9FD;
+    --tren-dam:   #DCEAF3;
+    --tren-dam-mo:#8FB0C6;
+
+    --nhan:       #4FBF9C;
+    --nhan-nen:   #10302A;
+    --tuchoi:     #EE8A6E;
+    --tuchoi-nen: #32201A;
+    --cho:        #D9B463;
+    --cho-nen:    #2C2617;
+
+    --nhan-manh:  #E4F0F7;
+    --bong:       0 1px 2px rgba(0,0,0,.5), 0 12px 28px -14px rgba(0,0,0,.6);
+    --bong-cao:   0 2px 4px rgba(0,0,0,.5), 0 22px 44px -20px rgba(0,0,0,.7);
+
+    --sv-net:  #6FA3C4;
+    --sv-mo:   #3D6480;
+    --sv-to:   #0F2B3C;
+    --sv-man:  #041722;
+    --sv-nhan: #35C3EE;
+    --sv-ok:   #4FBF9C;
+    --sv-canh: #EE8A6E;
+  }
+}
+:root[data-theme="dark"] {
+  --nen:        #071722;
+  --nen-2:      #04121B;
+  --the:        #0E2533;
+  --muc:        #E4F0F7;
+  --muc-mo:     #93AFC0;
+  --vien:       #1C3848;
+  --vien-dam:   #2E4E63;
+
+  --th:         #0D3B57;
+  --th-2:       #17587F;
+  --th-dam:     #04121C;
+  --th-nen:     #11344B;
+  --th-vien:    #1F4761;
+
+  --sang:       #35C3EE;
+  --sang-muc:   #6FD0F2;
+  --tren-sang:  #04222F;
+
+  --tren-th:    #F2F9FD;
+  --tren-dam:   #DCEAF3;
+  --tren-dam-mo:#8FB0C6;
+
+  --nhan:       #4FBF9C;
+  --nhan-nen:   #10302A;
+  --tuchoi:     #EE8A6E;
+  --tuchoi-nen: #32201A;
+  --cho:        #D9B463;
+  --cho-nen:    #2C2617;
+
+  --nhan-manh:  #E4F0F7;
+  --bong:       0 1px 2px rgba(0,0,0,.5), 0 12px 28px -14px rgba(0,0,0,.6);
+  --bong-cao:   0 2px 4px rgba(0,0,0,.5), 0 22px 44px -20px rgba(0,0,0,.7);
+
+  --sv-net:  #6FA3C4;
+  --sv-mo:   #3D6480;
+  --sv-to:   #0F2B3C;
+  --sv-man:  #041722;
+  --sv-nhan: #35C3EE;
+  --sv-ok:   #4FBF9C;
+  --sv-canh: #EE8A6E;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+/* Nền giấy: một lớp nhiễu rất mỏng (3.5%) trải trên toàn trang. Không ai
+   nhìn ra nó, nhưng bỏ đi thì các mảng màu lớn phẳng lì như ô tô màu. */
+body {
+  margin: 0;
+  background-color: var(--nen);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E");
+  color: var(--muc);
+  font: 400 16px/1.68 "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  /* Chạm nhanh hai cái vào cùng một chỗ thì trình duyệt điện thoại hiểu là
+     "phóng to đoạn này" và trang nhảy cỡ — khách bấm hụt một nút rồi bấm lại
+     ngay là dính. manipulation bỏ đúng cử chỉ ấy; chụm hai ngón để phóng to
+     vẫn còn, nên người mắt kém không mất gì. */
+  touch-action: manipulation;
+  /* Xoay ngang máy là iOS tự thổi chữ to lên nếu không chặn. */
+  -webkit-text-size-adjust: 100%;
+}
+/* Thuộc tính hidden phải thắng mọi thứ. Trình duyệt cho nó display:none ở mức
+   yếu nhất, nên bất kỳ luật nào của mình đặt display:flex hay display:grid
+   cho chính phần tử ấy là hidden mất tác dụng — phần tử "đang ẩn" vẫn nằm
+   chình ình. Bốn chỗ trong site này đã dính: thẻ mời cài app, khối hướng dẫn
+   iPhone, danh sách tệp vừa chọn, thẻ đơn máy nhớ giùm. Đóng một lần ở đây
+   thay vì vá từng chỗ, và chỗ nào viết sau này cũng khỏi dính. */
+[hidden] { display: none !important; }
+
+.khung { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+.hep   { max-width: 700px; }
+
+/* Tiêu đề: Plus Jakarta Sans, sans-serif hình học, chữ đậm, giãn chữ âm — đúng
+   kiểu chữ của các trang phần mềm hiện nay. Trước đây dùng Fraunces (serif) cho
+   vẻ nghề thủ công, nhưng serif là thứ làm trang khác hẳn tham chiếu nhất.
+   Càng to thì càng phải bóp chữ lại: cỡ 55px mà giãn chữ như cỡ 16px thì các
+   chữ cái rời rạc ra, mất cảm giác một khối. Thân bài vẫn là Be Vietnam Pro —
+   nó vẽ dấu tiếng Việt tử tế hơn ở cỡ nhỏ. */
+h1, h2, h3, h4 {
+  font-family: "Plus Jakarta Sans", "Be Vietnam Pro", system-ui, sans-serif;
+  text-wrap: balance; margin: 0; line-height: 1.14;
+  font-weight: 700;
+}
+h1 {
+  font-size: clamp(32px, 4.8vw, 56px); letter-spacing: -.038em; line-height: 1.02;
+  font-weight: 800;
+}
+h2 {
+  font-size: clamp(23px, 2.9vw, 34px); letter-spacing: -.03em; line-height: 1.1;
+  font-weight: 800;
+}
+h3 { font-size: 18.5px; letter-spacing: -.018em; font-weight: 700; }
+h4 { font-size: 16px; letter-spacing: -.012em; font-weight: 700; }
+p  { margin: 0; }
+a  { color: var(--sang-muc); text-underline-offset: 2px; }
+
+/* --- Bản vẽ SVG ---------------------------------------------------------- */
+.sv { width: 100%; height: auto; display: block; overflow: visible; }
+/* Nhãn trên bản vẽ. Cỡ chữ tính theo bề rộng viewBox chứ không theo pixel màn
+   hình: hình rộng 520 đơn vị hiển thị trong cột ~410px, tức mọi thứ co lại còn
+   ~0.79. Nhãn 10px từng đọc ra 8px trên màn — không đọc được. */
+.sv-chu {
+  font: 700 13px "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: .1em; fill: var(--sv-nhan);
+}
+.sv-chu-ok   { fill: var(--sv-ok); }
+.sv-chu-canh { fill: var(--sv-canh); }
+.sv-so {
+  font: 700 17px "JetBrains Mono", ui-monospace, monospace;
+  fill: var(--sang); letter-spacing: .04em;
+}
+/* Biểu tượng dịch vụ: nét mảnh, không tô, thừa hưởng màu chữ chỗ đặt nó. */
+.bt {
+  width: 29px; height: 29px; flex: none; display: block;
+  fill: none; stroke: currentColor; stroke-width: 1.6;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+
+.nhan-nho {
+  font: 700 11px/1 "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--sang-muc);
+}
+/* Nhãn mục có vạch dẫn: chia trang bằng đường kẻ, không bằng khoảng trống.
+   Vạch chuyển dần sang trong suốt để không cắt ngang trang bằng một đường cứng. */
+.nhan-vach { display: flex; align-items: center; gap: 12px; }
+.nhan-vach::after {
+  content: ""; flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--th-vien), transparent);
+}
+.so { font-family: "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+/* Chữ trong dấu ` của markdown ra <code>. Cho nó giống .so để mã đơn gõ trong
+   ô nội dung nhìn y như mã đơn viết thẳng trong template. */
+code { font-family: "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; font-size: .95em; }
+.mo { color: var(--muc-mo); }
+.nho { font-size: 13px; }
+.doc { display: grid; gap: 14px; }
+.doc-lon { display: grid; gap: 30px; }
+.dan-lon { font-size: clamp(16.5px, 1.9vw, 19px); line-height: 1.6; color: var(--muc-mo); max-width: 58ch; }
+
+/* --- Đầu trang: dải navy chạy hết chiều ngang ---------------------------- */
+header.dau {
+  background: color-mix(in srgb, var(--th-dam) 88%, transparent);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  backdrop-filter: saturate(160%) blur(14px);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  position: sticky; top: 0; z-index: 20;
+}
+.dau-trong { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 11px 0; }
+.logo {
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif; font-weight: 800; font-size: 20px;
+  letter-spacing: -.01em; text-transform: none;
+  color: var(--tren-th); text-decoration: none; display: flex; align-items: baseline; gap: 10px;
+}
+/* Logo T-PIC bản ngang: bộ đồ nghề bắt chéo, quả bóng, rồi chữ T-PIC. Hình
+   nhúng thẳng trong logo.html; ở đây chỉ đặt cỡ và ba màu.
+
+   Dải đầu trang chạy nền tối ở mọi giao diện (--th-dam), nên mặc định là bản
+   nền tối: đồ nghề steel, bóng volt, chữ paper. Riêng "tím" và "lá" phải dùng
+   bản một màu — assets/logo/README.md: volt đặt cạnh tím #6D4AE0 thì chói,
+   cạnh xanh #35D68A thì lệch sắc nhìn ra ngay. Trên nền tối bản một màu là
+   màu trắng.
+
+   Chỉ đặt height, để width auto giữ tỉ lệ 322/152 — kéo méo là điều README
+   cấm đầu tiên. */
+/* Logo tải lên là ảnh ngoài: CSS không với vào đổi màu bên trong nó, và
+   tệp nào cũng có thể rất rộng. Kẹp bề ngang để đầu trang không vỡ. */
+img.logo-dau { max-width: 240px; object-fit: contain; }
+.logo-dau {
+  height: 34px; width: auto; flex: none; align-self: center;
+  --lg-do: #9FB3BD; --lg-bong: #D6F32F; --lg-chu: #F2F5F1;
+}
+body.theme-tim .logo-dau,
+body.theme-la .logo-dau,
+body.theme-cobalt .logo-dau,
+body.theme-dien .logo-dau,
+body.theme-bien .logo-dau,
+body.theme-kem .logo-dau,
+body.theme-do .logo-dau,
+body.theme-cam .logo-dau { --lg-do: #FFFFFF; --lg-bong: #FFFFFF; --lg-chu: #FFFFFF; }
+/* Vạch ngăn giữa chữ trong logo và tên tiếng Việt: hai cụm chữ đứng sát nhau
+   thì đọc thành một cụm dài. */
+.logo-ten { padding-left: 12px; border-left: 2px solid rgba(255,255,255,.22); }
+.logo-phu {
+  font-family: "Be Vietnam Pro", sans-serif; font-size: 12.5px; color: var(--tren-dam-mo);
+  font-weight: 400; font-stretch: 100%; letter-spacing: 0; text-transform: none;
+}
+.dau-trong nav { margin-left: auto; display: flex; gap: 2px; flex-wrap: wrap; align-items: center; }
+.dau-trong nav a {
+  color: var(--tren-dam); text-decoration: none; font-size: 14.5px; font-weight: 500;
+  padding: 7px 11px; border-radius: var(--r-nho);
+}
+.dau-trong nav a:hover { color: #fff; background: rgba(255,255,255,.09); }
+/* Mục đang mở: gạch chân màu nhấn, không tô nền — nền tối tô mảng là nặng mặt. */
+.dau-trong nav a.day {
+  color: #fff; font-weight: 600; background: transparent;
+  box-shadow: inset 0 -2px 0 var(--sang); border-radius: 0;
+}
+.nut-nho, .dau-trong nav a.nut-nho {
+  display: inline-block; padding: 8px 17px; border-radius: 999px;
+  background: var(--sang); color: var(--tren-sang); font-weight: 700;
+  box-shadow: none;
+}
+/* Cùng luật với .nut-chinh:hover. Mã cyan trước đây ở đây là một màu thứ năm
+   không có trong logo. */
+.nut-nho:hover, .dau-trong nav a.nut-nho:hover {
+  background: color-mix(in srgb, var(--sang) 86%, var(--muc)); color: var(--tren-sang);
+}
+/* Nút "Thoát" ở đầu trang quản trị nằm trên nền navy — nút phụ mặc định là
+   chữ mực trên nền trong suốt, ở đây sẽ chìm hẳn. Đảo sang tông sáng. */
+.dau-trong button.phu {
+  background: transparent; color: var(--tren-dam);
+  border: 1px solid rgba(255,255,255,.28);
+}
+.dau-trong button.phu:hover { background: rgba(255,255,255,.1); color: #fff; border-color: rgba(255,255,255,.5); }
+
+/* --- Khối ---------------------------------------------------------------- */
+section { padding: 60px 0; }
+section + section { border-top: 1px solid var(--vien); }
+section.nen2 { background: var(--nen-2); }
+
+.the {
+  background: var(--the); border: 1px solid var(--vien);
+  border-radius: var(--r); padding: 22px;
+}
+
+/* --- Hero: TẤM, không phải DẢI --------------------------------------------
+   Trước đây hero là một băng navy chạy hết chiều ngang màn hình. Trên màn
+   rộng nó thành một mảng xanh 1600px không có gì bên trong — nặng và trống
+   cùng lúc. Giờ bó lại thành một tấm bo góc nằm trong khung nội dung: cùng
+   màu ấy nhưng chiếm chưa tới hai phần ba bề ngang, và có mép để mắt bám. */
+.hero {
+  padding: 24px 0 0;
+  background: none;
+  border-top: none;
+}
+.hero > .khung {
+  position: relative; overflow: hidden;
+  padding: 56px 46px 52px;
+  border-radius: var(--r-lon);
+  background: linear-gradient(158deg, var(--th) 0%, var(--th-dam) 92%);
+  color: var(--tren-dam);
+  box-shadow: var(--bong-cao);
+}
+@media (max-width: 680px) {
+  .hero { padding-top: 14px; }
+  .hero > .khung { padding: 36px 22px 34px; border-radius: 14px; }
+}
+.hero > .khung::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(760px 340px at 88% -22%, color-mix(in srgb, var(--sang) 32%, transparent), transparent 62%),
+    radial-gradient(520px 280px at 2% 118%, color-mix(in srgb, var(--sang) 14%, transparent), transparent 66%);
+}
+/* Lưới kỹ thuật rất mờ phủ lên tấm hero — đủ để mặt phẳng có kết cấu, không
+   đủ để ai kịp nhận ra là ô vuông. */
+.hero > .khung::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mask-image: radial-gradient(120% 100% at 70% 0%, #000 10%, transparent 72%);
+  -webkit-mask-image: radial-gradient(120% 100% at 70% 0%, #000 10%, transparent 72%);
+}
+.hero > .khung > * { position: relative; z-index: 1; }
+.hero h1, .hero h2, .hero h3, .hero h4 { color: #fff; }
+.hero h1 { max-width: 17ch; margin-top: 18px; }
+.hero .dan,
+.hero > .khung > .dan { font-size: clamp(16.5px, 2vw, 19px); color: var(--tren-dam-mo); max-width: 54ch; margin-top: 20px; line-height: 1.6; }
+.hero .dan-lon, .hero > .khung > p, .hero > .khung > .nho, .hero > .khung > .mo { color: var(--tren-dam-mo); }
+/* Nhãn mono trên tấm hero tối. Với volt của T-PIC thì --sang tự đủ sáng, nhưng
+   giao diện lấy màu nhấn là xanh cobalt hay đỏ thì --sang trên nền tối chỉ còn
+   3-4:1 — đọc không nổi ở cỡ 12px. Những bộ đó khai thêm --sang-tren-toi (bản
+   nâng sáng trên đúng trục của chính màu nhấn, tới đúng 4.5:1); bộ nào không
+   khai thì rơi về --sang như cũ. */
+.hero .nhan-nho { color: var(--sang-tren-toi, var(--sang)); }
+/* Dòng nhãn hero là câu duy nhất nói trạm LÀM GÌ — 11px chữ mảnh trên nền
+   tối thì mắt lướt qua mất. Phóng lên và bọc một khung mỏng: vẫn là nhãn nhỏ,
+   nhưng thành một vật thể có mép chứ không phải vệt chữ nhạt. */
+.hero-lon .nhan-nho {
+  display: inline-flex; align-items: center;
+  padding: 7px 13px; border-radius: 999px;
+  font-size: 12.5px; letter-spacing: .13em;
+  color: var(--sang-tren-toi, var(--sang));
+  background: color-mix(in srgb, var(--sang) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sang) 34%, transparent);
+}
+.hero .nhan-vach::after { background: linear-gradient(90deg, rgba(255,255,255,.24), transparent); }
+.hero a { color: var(--sang); }
+.hero .so { color: #fff; }
+.hero .the .so, .hero .phieu .so, .hero .bao .so { color: var(--muc); }
+.hero-nut { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px; }
+/* Dòng địa chỉ dưới hàng nút. Ghim vẽ bằng SVG nhúng chứ không phải emoji:
+   emoji ghim trên Windows ra màu đỏ tươi, đặt cạnh chữ trắng trên nền tối
+   trông như báo lỗi. */
+/* Trang Về chúng tôi -------------------------------------------------- */
+.tram-o {
+  margin: 18px 0 0; font-size: clamp(22px, 2.6vw, 30px);
+  font-weight: 600; line-height: 1.25;
+}
+.tram-gio { margin: 8px 0 0; color: var(--mo); }
+.tram-gio span { color: var(--chu); font-weight: 600; }
+/* Lưới chứ không phải băng chạy: ảnh chỗ làm việc là thứ khách soi kỹ, băng
+   chạy bắt chờ tấm sau hiện lên thì soi kiểu gì. */
+.tram-anh {
+  display: grid; gap: 16px; margin-top: 22px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+.tram-anh figure { margin: 0; }
+.tram-anh img {
+  width: 100%; aspect-ratio: 4 / 3; object-fit: cover;
+  border-radius: 14px; display: block;
+}
+.tram-anh figcaption { margin-top: 8px; font-size: 13.5px; color: var(--mo); line-height: 1.45; }
+
+.hero-lien-he {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 6px 22px; margin: 18px 0 0; font-size: 15px; line-height: 1.45;
+  color: var(--tren-dam);
+}
+.hero-lien-he > * { display: inline-flex; align-items: center; gap: 9px; }
+/* Số điện thoại phải trông bấm được: trên nền tối một chữ trắng trơn không ai
+   biết đó là nút gọi. Gạch chân mờ, đậm lên khi rê chuột. */
+.hero-lien-he a {
+  color: #fff; text-decoration: underline;
+  text-decoration-color: rgba(255,255,255,.32);
+  text-underline-offset: 4px;
+}
+.hero-lien-he a:hover { text-decoration-color: #fff; }
+.hero-lien-he svg {
+  flex: none; width: 17px; height: 17px;
+  fill: none; stroke: var(--sang-tren-toi, var(--sang));
+  stroke-width: 1.7; stroke-linejoin: round;
+}
+
+/* Thẻ trắng đặt trên nền hero phải lấy lại màu chữ của nền sáng. */
+.hero .the, .hero .phieu, .hero .bao, .hero .the-nhom { color: var(--muc); }
+.hero .the h1, .hero .the h2, .hero .the h3, .hero .the h4 { color: var(--muc); }
+.hero .the .mo, .hero .the .nho, .hero .the p.mo { color: var(--muc-mo); }
+.hero .the a { color: var(--sang-muc); }
+.hero .bao-ok  { color: var(--nhan); }
+.hero .bao-loi { color: var(--tuchoi); }
+.hero .bao-luu { color: var(--cho); }
+/* Chip trong hero: nền tối nên chip xám nhạt bị chìm, đổi sang kính mờ. */
+.hero .chip-trung { background: rgba(255,255,255,.12); color: var(--tren-dam); border-color: rgba(255,255,255,.2); }
+/* Bản vẽ đặt trên tấm navy: đảo cả bộ màu SVG sang tông sáng. */
+.hero .sv {
+  --sv-net:  rgba(212,234,246,.86);
+  --sv-mo:   rgba(143,176,198,.62);
+  --sv-to:   rgba(255,255,255,.055);
+  --sv-man:  #04121C;
+  --sv-nhan: var(--sang);
+}
+
+.nut {
+  display: inline-block; padding: 13px 26px; border-radius: 999px; text-decoration: none;
+  font-weight: 700; font-size: 15px; border: 1px solid transparent;
+}
+.nut-chinh { background: var(--sang); color: var(--tren-sang); }
+/* Hover của nút màu nhấn: cùng màu, ĐẬM hơn — pha thêm 14% màu mực. Trước
+   đây pha thêm trắng, nhưng trên nền trang trắng thì hover làm nút nhạt đi,
+   tức là mờ dần vào nền. Với volt của T-PIC, 86% volt + 14% ink ra ~#B9D42D,
+   đúng một bậc L thấp hơn trên trục volt. Bản nền tối đảo lại ở body.toi. */
+.nut-chinh:hover { background: color-mix(in srgb, var(--sang) 86%, var(--muc)); }
+.nut-vien  { border-color: var(--vien-dam); color: var(--muc); background: transparent; }
+.nut-vien:hover { border-color: var(--th); color: var(--th); }
+/* Nút viền đặt trên nền navy: viền và chữ phải sáng lên. */
+.hero .nut-vien { border-color: rgba(255,255,255,.38); color: #fff; }
+.hero .nut-vien:hover { border-color: #fff; background: rgba(255,255,255,.1); color: #fff; }
+.hero .the .nut-vien { border-color: var(--vien-dam); color: var(--muc); }
+.hero .the .nut-vien:hover { border-color: var(--th); color: var(--th); }
+.hero .nut-chinh { color: var(--tren-sang); }
+
+/* Hero lệch: chữ bên trái, phiếu cân neo bên phải. */
+.hero-doi { display: grid; gap: 40px; align-items: center; }
+@media (min-width: 940px) { .hero-doi { grid-template-columns: minmax(0, 1.12fr) 348px; gap: 56px; } }
+
+/* --- Phiếu cân -----------------------------------------------------------
+   Vật đặc trưng nhất của nghề này. Cả trang chỉ có một cam kết kiểm chứng
+   được bằng cái cân nhà bếp, nên nó đáng được vẽ ra chứ không chỉ kể lại. */
+.phieu {
+  background: var(--the); border: 1px solid var(--vien);
+  border-radius: var(--r); overflow: hidden; box-shadow: var(--bong-cao);
+}
+.phieu .dinh {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  padding: 13px 16px; background: var(--th-dam); color: var(--tren-dam);
+  font: 700 11px/1.4 "JetBrains Mono", monospace; letter-spacing: .14em; text-transform: uppercase;
+  border-bottom: 2px solid var(--sang);
+}
+.phieu .dinh span { letter-spacing: .06em; color: var(--tren-dam-mo); font-weight: 500; }
+.phieu .d {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+  padding: 13px 16px; border-bottom: 1px solid var(--vien); font-size: 14px; color: var(--muc-mo);
+}
+.phieu .d b { font: 700 17px/1 "JetBrains Mono", monospace; font-variant-numeric: tabular-nums; color: var(--muc); }
+.phieu .chot {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+  padding: 13px 16px; background: var(--nhan-nen); color: var(--nhan);
+  font-size: 13.5px; font-weight: 600;
+}
+.phieu .chot b { font: 700 17px/1 "JetBrains Mono", monospace; font-variant-numeric: tabular-nums; }
+.phieu-ghi { margin-top: 11px; font-size: 12.5px; color: var(--tren-dam-mo); line-height: 1.5; }
+.hero .phieu-ghi { color: var(--tren-dam-mo); }
+
+/* --- Dải số: tấm biển thông số, không phải trang trí ---------------------
+   Trước là một băng navy thứ hai nối ngay dưới hero — hai mảng xanh chồng
+   nhau thành 600px xanh liên tục ở đầu trang. Giờ là ba ô sáng, và kéo lên
+   đè một góc lên mép dưới tấm hero: hết cảnh các khối xếp thẳng hàng nhau. */
+.bang-so { background: none; color: var(--muc); padding: 0; }
+.bang-so > .khung { margin-top: -26px; position: relative; z-index: 3; }
+@media (max-width: 680px) { .bang-so > .khung { margin-top: -18px; } }
+.hero + .bang-so, .hero + section, .bang-so + section { border-top: none; }
+.bang-so + section { padding-top: 58px; }
+.bang-so-luoi {
+  display: grid; gap: 1px; background: var(--vien);
+  border: 1px solid var(--vien); border-radius: var(--r); overflow: hidden;
+  box-shadow: var(--bong-cao);
+}
+@media (min-width: 700px) { .bang-so-luoi { grid-template-columns: repeat(3, 1fr); } }
+.bang-so-luoi > div { background: var(--the); padding: 22px 26px; }
+.bang-so .v {
+  font: 700 clamp(26px, 3.6vw, 36px)/1 "JetBrains Mono", monospace;
+  font-variant-numeric: tabular-nums; letter-spacing: -.02em; display: block;
+  color: var(--th);
+}
+.bang-so .t { display: block; margin-top: 9px; font-size: 13.5px; color: var(--muc-mo); line-height: 1.5; }
+.bang-so .n {
+  font: 700 10.5px/1 "JetBrains Mono", monospace; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--sang-muc); display: block; margin-bottom: 14px;
+}
+
+/* --- Lưới thẻ dịch vụ ---------------------------------------------------- */
+.luoi { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+/* Lưới vạch: các ô dính liền, chia bằng đường kẻ 1px. Kỷ luật lưới thay cho
+   thẻ nổi — ít đổ bóng, đọc ra một khối chứ không phải mấy mảnh rời. */
+/* Lưới thẻ dịch vụ.
+
+   Từng dùng flex-wrap cho hàng cuối tự giãn lấp chỗ trống. Hỏng: 5 thẻ ra
+   4 + 1, và cái thứ 5 kéo dài hết 1140px trông như một lỗi layout.
+
+   Đường kẻ 1px là nền --vien lòi qua khe gap. Từng thử vẽ bằng box-shadow của
+   mỗi ô, nhưng nền của ô kế bên tô đè lên bóng của ô trước nên kẻ mất hẳn.
+   Cách gap chỉ hỏng khi hàng cuối còn ô trống — mọi trang dùng lưới này đều
+   dựng đủ 6 ô nên 1 / 2 / 3 cột đều chia hết hàng. */
+.luoi-vach {
+  display: grid; grid-template-columns: 1fr; gap: 1px;
+  background: var(--vien);
+  border: 1px solid var(--vien); border-radius: var(--r); overflow: hidden;
+  box-shadow: var(--bong);
+}
+/* Số cột cố định chứ không auto-fill. Auto-fill cho 4 cột ở 1140px, thành
+   4 + 2 và để lộ hai ô trống thành một mảng xám. */
+@media (min-width: 620px)  { .luoi-vach { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { .luoi-vach { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.luoi-vach > * { background: var(--the); min-width: 0; }
+.dv-the {
+  background: var(--the); border: 1px solid var(--vien); border-radius: var(--r);
+  padding: 20px; display: flex; flex-direction: column; gap: 9px;
+  text-decoration: none; color: inherit; position: relative;
+}
+/* Vạch cyan chạy dọc mép trái khi rê chuột: dấu "đang chọn cái này". */
+.dv-the::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--sang); opacity: 0;
+}
+.dv-the:hover::before { opacity: 1; }
+.luoi-vach .dv-the { border: none; border-radius: 0; }
+.dv-the:hover { border-color: var(--th-vien); box-shadow: var(--bong); }
+/* Trong lưới thì ô không có viền riêng, nên hover chỉ đổi nền — bóng đổ ở đây
+   sẽ tràn qua khe gap và nuốt mất đường kẻ. */
+.luoi-vach .dv-the:hover { background: var(--th-nen); box-shadow: none; }
+.dv-the .dau-the { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+/* Ô biểu tượng: mỗi dịch vụ có một hình riêng. Chín thẻ chữ giống hệt nhau
+   là chín thẻ không ai đọc — cái hình cho mắt chỗ phân biệt trước khi đọc. */
+.dv-the .bt-o {
+  width: 50px; height: 50px; border-radius: 12px; margin-bottom: 3px;
+  background: var(--th-nen); color: var(--th);
+  display: grid; place-items: center;
+  border: 1px solid var(--th-vien);
+}
+.dv-the:hover .bt-o { background: var(--sang); color: var(--tren-sang); border-color: var(--sang); }
+/* Thẻ là flex column: chip không chặn align-self sẽ bị kéo rộng hết thẻ và
+   trông như một ô input rỗng. */
+.dv-the .chip { align-self: flex-start; }
+.dv-the .p { font: 700 17px/1 "JetBrains Mono", monospace; white-space: nowrap; color: var(--th); }
+.dv-the .mota { font-size: 14px; color: var(--muc-mo); line-height: 1.55; }
+.dv-the .chan { margin-top: auto; padding-top: 10px; font-size: 12.5px; color: var(--muc-mo); display: flex; gap: 16px; flex-wrap: wrap; }
+
+/* --- Bảng ---------------------------------------------------------------- */
+.bang { width: 100%; border-collapse: collapse; font-size: 15px; }
+.bang th {
+  text-align: left; padding: 11px 12px; background: var(--th-nen);
+  border-bottom: 1px solid var(--th-vien);
+  font: 700 10.5px/1 "JetBrains Mono", monospace; letter-spacing: .13em;
+  text-transform: uppercase; color: var(--th); white-space: nowrap;
+}
+.bang td { padding: 13px 12px; border-bottom: 1px solid var(--vien); vertical-align: top; }
+.bang tbody tr:last-child td { border-bottom: none; }
+.bang .p { text-align: right; white-space: nowrap; font-weight: 700; font-family: "JetBrains Mono", monospace; font-variant-numeric: tabular-nums; }
+.bang .g { text-align: right; white-space: nowrap; color: var(--muc-mo); font-size: 14px; font-family: "JetBrains Mono", monospace; font-variant-numeric: tabular-nums; }
+.bang a { text-decoration: none; font-weight: 600; color: var(--muc); }
+.bang a:hover { color: var(--sang-muc); }
+.bang tr.co-link:hover td { background: var(--th-nen); }
+.cuon { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+.chip {
+  display: inline-block; padding: 3px 9px; border-radius: 3px;
+  font: 700 11px/1.6 "JetBrains Mono", monospace; letter-spacing: .05em; white-space: nowrap;
+  border: 1px solid transparent;
+}
+.chip-nhan   { background: var(--nhan-nen);   color: var(--nhan); }
+.chip-tuchoi { background: var(--tuchoi-nen); color: var(--tuchoi); }
+.chip-cho    { background: var(--cho-nen);    color: var(--cho); }
+.chip-trung  { background: var(--th-nen);     color: var(--th); border-color: var(--th-vien); }
+
+/* --- Khối không nhận: điểm khác biệt, phải đọc được ngay ------------------ */
+.khong-nhan {
+  background: var(--tuchoi-nen);
+  border: 1px solid color-mix(in srgb, var(--tuchoi) 28%, transparent);
+  border-left: 3px solid var(--tuchoi);
+  border-radius: var(--r); padding: 24px 26px;
+}
+.khong-nhan h2 { color: var(--tuchoi); }
+.khong-nhan ul { margin: 18px 0 0; padding-left: 20px; }
+.khong-nhan li { margin-bottom: 12px; line-height: 1.6; }
+.khong-nhan li b { display: block; }
+
+.cam-ket { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.cam-ket .the { border-top: 3px solid var(--th); }
+.cam-ket .the strong {
+  display: block; margin-bottom: 8px; font-size: 17.5px; font-weight: 700;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif; letter-spacing: -.018em; line-height: 1.28;
+}
+/* Số thứ tự lớn mờ sau mỗi cam kết — nhịp thị giác cho hàng ba thẻ giống
+   hệt nhau, và cho biết đây là một danh sách đếm được chứ không phải khẩu hiệu. */
+.cam-ket .the { position: relative; overflow: hidden; }
+.cam-ket .the::after {
+  content: attr(data-so); position: absolute; right: 14px; top: 2px;
+  font: 700 62px/1 "JetBrains Mono", monospace; color: var(--th);
+  opacity: .07; pointer-events: none;
+}
+
+/* --- Các bước: đánh số vì đây LÀ một trình tự, không phải trang trí ------- */
+.buoc {
+  display: grid; gap: 1px; background: var(--vien);
+  border: 1px solid var(--vien); border-radius: var(--r); overflow: hidden;
+  box-shadow: var(--bong);
+}
+@media (min-width: 760px) { .buoc { grid-template-columns: repeat(4, 1fr); } }
+.buoc > div { background: var(--the); padding: 24px 22px; display: grid; gap: 8px; align-content: start; }
+.buoc .n {
+  font: 700 11px/1 "JetBrains Mono", monospace; color: var(--th);
+  letter-spacing: .14em; padding-bottom: 10px; border-bottom: 2px solid var(--sang);
+  justify-self: start; margin-bottom: 4px;
+}
+.buoc p { font-size: 14px; color: var(--muc-mo); line-height: 1.6; }
+/* Ô trải hết hàng: dùng cho bước lẻ cuối cùng. 1 / -1 nên nó đúng ở mọi
+   theme, kể cả theme đổi số cột (kem để 2 cột, mặc định 4). */
+.buoc > div.buoc-rong { grid-column: 1 / -1; }
+
+/* Bố cục hai cột kiểu ấn phẩm: chữ chạy bên trái, khối phụ neo bên phải. */
+.doi-cot { display: grid; gap: 34px; align-items: start; }
+@media (min-width: 900px) { .doi-cot { grid-template-columns: minmax(0, 1fr) 340px; gap: 48px; } }
+.doi-cot > .canh { display: grid; gap: 14px; align-content: start; }
+@media (min-width: 900px) { .doi-cot > .canh { position: sticky; top: 84px; } }
+
+/* --- Khối chữ đi kèm bản vẽ ---------------------------------------------- */
+.doi-hinh { display: grid; gap: 34px; align-items: center; }
+@media (min-width: 900px) { .doi-hinh { grid-template-columns: minmax(0, 460px) minmax(0, 1fr); gap: 52px; } }
+.doi-hinh.lat { direction: rtl; }
+.doi-hinh.lat > * { direction: ltr; }
+
+/* Khung đựng bản vẽ. Nền hơi khác nền trang để hình không lửng lơ, và có
+   một vạch cyan ở mép trên để nó đọc ra là "hình minh họa" chứ không phải
+   một thẻ nội dung khác. */
+.hinh-o {
+  margin: 0; padding: 26px 24px; background: var(--the);
+  border: 1px solid var(--vien); border-radius: var(--r);
+  border-top: 3px solid var(--sang); box-shadow: var(--bong);
+}
+.hinh-o figcaption {
+  margin-top: 18px; padding-top: 13px; border-top: 1px solid var(--vien);
+  font-size: 12.5px; line-height: 1.55; color: var(--muc-mo);
+}
+
+/* Danh sách có gạch đầu dòng riêng: dấu gạch cyan thay cho chấm tròn. */
+.gach { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 13px; }
+.gach li { position: relative; padding-left: 22px; line-height: 1.6; }
+.gach li::before {
+  content: ""; position: absolute; left: 0; top: .72em; width: 12px; height: 2px;
+  background: var(--sang);
+}
+.gach li b { font-weight: 600; }
+
+/* --- Bài viết ------------------------------------------------------------
+   Thân bài là văn xuôi dài, nên đo bằng SỐ KÝ TỰ chứ không bằng pixel:
+   65ch là chiều dài dòng mắt còn bắt được đầu dòng sau khi xuống hàng. */
+/* Danh sách "đọc tiếp" ở cột bên bài viết. */
+.lien-quan { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 0; }
+.lien-quan li { border-top: 1px solid var(--vien); }
+.lien-quan li:first-child { border-top: none; }
+.lien-quan a {
+  display: block; padding: 11px 0; font-size: 14px; line-height: 1.45;
+  color: var(--muc); text-decoration: none;
+}
+.lien-quan a:hover { color: var(--sang-muc); }
+
+/* Danh sách bài: xếp hai cột từ 860px trở lên, riêng bài đầu chiếm cả hàng.
+   Bài đầu là bài trụ — người mới vào nên đọc nó trước, nên nó được nằm riêng
+   một hàng thay vì lẫn vào lưới. */
+.bv-luoi { display: grid; gap: 16px; }
+@media (min-width: 860px) {
+  .bv-luoi { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+  .bv-luoi > :first-child { grid-column: 1 / -1; }
+}
+.bv-the { display: flex; flex-direction: column; align-items: flex-start; }
+.bv-the > :last-child { margin-top: auto; padding-top: 14px; }
+.bv-the h2 { font-size: clamp(19px, 2.2vw, 23px); line-height: 1.3; }
+.bv-the h2 a { color: var(--muc); text-decoration: none; }
+.bv-the h2 a:hover { color: var(--sang-muc); text-decoration: underline; }
+
+.bai { max-width: 65ch; font-size: 16.5px; line-height: 1.75; color: var(--muc); }
+.bai > p { margin-top: 16px; }
+.bai > p.dat { font-size: 18px; line-height: 1.7; color: var(--muc-mo); margin-top: 0; }
+.bai h2 {
+  font-size: clamp(21px, 2.5vw, 26px); line-height: 1.25;
+  margin-top: 42px; padding-top: 20px; border-top: 1px solid var(--vien);
+}
+.bai h3 { font-size: 17.5px; line-height: 1.35; margin-top: 30px; color: var(--sang-muc); }
+.bai h3 + p { margin-top: 10px; }
+.bai ol, .bai ul { margin-top: 16px; padding-left: 22px; display: grid; gap: 12px; }
+.bai li { padding-left: 4px; }
+.bai li::marker { color: var(--sang-muc); font-weight: 600; }
+.bai strong { font-weight: 600; }
+.bai em { color: var(--muc-mo); font-style: italic; }
+.bai a { color: var(--sang-muc); }
+
+/* Bản vẽ chèn giữa bài: cho phép tràn rộng hơn cột chữ, vì 65ch là bề rộng
+   cho MẮT ĐỌC CHỮ, còn hình thì cần chỗ. */
+.bai .hinh-o { margin: 36px 0 4px; max-width: none; }
+@media (min-width: 1040px) { .bai .hinh-o { margin-left: -40px; margin-right: -40px; } }
+
+/* Ô nhấn giữa bài: chỗ nói thẳng một điều quan trọng, không phải trích dẫn. */
+.bai .luu-y {
+  margin: 32px 0 0; padding: 20px 24px;
+  background: var(--th-nen); border-left: 3px solid var(--sang);
+  border-radius: 0 var(--r-nho) var(--r-nho) 0;
+  font-size: 16px; line-height: 1.65; color: var(--muc);
+}
+.bai .luu-y b { font-weight: 650; }
+
+/* Mục lục neo ở cột phải. Bài dài 1400 chữ mà không có mục lục thì người đọc
+   không biết mình đang ở đâu, và Google cũng không thấy được cấu trúc. */
+.muc-luc { font-size: 13.5px; }
+.muc-luc ol { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 2px; counter-reset: ml; }
+.muc-luc a {
+  display: block; padding: 7px 10px 7px 30px; border-radius: var(--r-nho);
+  text-decoration: none; color: var(--muc-mo); position: relative; line-height: 1.4;
+}
+.muc-luc a::before {
+  counter-increment: ml; content: counter(ml, decimal-leading-zero);
+  position: absolute; left: 9px; top: 8px;
+  font: 700 10px/1.4 "JetBrains Mono", monospace; color: var(--sang-muc); opacity: .75;
+}
+.muc-luc a:hover { background: var(--th-nen); color: var(--th); }
+
+/* --- Form ---------------------------------------------------------------- */
+label { display: block; margin-bottom: 15px; font-size: 14px; font-weight: 500; }
+label span.hd { display: block; font-weight: 400; color: var(--muc-mo); font-size: 13px; margin-top: 2px; }
+input, textarea, select {
+  width: 100%; margin-top: 6px; padding: 11px 13px;
+  border: 1px solid var(--vien-dam); border-radius: var(--r-nho);
+  background: var(--the); color: var(--muc);
+  font: 400 15px/1.5 "Be Vietnam Pro", system-ui, sans-serif;
+}
+input[type=checkbox], input[type=radio] { width: auto; margin: 0 8px 0 0; accent-color: var(--th); }
+/* Ô chọn tệp mặc định của trình duyệt cao thấp mỗi nơi một kiểu; kẻ viền
+   đứt cho nó ra dáng vùng thả tệp thay vì một cái nút lạc lõng. */
+input[type=file] {
+  padding: 14px; border-style: dashed; border-color: var(--vien-dam);
+  background: var(--nen-2); font-size: 14px; cursor: pointer;
+}
+input[type=file]:hover { border-color: var(--sang); background: var(--th-nen); }
+input[type=file]::file-selector-button {
+  margin-right: 12px; padding: 7px 13px; border: 1px solid var(--vien-dam);
+  border-radius: var(--r-nho); background: var(--the); color: var(--muc);
+  font: 600 13.5px/1 "Be Vietnam Pro", system-ui, sans-serif; cursor: pointer;
+}
+.tep-ds { margin: -6px 0 15px; display: grid; gap: 4px; font-size: 13px; color: var(--muc-mo); }
+.tep-ds .nang { color: var(--tuchoi); font-weight: 600; }
+/* Vòng focus: nét trong lấy --muc chứ KHÔNG lấy volt. Volt trên nền trắng chỉ
+   được 1.3:1 — người gõ bàn phím nhìn không ra đang đứng ở ô nào, mà đây là
+   form khách phải điền. --muc thì tự đảo theo nền (18:1 trên trắng, và vẫn
+   sáng rõ ở các trang nền tối), nên một dòng này đúng cho cả năm giao diện.
+   Quầng volt bên ngoài giữ phần nhận diện, không gánh việc tương phản. */
+input:focus, textarea:focus, select:focus {
+  outline: 2px solid var(--muc); outline-offset: 1px; border-color: var(--muc);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--sang) 55%, transparent);
+}
+/* Link và nút cũng phải thấy được khi đi bằng phím Tab. Dùng :focus-visible
+   để chuột bấm không kéo theo vòng sáng. */
+a:focus-visible, button:focus-visible, .nut:focus-visible,
+input[type=file]:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--muc); outline-offset: 2px; border-radius: 3px;
+}
+.hero a:focus-visible, .hero button:focus-visible, .hero .nut:focus-visible,
+header.dau a:focus-visible, header.dau button:focus-visible,
+footer a:focus-visible {
+  outline-color: var(--sang);
+}
+textarea { resize: vertical; min-height: 100px; }
+button, .nut-form {
+  padding: 12px 22px; border: none; border-radius: var(--r-nho);
+  background: var(--th); color: var(--tren-th);
+  font: 700 15px/1 "Be Vietnam Pro", system-ui, sans-serif; cursor: pointer;
+}
+button:hover { background: var(--th-2); }
+button:disabled { opacity: .5; cursor: default; }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--sang); outline-offset: 2px; }
+button.phu, .nut-phu { background: transparent; color: var(--muc); border: 1px solid var(--vien-dam); }
+button.phu:hover, .nut-phu:hover { background: var(--th-nen); border-color: var(--th-vien); color: var(--th); }
+button.nho { padding: 7px 13px; font-size: 13.5px; }
+button.do { background: var(--tuchoi); color: #fff; }
+button.do:hover { background: var(--tuchoi); opacity: .88; }
+.hang { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.hang > * { flex: 1 1 180px; }
+.hang > .co-hep { flex: 0 1 150px; }
+
+.bao { padding: 13px 15px; border-radius: var(--r-nho); margin-bottom: 18px; font-size: 15px; }
+.bao-ok  { background: var(--nhan-nen);   color: var(--nhan); }
+.bao-loi { background: var(--tuchoi-nen); color: var(--tuchoi); }
+.bao-luu { background: var(--cho-nen);    color: var(--cho); }
+
+/* Mã yêu cầu hiện sau khi khách gửi ảnh. To và tách hẳn ra: khách phải nhìn
+   thấy nó ngay để chụp màn hình, chứ không phải dò trong một câu văn. */
+.ma-yc {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin-top: 12px; padding: 11px 14px;
+  border: 1px dashed currentColor; border-radius: var(--r-nho);
+}
+.ma-yc > span { font-size: 13px; opacity: .8; }
+.ma-yc > b { font-size: 18px; letter-spacing: .04em; user-select: all; }
+
+/* --- Chân trang: đóng trang bằng đúng mảng navy đã mở trang -------------- */
+footer {
+  background: var(--th-dam); color: var(--tren-dam-mo);
+  border-top: none; padding: 48px 0 52px; font-size: 13.5px;
+}
+footer .cot { display: grid; gap: 26px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+footer b {
+  color: #fff; font-family: "Plus Jakarta Sans", system-ui, sans-serif; font-size: 17px;
+  font-weight: 800; letter-spacing: -.018em;
+}
+footer .nhan-nho { color: var(--sang-tren-toi, var(--sang)); }
+footer a { color: var(--tren-dam); text-decoration: none; display: block; padding: 3px 0; }
+footer a:hover { color: var(--sang); }
+footer .mo { color: var(--tren-dam-mo); }
+footer .day {
+  margin-top: 32px; padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,.13); font-size: 12.5px;
+}
+
+/* --- Trang quản trị ------------------------------------------------------
+   Cột trái dùng navy sâu để tách hẳn khỏi vùng làm việc: nhìn một cái là biết
+   đâu là điều hướng, đâu là dữ liệu đang sửa. */
+.qt-than { display: grid; grid-template-columns: 224px minmax(0, 1fr); gap: 0; min-height: calc(100vh - 57px); }
+@media (max-width: 860px) { .qt-than { grid-template-columns: 1fr; } }
+.qt-canh {
+  background: var(--th-dam); padding: 20px 14px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+@media (max-width: 860px) { .qt-canh { flex-direction: row; flex-wrap: wrap; } }
+.qt-canh a {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 9px 12px; border-radius: var(--r-nho); text-decoration: none;
+  color: var(--tren-dam); font-size: 14.5px; font-weight: 500;
+}
+.qt-canh a:hover { background: rgba(255,255,255,.09); color: #fff; }
+.qt-canh a.day {
+  background: var(--sang); color: var(--tren-sang); font-weight: 700;
+}
+.qt-canh .nhom {
+  margin-top: 18px; padding: 0 12px 4px; color: var(--tren-dam-mo);
+}
+.qt-canh .dem {
+  font: 700 11px/1.6 "JetBrains Mono", monospace; background: var(--tuchoi);
+  color: #fff; border-radius: 999px; padding: 0 7px;
+}
+.qt-canh a.day .dem { background: var(--tren-sang); color: #fff; }
+.qt-noi { padding: 28px 26px 64px; min-width: 0; background: var(--nen); }
+.qt-dau-trang {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--vien);
+}
+.qt-dau-trang h1 { font-size: 27px; letter-spacing: -.025em; }
+.qt-dau-trang .phai { margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap; }
+
+.luoi-so { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(158px, 1fr)); }
+.o-so {
+  background: var(--the); border: 1px solid var(--vien); border-radius: var(--r);
+  padding: 15px 17px; border-top: 3px solid var(--th);
+}
+.o-so .v { font: 700 25px/1.1 "JetBrains Mono", monospace; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--th); }
+.o-so .t { font-size: 13px; color: var(--muc-mo); margin-top: 4px; }
+.o-so.canh-bao { border-top-color: var(--tuchoi); }
+.o-so.canh-bao .v { color: var(--tuchoi); }
+.o-so.tot { border-top-color: var(--nhan); }
+.o-so.tot .v { color: var(--nhan); }
+
+.the-nhom {
+  background: var(--the); border: 1px solid var(--vien);
+  border-radius: var(--r); overflow: hidden; box-shadow: var(--bong);
+}
+.the-nhom > h3 {
+  padding: 13px 18px; border-bottom: 1px solid var(--th-vien); background: var(--th-nen);
+  font: 700 11px/1.5 "JetBrains Mono", monospace; letter-spacing: .13em;
+  text-transform: uppercase; color: var(--th);
+}
+.the-nhom > .noi { padding: 18px; }
+.the-nhom .bang { font-size: 14.5px; }
+.the-nhom .bang th { padding-left: 18px; padding-right: 18px; }
+.the-nhom .bang td { padding-left: 18px; padding-right: 18px; }
+
+.moc { border-left: 1px solid var(--th-vien); padding-left: 17px; display: grid; gap: 13px; }
+.moc > div { position: relative; font-size: 14px; }
+.moc > div::before {
+  content: ""; position: absolute; left: -21px; top: 7px; width: 7px; height: 7px;
+  background: var(--the); border: 2px solid var(--th-vien); border-radius: 50%;
+}
+.moc > div:first-child::before { background: var(--sang); border-color: var(--sang); }
+.moc .khi { font: 500 12px/1.4 "JetBrains Mono", monospace; color: var(--muc-mo); }
+
+.anh-luoi { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+.anh-o { border: 1px solid var(--vien); border-radius: var(--r); overflow: hidden; background: var(--nen-2); }
+.anh-o img, .anh-o video { display: block; width: 100%; height: 130px; object-fit: cover; background: #000; }
+.anh-o .duoi { display: flex; align-items: center; gap: 6px; padding: 6px 8px; font-size: 11.5px; color: var(--muc-mo); }
+.anh-o form { margin-left: auto; }
+.anh-o button { padding: 2px 7px; font-size: 11px; background: transparent; color: var(--tuchoi); border: 1px solid var(--vien); }
+.anh-o button:hover { background: var(--tuchoi-nen); }
+
+/* Danh sách ảnh trang chủ ở /qt/anh-trang-chu. Dùng lại khung .anh-o của ảnh
+   đơn hàng cho khỏi vẽ lại, nhưng ở đây không phải nút nào cũng là nút xoá —
+   phải gỡ màu đỏ và cái margin-left:auto mà .anh-o đặt sẵn. */
+.anh-ds {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px; margin-top: 14px;
+}
+.anh-ds .anh-o img { height: 168px; }
+.anh-viec { display: grid; gap: 8px; padding: 9px; }
+.anh-viec form { margin-left: 0; }
+.anh-ct { display: flex; gap: 6px; }
+.anh-ct input { flex: 1; min-width: 0; font-size: 12px; padding: 5px 7px; }
+.anh-nut { display: flex; gap: 6px; }
+.anh-ds .anh-o button { color: var(--muc-mo); }
+.anh-ds .anh-o button:hover { background: var(--nen); }
+.anh-nut form:last-child button { color: var(--tuchoi); }
+.anh-nut form:last-child button:hover { background: var(--tuchoi-nen); }
+
+/* Phải bó trong .bieu-do: chân trang cũng có .cot (lưới cột link), và một
+   .cot trần thì cái gradient này tràn xuống đó thành vệt xanh lạ. */
+.bieu-do .cot { background: linear-gradient(90deg, var(--th), var(--sang)); border-radius: 2px; min-height: 3px; }
+.bieu-do { display: grid; gap: 9px; }
+.bieu-do .dong { display: grid; grid-template-columns: 96px minmax(0,1fr) 112px; align-items: center; gap: 12px; font-size: 13.5px; }
+.bieu-do .dong .st { text-align: right; font-family: "JetBrains Mono", monospace; font-variant-numeric: tabular-nums; font-weight: 700; }
+
+.tra-loi {
+  white-space: pre-wrap; background: var(--the); border: 1px solid var(--vien);
+  border-left: 3px solid var(--sang); border-radius: var(--r);
+  padding: 17px 19px; margin-top: 14px; font-size: 15px;
+}
+.can-cu { margin-top: 12px; font-size: 13px; }
+.can-cu details { background: var(--the); border: 1px solid var(--vien); border-radius: var(--r); padding: 10px 14px; }
+.can-cu summary { cursor: pointer; color: var(--muc-mo); }
+.can-cu pre { white-space: pre-wrap; font-size: 12px; margin: 8px 0 0; color: var(--muc-mo); }
+.canh-bao-dong {
+  background: var(--tuchoi-nen); color: var(--tuchoi);
+  border-radius: var(--r-nho); padding: 11px 14px; margin-top: 10px; font-size: 14px;
+}
+.hang-nut { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+
+.yc { border-bottom: 1px solid var(--vien); padding: 15px 0; }
+.yc:last-child { border-bottom: none; }
+.yc .d { font-size: 13px; color: var(--muc-mo); }
+
+.trong { text-align: center; padding: 48px 20px; color: var(--muc-mo); }
+.trong b { display: block; color: var(--muc); margin-bottom: 6px; font-size: 16px; }
+
+dl.kv { display: grid; grid-template-columns: auto 1fr; gap: 10px 20px; margin: 0; font-size: 14.5px; }
+dl.kv dt { color: var(--muc-mo); }
+dl.kv dd { margin: 0; font-weight: 500; }
+
+/* Chi tiết đơn: cột việc bên trái, cột tóm tắt bên phải. */
+.ct-2cot { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr) 320px; align-items: start; }
+@media (max-width: 1000px) { .ct-2cot { grid-template-columns: 1fr; } }
+.ct-2cot > div { display: grid; gap: 18px; align-content: start; }
+
+/* --- Trang chọn giao diện -------------------------------------------------
+   Mỗi lựa chọn là một ô bấm được cả mảng, không phải cái nút tròn bé xíu bên
+   cạnh chữ. Ô đang dùng viền màu nhấn — nhìn một cái là biết đang bật cái nào
+   mà không phải soi xem chấm tròn nào được tô. */
+.chon-gd { display: grid; gap: 14px; }
+@media (min-width: 720px) { .chon-gd { grid-template-columns: 1fr 1fr; } }
+.gd-o {
+  display: grid; gap: 12px; align-content: start; cursor: pointer;
+  background: var(--the); border: 1px solid var(--vien);
+  border-radius: var(--r); padding: 16px;
+}
+.gd-o:hover { border-color: var(--vien-dam); }
+.gd-o.dang-dung { border-color: var(--sang); box-shadow: 0 0 0 1px var(--sang); }
+.gd-o input { justify-self: start; }
+.gd-mau { display: block; height: 76px; border-radius: var(--r-nho); border: 1px solid var(--vien); }
+.gd-mau-xuong {
+  background: radial-gradient(120% 130% at 78% 8%, #202B14 0%, #10150C 46%, #060804 100%);
+  box-shadow: inset -14px 0 0 -8px #D6F32F;
+}
+/* Ô màu bản sáng: nền kem của trang, một vệt than là tấm hero, mép volt. */
+.gd-mau-xuong-sang {
+  background: linear-gradient(180deg, #14180F 0%, #14180F 44%, #F4F5EF 44%, #E9EBE0 100%);
+  box-shadow: inset -14px 0 0 -8px #D6F32F;
+}
+.gd-mau-tim {
+  background: linear-gradient(168deg, #1E1147 0%, #4B2FA8 44%, #7B54E8 100%);
+  box-shadow: inset -14px 0 0 -8px #fff;
+}
+.gd-mau-la {
+  background: radial-gradient(130% 140% at 20% 6%, #1D6B4C 0%, #14523A 44%, #08281C 100%);
+  box-shadow: inset -14px 0 0 -8px #35D68A;
+}
+/* T-PIC cũng là bản sáng: một vệt ink là tấm hero, dưới là trang trắng. */
+.gd-mau-tpic {
+  background: linear-gradient(180deg, #253036 0%, #08171F 44%, #FFFFFF 44%, #F2F8FB 100%);
+  box-shadow: inset -14px 0 0 -8px #D6F32F;
+}
+.gd-chu { display: grid; gap: 6px; justify-items: start; }
+.gd-chu .nho { line-height: 1.55; }
+
+/* ==========================================================================
+   ĐIỆN THOẠI
+   --------------------------------------------------------------------------
+   Đo bằng Chrome DevTools Protocol ở khổ 390x844 có bật giả lập thiết bị
+   (scratchpad/do.js). Trang KHÔNG tràn ngang — scrollWidth đúng 390 ở mọi
+   trang. Ba lỗi có thật, sửa ở đây:
+
+     1. Đầu trang ăn ~215px: "Trạm Pickle" xuống dòng, dòng mô tả chiếm thêm
+        hai dòng nữa, nav sáu mục nằm hai hàng. Trên màn 844px cao thì hero
+        gần như không còn chỗ.
+     2. Chữ dưới 12px: nhãn mono viết hoa 10.5-11px. Trên màn cầm tay, ngoài
+        trời, cỡ đó là đoán chữ chứ không phải đọc.
+     3. Vùng bấm dưới 44px (khuyến nghị của Apple; WCAG 2.5.8 chỉ bắt 24px).
+
+   Cỡ chữ desktop giữ nguyên — thang chữ ở đó là cố ý, chỉ nới ở khổ hẹp.
+   ========================================================================== */
+@media (max-width: 680px) {
+  /* --- Đầu trang --- */
+  .dau-trong { gap: 10px; padding: 9px 0; }
+  .logo { font-size: 17px; gap: 8px; }
+  .logo-dau { height: 28px; }
+  /* Không cho "Trạm Pickle" gãy làm hai dòng: hai chữ này là tên thương hiệu,
+     gãy dòng đọc ra hai thứ khác nhau. */
+  .logo-ten { white-space: nowrap; padding-left: 9px; }
+  /* Dòng mô tả dài (Chuyên sửa chữa · Thay đế giày Pickleball) ăn hai dòng
+     nữa mà không nói thêm gì so với chính trang đang mở — bỏ ở khổ này. */
+  .logo-phu { display: none; }
+  .dau-trong nav { width: 100%; margin-left: 0; gap: 0 4px; }
+  .dau-trong nav a {
+    font-size: 14px; padding: 11px 9px;
+    display: inline-flex; align-items: center; min-height: 44px;
+  }
+  .nut-nho, .dau-trong nav a.nut-nho { padding: 11px 15px; min-height: 44px; }
+
+  /* --- Cỡ chữ nhỏ nhất --- */
+  .nhan-nho { font-size: 12px; letter-spacing: .13em; }
+  .bang-so .n { font-size: 12px; letter-spacing: .12em; }
+  .chip { font-size: 12px; padding: 4px 9px; }
+  .nho { font-size: 13.5px; }
+  /* Nhãn mono viết hoa còn lại — cùng một họ chữ, cùng một lý do. */
+  .phieu .dinh,
+  .bang th,
+  .buoc .n,
+  .the-nhom > h3 { font-size: 12px; letter-spacing: .12em; }
+  .muc-luc a::before { font-size: 11px; }
+
+  /* --- Vùng bấm --- */
+  .nut { padding: 14px 24px; min-height: 44px; }
+  button, .nut-form, input[type=submit] { min-height: 44px; }
+  /* Trừ chấm slider: nó đã tự lo vùng bấm bằng viền trong suốt, ép cao 44px
+     vào đây là kéo dài cả hàng chấm. */
+  .ba-cham button { min-height: 0; }
+}
+
+/* ==========================================================================
+   GIAO DIỆN "XƯỞNG" — màu quả bóng pickleball
+   --------------------------------------------------------------------------
+   Màu nhấn là volt #D6F32F, đúng màu quả bóng thi đấu. Volt có độ chói rất
+   cao nên nó KHÔNG bao giờ trải thành mảng lớn và KHÔNG bao giờ đi với chữ
+   trắng (tương phản 1.4:1, fail hẳn). Luật của màu này chỉ có hai dòng:
+
+     nền volt  → chữ --tren-sang (#10140A, gần đen)
+     chữ volt  → chỉ đặt trên nền tối; trên nền trắng phải hạ xuống --sang-muc
+
+   Nền lớn là than ngả xanh rất nhẹ, không phải đen thuần: đen thuần cạnh một
+   vệt volt sẽ đọc ra "thiếu màu" chứ không ra "sân đêm".
+
+   Khối này là biến cho các trang SÁNG của giao diện trạm (bài viết, liên hệ,
+   tra cứu). Trang chủ và trang dịch vụ nền tối, xem body.toi ngay dưới.
+
+   Bản "Trạm sáng" dùng chung đúng bảng màu này, chỉ khác ở chỗ nó không bao
+   giờ nhận lớp "toi" — nên trang chủ và trang dịch vụ cũng chạy nền sáng.
+   Viết chung một selector chứ không chép đôi: hai bảng màu giống hệt nhau đặt
+   cạnh nhau là kiểu gì cũng có ngày sửa một bên quên bên kia.
+   ========================================================================== */
+body.theme-xuong,
+body.theme-xuong-sang {
+  --nen:        #F4F5EF;
+  --nen-2:      #E9EBE0;
+  --the:        #FFFFFF;
+  --muc:        #14170F;
+  --muc-mo:     #5C6353;
+  --vien:       #E0E3D6;
+  --vien-dam:   #C2C7B2;
+
+  --th:         #1D2416;
+  --th-2:       #2F3B20;
+  --th-dam:     #0A0C08;
+  --th-nen:     #EDF2D6;
+  --th-vien:    #D9E2B4;
+
+  --sang:       #D6F32F;
+  /* Volt trên nền trắng chỉ được 1.3:1 — link và nhãn nhỏ phải dùng bản hạ
+     tối này (7.4:1). Cùng tông, khác việc. */
+  --sang-muc:   #4E6108;
+  --tren-sang:  #10140A;
+
+  --tren-th:    #FFFFFF;
+  --tren-dam:   #E6EAD7;
+  --tren-dam-mo:#A6AE92;
+
+  --nhan-manh:  #14170F;
+  --bong:       0 1px 2px rgba(10,12,8,.06), 0 12px 28px -14px rgba(10,12,8,.34);
+  --bong-cao:   0 2px 4px rgba(10,12,8,.07), 0 22px 44px -20px rgba(10,12,8,.44);
+
+  --sv-net:  #4A5540;
+  --sv-mo:   #A9B398;
+  --sv-to:   #F0F3E4;
+  --sv-man:  #14170F;
+  --sv-nhan: #5D7409;
+}
+
+/* --- Nền tối: trang chủ và trang dịch vụ ----------------------------------
+   Hai trang này là trang bán hàng: người ta lướt chứ không đọc từng chữ, nên
+   nền tối và chữ lớn ăn tiền hơn. 13 bài viết thì ngược lại — đọc 1400 chữ
+   trên nền đen mỏi mắt và người ta rời trang sớm, nên bài viết giữ nền sáng.
+
+   Lớp "toi" hiện chỉ giao diện trạm mới có (xem lopThan trong giaodien.go),
+   nên bảng màu volt viết thẳng vào đây thay vì lồng thêm một tầng chọn. */
+body.toi {
+  --nen:        #0A0C08;
+  --nen-2:      #0E1109;
+  --the:        #14180F;
+  --muc:        #F1F5E6;
+  --muc-mo:     #9AA48C;
+  --vien:       #232819;
+  --vien-dam:   #3D4530;
+
+  --th:         #253018;
+  --th-2:       #384625;
+  --th-dam:     #060804;
+  --th-nen:     #19200F;
+  --th-vien:    #2B3420;
+
+  --sang:       #D6F32F;
+  --sang-muc:   #DCF556;
+  --tren-sang:  #10140A;
+
+  /* Ba màu trạng thái giữ nguyên tông cũ. Volt đã là màu thương hiệu, nếu
+     kéo cả "đã nhận" sang vàng-xanh nữa thì thợ nhìn một vệt sáng không còn
+     biết đang nói về trạm hay về cái đơn. */
+  --nhan:       #4FBF9C;
+  --nhan-nen:   #102A24;
+  --tuchoi:     #EE8A6E;
+  --tuchoi-nen: #2C1C17;
+  --cho:        #D9B463;
+  --cho-nen:    #272113;
+
+  --nhan-manh:  #F1F5E6;
+  --bong:       0 1px 2px rgba(0,0,0,.6), 0 14px 32px -16px rgba(0,0,0,.8);
+  --bong-cao:   0 2px 4px rgba(0,0,0,.6), 0 26px 52px -22px rgba(0,0,0,.9);
+
+  --sv-net:  #A9B893;
+  --sv-mo:   #5A6549;
+  --sv-to:   #121808;
+  --sv-man:  #060804;
+  --sv-nhan: #D6F32F;
+  --sv-ok:   #4FBF9C;
+  --sv-canh: #EE8A6E;
+}
+/* Đầu trang trên nền tối: hoà vào nền thay vì là một dải nổi lên. */
+body.toi header.dau {
+  background: color-mix(in srgb, #0A0C08 82%, transparent);
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+/* Nút chính là quả bóng: volt đặc, chữ gần đen. Đây là chỗ duy nhất trên
+   trang được phép có một mảng volt — có hai mảng thì không còn mảng nào nổi. */
+body.toi .nut-chinh { background: var(--sang); color: var(--tren-sang); }
+body.toi .nut-chinh:hover { background: #E4FF52; }
+body.toi .nut-vien { border-color: rgba(255,255,255,.22); color: #fff; background: rgba(255,255,255,.06); }
+body.toi .nut-vien:hover { border-color: rgba(214,243,47,.55); background: rgba(214,243,47,.1); color: #fff; }
+body.toi .nut-nho { background: var(--sang); color: var(--tren-sang); }
+body.toi .nut-nho:hover { background: #E4FF52; color: var(--tren-sang); }
+/* Vạch phân mục giữa các section biến mất trên nền đen nếu vẫn dùng --vien. */
+body.toi section + section { border-top-color: rgba(255,255,255,.07); }
+{{/* Hai chỗ chìm hẳn khi đảo nền: số của bảng thống kê vốn dùng --th (đậm,
+     trên nền tối gần như biến mất) và chip trên thẻ dịch vụ. Kéo cả hai về màu
+     nhấn sáng thay vì chỉnh biến gốc, vì bản sáng đang đúng. */}}
+body.toi .bang-so .v { color: var(--sang); }
+body.toi .chip-trung {
+  background: rgba(214,243,47,.12); color: var(--sang-muc);
+  border-color: rgba(214,243,47,.28);
+}
+{{/* Đơn vị đo đi sau con số. Chữ "g" cùng cỡ 42px mà lại là font mono thì dấu
+     cách rộng bằng cả một ký tự — nhìn thành hai thứ rời nhau. */}}
+.bang-so .v i {
+  font-style: normal; font-size: .5em; margin-left: .1em;
+  color: var(--muc-mo); letter-spacing: 0;
+}
+
+/* --- Hero kiểu tấm phủ: chữ lớn bên trái, hình vẽ lớn bên phải -------------
+   Tham chiếu dựng hero bằng một đoạn phim quay thật. Chưa có phim thì chỗ đó
+   phải có thứ khác giữ được nửa màn hình — ở đây là bản vẽ cây vợt cỡ lớn,
+   nét tự chạy khi tải trang. Hình vẽ không thay được phim, nhưng nó nói được
+   một điều mà ảnh chụp không nói được: bên trong cây vợt có gì. */
+.hero-lon > .khung {
+  padding: clamp(40px, 5vw, 78px) clamp(24px, 4vw, 56px) clamp(44px, 5vw, 74px);
+  background: radial-gradient(120% 130% at 78% 8%, #202B14 0%, #10150C 46%, #060804 100%);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 26px;
+}
+@media (max-width: 680px) { .hero-lon > .khung { border-radius: 18px; } }
+.hero-lon h1 { max-width: 15ch; margin-top: 20px; color: #fff; }
+.hero-lon .dan { max-width: 46ch; }
+.hero-lon .hero-nut { margin-top: 34px; }
+/* Hai cột: trái là chữ RỒI ảnh xếp dọc, phải là danh sách việc bắt đầu ngay
+   từ đỉnh. Bố cục cũ nhét cả ảnh lẫn danh sách việc vào cột phải, chồng lên
+   nhau — cộng lại cao hơn một màn hình, mà ảnh thì bị bóp còn bằng con tem.
+   Tách ra: danh sách việc giữ cột phải, ảnh xuống dưới chữ nên rộng gần hết
+   bề ngang. */
+.hero-canh { display: grid; gap: 34px; align-items: start; }
+/* Cột việc 340px vừa đủ cho tên việc dài nhất ("Tinh chỉnh cân bằng bằng lead
+   tape") không xuống dòng. */
+@media (min-width: 980px) {
+  .hero-canh { grid-template-columns: minmax(0, 1fr) minmax(0, 340px); gap: 40px; }
+}
+.hero-trai { display: grid; gap: clamp(24px, 3vh, 40px); min-height: 0; }
+.hero-trai > * { min-width: 0; }
+{{/* min-width:0 là bắt buộc, không phải cho đẹp. Ô lưới mặc định rộng tối thiểu
+     bằng nội dung, mà SVG hero có kích thước gốc 440px — trên màn 430px thì cả
+     trang bị đẩy tràn ngang, chữ cột trái cụt mất mép phải. */}}
+.hero-canh > * { min-width: 0; }
+/* --- Danh sách việc trong hero -------------------------------------------
+   Kính mờ chứ không phải thẻ đặc: hero có ảnh trạm làm nền, đặt một tấm đục
+   lên là che mất thứ đắt nhất của trang. Nền mờ 12% cho chữ đủ tương phản mà
+   ảnh vẫn xuyên qua. */
+.hero-dv {
+  display: grid; gap: 1px;
+  background: rgba(255,255,255,.14);
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: var(--r); overflow: hidden;
+  backdrop-filter: blur(9px); -webkit-backdrop-filter: blur(9px);
+}
+.hero-dv-dinh {
+  background: rgba(255,255,255,.10); padding: 12px 16px;
+  font: 700 10.5px/1.4 "JetBrains Mono", monospace;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--sang-tren-toi, var(--sang));
+}
+.hero-dv a {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 13px 16px; background: rgba(12,16,32,.42);
+  color: #fff; text-decoration: none; font-size: 14.5px; font-weight: 600;
+  transition: background .16s, padding-left .16s;
+}
+/* Mũi tên vẽ bằng ::after chứ không phải ký tự: font hệ thống trên Windows
+   hay thay → bằng một ô vuông. */
+.hero-dv a::after {
+  content: ""; flex: none; width: 7px; height: 7px;
+  border-top: 2px solid var(--sang-tren-toi, var(--sang));
+  border-right: 2px solid var(--sang-tren-toi, var(--sang));
+  transform: rotate(45deg); opacity: .75;
+}
+.hero-dv a:hover { background: rgba(12,16,32,.66); padding-left: 21px; }
+.hero-dv a:hover::after { opacity: 1; }
+.hero-dv a:focus-visible { outline: 2px solid var(--sang); outline-offset: -3px; }
+.hero-dv-het { font-size: 13px !important; font-weight: 500 !important; color: var(--tren-dam-mo) !important; }
+.hero-dv-het:hover { color: #fff !important; }
+@media (max-width: 680px) {
+  .hero-dv a { padding: 12px 14px; font-size: 14px; }
+}
+.hero-trai .sv { max-width: 460px; margin: 0 auto; }
+
+/* --- Băng ảnh hero --------------------------------------------------------
+   Thay chỗ bản vẽ khi trạm đã up ảnh thật. Khung cố định tỉ lệ 4:3 và ảnh
+   cắt theo object-fit: ảnh thợ chụp bằng điện thoại đủ mọi tỉ lệ, để nguyên
+   thì mỗi lần đổi ảnh là hero nhảy cao nhảy thấp một kiểu. */
+/* Không còn trần chiều ngang: ảnh giờ chiếm gần hết cột trái. Chiều cao mới
+   là thứ phải chặn, và chặn ở khối hero-cao-một-màn bên dưới. */
+.hero-trai .bang-anh { width: 100%; }
+.bang-anh-khung {
+  position: relative; aspect-ratio: 4 / 3; overflow: hidden;
+  border-radius: 18px; border: 1px solid rgba(255,255,255,.13);
+  background: rgba(255,255,255,.05);
+  box-shadow: var(--bong-cao);
+}
+.ba-o {
+  position: absolute; inset: 0; margin: 0;
+  opacity: 0; transition: opacity .7s ease;
+}
+.ba-o.hien { opacity: 1; }
+.ba-o img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Chú thích nằm trên ảnh: ảnh nào cũng có chỗ sáng chỗ tối, nên phải có vệt
+   tối đổ lên chứ không thể trông chờ vào màu ảnh. */
+.ba-o figcaption {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 34px 16px 13px; font-size: 13.5px; line-height: 1.45; color: #fff;
+  background: linear-gradient(180deg, transparent, rgba(3,8,4,.86));
+}
+/* Chấm chỉ 8px, nhưng vùng bấm phải đủ 24x24 (WCAG 2.5.8 Target Size). Cách
+   nới: viền TRONG SUỐT 8px cộng background-clip: content-box — nền chỉ tô ô
+   nội dung nên chấm vẫn 8px, còn ô nhận ngón tay đã là 24x24. Viền đã tạo
+   khoảng cách sẵn nên gap về 0, và margin-top bù lại 8px viền phía trên. */
+.ba-cham { display: flex; gap: 0; justify-content: center; margin-top: 6px; }
+.ba-cham button {
+  -webkit-appearance: none; appearance: none;
+  box-sizing: content-box;
+  width: 8px; height: 8px; min-width: 0; padding: 0; margin: 0;
+  border: 8px solid transparent; background-clip: content-box;
+  border-radius: 999px; cursor: pointer; font-size: 0;
+  background-color: rgba(255,255,255,.3);
+  transition: width .25s ease, background-color .25s ease;
+}
+.ba-cham button.day { width: 22px; background-color: var(--sang); }
+
+/* Nét chạy dần khi tải trang. Mỗi nét mang pathLength="1", nghĩa là trình duyệt
+   coi đường nào cũng dài đúng 1 đơn vị — nhờ vậy một luật dasharray duy nhất
+   chạy đúng cho cả nét ngắn lẫn nét dài, không phải đo từng đường. */
+@keyframes ve-net { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes hien-dan { from { opacity: 0; } to { opacity: 1; } }
+.sv-ve .net {
+  stroke-dasharray: 1; stroke-dashoffset: 1;
+  animation: ve-net 1.5s cubic-bezier(.6,.05,.3,1) forwards;
+}
+.sv-ve .cham { animation: hien-dan .8s ease 1.15s both; }
+.sv-ve .lop2 { animation-delay: .35s; }
+.sv-ve .lop3 { animation-delay: .7s; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  .sv-ve .net  { stroke-dashoffset: 0; }
+  .sv-ve .cham { opacity: 1; }
+}
+
+/* ==========================================================================
+   GIAO DIỆN "TÍM" — bản để so sánh với bản "Trạm"
+   --------------------------------------------------------------------------
+   Cùng một HTML, chỉ khác biến màu và cách xếp hero. Hai điểm khác căn bản:
+
+   1. Sáng cả trang, kể cả trang chủ. Hero là một tấm gradient tím, phần còn
+      lại nền trắng ngả tím rất nhạt. Bản "Trạm" ngược lại: tối ở trang bán
+      hàng, sáng ở bài viết.
+   2. Hero căn giữa một cột, hình vẽ nằm dưới chữ chứ không đứng cạnh. Chữ
+      tiêu đề nhẹ hơn một bậc (700 thay vì 800) và giãn chữ bớt âm — bản
+      "Trạm" bóp chữ mạnh cho ra chất công nghiệp, bản này thì không.
+
+   Tím thay cho cyan ở vai trò màu nhấn. Ba màu trạng thái giữ nguyên như bản
+   sáng gốc: đổi cả bảng màu trạng thái theo giao diện thì "đã nhận" ở hai
+   giao diện ra hai màu khác nhau, thợ nhìn quen màu sẽ đọc nhầm.
+   ========================================================================== */
+body.theme-tim {
+  --nen:        #FBFAFF;
+  --nen-2:      #F2EFFB;
+  --the:        #FFFFFF;
+  --muc:        #15102B;
+  --muc-mo:     #5C5480;
+  --vien:       #E7E2F4;
+  --vien-dam:   #CDC5E6;
+
+  --th:         #4B2FA8;
+  --th-2:       #6B47D6;
+  --th-dam:     #1F1147;
+  --th-nen:     #EFEBFC;
+  --th-vien:    #DDD5F3;
+
+  --sang:       #6D4AE0;
+  --sang-muc:   #5734C4;
+  /* Trắng trên tím #6D4AE0 cho 5.4:1 — khác nền cyan ở bản gốc, chỗ đó chỉ
+     được 2.6:1 nên mới phải dùng chữ navy. */
+  --tren-sang:  #FFFFFF;
+
+  --tren-th:    #FFFFFF;
+  --tren-dam:   #E7E1FA;
+  --tren-dam-mo:#B4A8DC;
+
+  --nhan-manh:  #15102B;
+  --bong:       0 1px 2px rgba(31,17,71,.05), 0 12px 30px -14px rgba(31,17,71,.28);
+  --bong-cao:   0 2px 4px rgba(31,17,71,.06), 0 24px 48px -20px rgba(31,17,71,.38);
+  --r:          14px;
+  --r-nho:      8px;
+  --r-lon:      24px;
+
+  --sv-net:  #6A5AA0;
+  --sv-mo:   #B6ADD8;
+  --sv-to:   #F1EDFC;
+  --sv-man:  #1F1147;
+  --sv-nhan: #6D4AE0;
+}
+/* Chữ nhẹ hơn một bậc và giãn chữ bớt âm. */
+body.theme-tim h1 { font-weight: 700; letter-spacing: -.028em; }
+body.theme-tim h2 { font-weight: 700; letter-spacing: -.022em; }
+
+/* Hero: tấm gradient tím, một cột, căn giữa. */
+body.theme-tim .hero-lon > .khung {
+  padding: clamp(46px, 5vw, 80px) clamp(24px, 4vw, 56px) clamp(46px, 5vw, 72px);
+  background: linear-gradient(168deg, #1E1147 0%, #4B2FA8 44%, #7B54E8 100%);
+  border: none;
+  border-radius: 28px;
+}
+body.theme-tim .hero-canh { grid-template-columns: 1fr; gap: 44px; text-align: center; }
+body.theme-tim .hero-lon h1 { max-width: 19ch; margin: 20px auto 0; }
+body.theme-tim .hero-lon .dan { max-width: 56ch; margin-left: auto; margin-right: auto; }
+body.theme-tim .hero-nut { justify-content: center; }
+body.theme-tim .hero-canh .sv { max-width: 340px; }
+/* Nút chính trên nền tím đảo thành trắng; ngoài hero thì ngược lại. */
+body.theme-tim .hero .nut-chinh { background: #fff; color: #23145C; }
+body.theme-tim .hero .nut-chinh:hover { background: #EDE6FF; }
+body.theme-tim .nut-chinh { color: var(--tren-sang); }
+{{/* Hero một cột nên nhãn nhỏ nằm giữa trang; vạch dẫn của .nhan-vach kéo về
+     một phía sẽ lệch hẳn. Bỏ vạch trong hero của giao diện này. */}}
+body.theme-tim .hero .nhan-vach::after { display: none; }
+
+/* ==========================================================================
+   GIAO DIỆN "SÂN CỎ" — bản xanh lá
+   --------------------------------------------------------------------------
+   Ba giao diện phải khác nhau ở chỗ nhìn phát ra ngay, không phải khác ở
+   mã màu. Chỗ khác của bản này:
+
+   1. Nền giấy ngả kem #F6F5EE, không phải trắng (bản Trạm) cũng không phải
+      trắng ngả tím (bản Tím). Kem + xanh lá đọc ra "ngoài trời, sân cỏ";
+      cùng màu xanh ấy đặt trên nền trắng tinh lại ra "phòng khám".
+   2. Bo góc to hơn hẳn (--r-lon 30px so với 22-24px). Bản Trạm cố tình
+      góc gắt cho ra chất công trạm; bản này đi hướng ngược lại.
+   3. Hero vẫn hai cột như bản Trạm, nhưng là tấm xanh rừng chứ không phải
+      than, và vệt sáng hắt từ góc TRÁI trên xuống thay vì góc phải.
+
+   Màu nhấn tách làm hai như bản Trạm, vì cùng một lý do: xanh lá tươi
+   #35D68A trên nền trắng chỉ được 2:1, đặt chữ lên là không đọc nổi.
+
+     nền xanh tươi → chữ --tren-sang (#08170F)
+     chữ trên nền sáng → --sang-muc (#0B6339, 7.3:1)
+     --sang chỉ dùng làm mảng tô và làm chữ TRÊN TẤM HERO TỐI (4.9:1)
+
+   Ba màu trạng thái giữ nguyên, giống bản Tím và vì cùng lý do: thợ nhìn
+   quen màu "đã nhận", đổi theo giao diện là đọc nhầm.
+   ========================================================================== */
+body.theme-la {
+  --nen:        #F6F5EE;
+  --nen-2:      #EBEAE0;
+  --the:        #FFFFFF;
+  --muc:        #12211A;
+  --muc-mo:     #55655C;
+  --vien:       #E2E0D4;
+  --vien-dam:   #C6C4B4;
+
+  --th:         #14523A;
+  --th-2:       #1D6B4C;
+  --th-dam:     #08281C;
+  --th-nen:     #E4F0E8;
+  --th-vien:    #CBE0D3;
+
+  --sang:       #35D68A;
+  --sang-muc:   #0B6339;
+  --tren-sang:  #08170F;
+
+  --tren-th:    #FFFFFF;
+  --tren-dam:   #DCEAE1;
+  --tren-dam-mo:#93AA9C;
+
+  --nhan-manh:  #12211A;
+  --bong:       0 1px 2px rgba(8,40,28,.05), 0 12px 30px -14px rgba(8,40,28,.26);
+  --bong-cao:   0 2px 4px rgba(8,40,28,.06), 0 24px 48px -20px rgba(8,40,28,.36);
+  --r:          18px;
+  --r-nho:      10px;
+  --r-lon:      30px;
+
+  --sv-net:  #3D5A4C;
+  --sv-mo:   #A3B6AA;
+  --sv-to:   #EEF3EE;
+  --sv-man:  #12211A;
+  --sv-nhan: #0B6339;
+}
+/* Tiêu đề không bóp chữ mạnh như bản Trạm — bản này đi tông mềm. */
+body.theme-la h1 { letter-spacing: -.026em; }
+body.theme-la h2 { letter-spacing: -.02em; }
+
+/* Hero trang chủ: tấm xanh rừng, sáng hắt từ góc trái trên. */
+body.theme-la .hero-lon > .khung {
+  background: radial-gradient(130% 140% at 20% 6%, #1D6B4C 0%, #14523A 44%, #08281C 100%);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 30px;
+}
+@media (max-width: 680px) { body.theme-la .hero-lon > .khung { border-radius: 20px; } }
+
+/* ==========================================================================
+   GIAO DIỆN "T-PIC" — lấy đúng bảng màu của logo
+   --------------------------------------------------------------------------
+   Logo Trạm Pickle chỉ có bốn màu (assets/logo/palette.css): volt #D6F32F là
+   quả bóng, ink #08171F là bộ đồ nghề và nền, steel #9FB3BD là chi tiết kim
+   loại, paper #F2F5F1 là chữ trên nền tối.
+
+   Khác giao diện "trạm" đúng một chỗ nhưng là chỗ ăn tiền: nền ở đó là than
+   ám xanh LÁ, ở đây là ink ám xanh DƯƠNG. Đặt logo lên nền xuong thì hai sắc
+   xanh lệch nhau một chút — kiểu lệch đó nhìn ra ngay là bẩn, y như README
+   của logo nói về chuyện đặt volt cạnh xanh lá.
+
+   Volt giữ nguyên vai trò: chỉ một mảng duy nhất trên trang, không bao giờ
+   đi với chữ trắng. Steel gánh phần việc mà xuong phải bịa ra một màu xám
+   ngả vàng để làm — chữ mờ, đường kẻ, nét phụ trong bản vẽ.
+
+   Nền TRẮNG suốt cả site, kể cả trang chủ và trang dịch vụ — giao diện này
+   không bao giờ nhận lớp "toi" (xem lopThan trong giaodien.go). Mảng tối duy
+   nhất còn lại là dải đầu trang và tấm hero, và cả hai lấy màu từ --th-dam
+   chứ không phải từ --nen, nên chúng tự tối mà không kéo cả trang theo.
+
+   Trang là trắng thuần #FFFFFF, không phải paper #F2F5F1 của logo: paper đặt
+   cạnh thẻ trắng thì thành xám bẩn. Paper vẫn còn nguyên vai trò cũ của nó là
+   màu chữ trên nền tối (--tren-th, --tren-dam).
+
+   Thẻ cũng trắng nên viền phải gánh hết phần việc tách khối — do đó --vien ở
+   đây đậm hơn một bậc so với hồi nền còn ngả kem, chứ không thì thẻ tan vào
+   trang.
+   ========================================================================== */
+/* Bảng dưới đây KHÔNG gõ bằng mắt. Mỗi mã là kết quả của một trong ba luật:
+
+     1. là một trong bốn màu logo, giữ nguyên bản;
+     2. là một mức sáng trên thang xám dựng từ trục màu chung của ink và
+        steel (hai màu đó lệch nhau chưa tới 5° trong OKLCH, nên chúng có
+        một trục thật chứ không phải trùng hợp) — sắc độ hạ dần về hai đầu
+        thang, vì màu no ở sát trắng hoặc sát đen đọc ra "ám màu" chứ không
+        ra "xám có sắc";
+     3. là ngưỡng WCAG: mức sáng cực trị mà tại đó cặp màu vẫn còn đạt đúng
+        tỉ lệ tương phản mà chỗ đó cần — không dư một bậc, không thiếu.
+
+   Chữ lấy AAA 7:1 chứ không phải AA 4.5:1, vì phần lớn chữ mờ ở đây là chữ
+   13-14px và khách phần lớn mở bằng điện thoại ngoài sân, giữa nắng.
+
+   Hai loại viền, hai luật khác nhau, đừng nhập làm một:
+     --vien      viền thẻ, đường kẻ — trang trí, WCAG không ràng buộc
+     --vien-dam  viền ô nhập, nút phụ — WCAG 1.4.11 bắt >= 3:1 với nền kề
+
+   Muốn đổi màu thì sửa công thức rồi sinh lại, đừng sửa tay từng mã: sửa
+   tay một mã là thang gãy, mà gãy ở đâu thì không ai nhìn ra được. */
+body.theme-tpic {
+  --nen:        #FFFFFF;  /* trắng thuần */
+  --nen-2:      #F2F8FB;  /* L=.975 — dải xen kẽ, đủ khác trắng để thấy ranh giới */
+  --the:        #FFFFFF;  /* thẻ cùng trắng với trang, tách nhau bằng viền */
+  --muc:        #08171F;  /* ink logo — 18.2:1 */
+  --muc-mo:     #4A5B65;  /* sáng nhất còn đạt AAA 7:1 trên trắng */
+  --vien:       #D2DBDF;  /* L=.885 */
+  --vien-dam:   #8597A2;  /* nhạt nhất còn đạt 3:1 — WCAG 1.4.11 */
+
+  --th:         #253036;  /* L=.30 — nền nút */
+  --th-2:       #37454C;  /* L=.38 — đầu gradient hero */
+  --th-dam:     #08171F;  /* ink logo — dải đầu trang, đáy hero */
+  --th-nen:     #EBF1F5;  /* L=.955 — nền chip */
+  --th-vien:    #C8D1D6;  /* L=.855 — viền chip */
+
+  --sang:       #D6F32F;  /* volt logo */
+  /* Volt trên nền trắng chỉ được 1.3:1. Khi volt phải làm CHỮ chứ không làm
+     mảng tô thì dùng mã dưới — cùng trục màu, hạ sáng tới đúng 7:1. */
+  --sang-muc:   #4E6000;
+  --tren-sang:  #08171F;  /* chữ trên mảng volt — 14.5:1 */
+
+  --tren-th:    #FFFFFF;
+  --tren-dam:   #F2F5F1;  /* paper logo, đúng vai README giao — 16.6:1 trên ink */
+  --tren-dam-mo:#9FB3BD;  /* steel logo — 8.4:1 trên ink */
+
+  --nhan-manh:  #08171F;
+  --bong:       0 1px 2px rgba(8,23,31,.07), 0 12px 28px -14px rgba(8,23,31,.36);
+  --bong-cao:   0 2px 4px rgba(8,23,31,.08), 0 22px 44px -20px rgba(8,23,31,.46);
+
+  --sv-net:  #415058;
+  --sv-mo:   #9FB3BD;
+  --sv-to:   #EEF5F8;
+  --sv-man:  #08171F;
+  --sv-nhan: #4E6000;
+}
+
+/* Dải đầu trang: ink đặc, không dùng bản color-mix trong suốt như hồi nền
+   trang còn tối — nền trắng lộ qua thì chữ paper trên đó mất tương phản. */
+body.theme-tpic header.dau {
+  background: var(--th-dam);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+/* Hero: cùng dạng tấm như xuong, nhưng lấy hai mức trên thang thay vì ba mã
+   rời — đổi thang là hero đổi theo, không phải nhớ sửa thêm chỗ này. */
+body.theme-tpic .hero-lon > .khung {
+  background: radial-gradient(120% 130% at 78% 8%, var(--th) 0%, var(--th-dam) 72%);
+  border: 1px solid rgba(255,255,255,.09);
+}
+
+/* ==========================================================================
+   SÁU GIAO DIỆN DỰNG TỪ MẪU NGÀNH SỬA CHỮA
+   --------------------------------------------------------------------------
+   Kendy gửi năm trang mẫu của ngành sửa chữa và bảo dựng chúng thành giao
+   diện chọn được. Mỗi bộ có HAI phần, và phần thứ hai mới là phần quan trọng:
+
+     1. BẢNG MÀU — đọc thẳng từ CSS của chính trang mẫu, đếm số lần xuất hiện
+        để biết mã nào là màu thương hiệu chứ không phải màu của một cái nút lẻ.
+     2. DÁNG — cỡ chữ, nét chữ, chữ hoa hay thường, bo góc, hình nút, cách xếp
+        hero, cách chia ô, nhịp khối. Cũng đo bằng máy: mở trang mẫu bằng
+        trình duyệt điều khiển qua CDP rồi đọc getComputedStyle của tiêu đề,
+        nút, thẻ, section (scratchpad/dodang.js). Số đo ghi ngay trong khối
+        DÁNG của từng bộ.
+
+   Chỉ đổi bảng màu thì sáu bộ ra sáu bản sơn lại của cùng một trang. Phần DÁNG
+   là chỗ để chúng khác nhau ở bố cục — như "tím" và "sân cỏ" vẫn làm.
+
+     cobalt  TemplateMonster 70945 -> ld-wt73.template-help.com/wt_prod-18701_v2
+             css/style.css: #273AA3 xuất hiện 238 lần, #FEDD02 100 lần.
+     dien    TemplateMonster 321112 -> themexbd.com/gogrin/aircondition
+             bộ màu Elementor của trang: #0080FF và #06233E.
+     bien    demo.proteusthemes.com/repairpress
+             style.css: #3BAED4 55 lần, navy #25426F.
+     kem     repairing-wbs.webflow.io
+             biến của trang: --color--primary-1 #1C1F3B, --color--primary-2
+             #FFDC69, --color--secondary-2 #FFF9ED (nền kem, không phải trắng).
+     do      ThemeForest 19191980 (MobRepair). Trang demo của tác giả hiện
+             không truy cập được (tên miền brotherstheme.com không phân giải,
+             preview của ThemeForest chặn), nên bộ này dựng theo lối chung của
+             dòng mẫu sửa điện thoại: đỏ trên than. Đây là bộ DUY NHẤT không
+             đọc được cả màu lẫn dáng — nếu Kendy mở được demo thì đưa hai mã
+             thật vào scratchpad/themes.js rồi sinh lại.
+     cam     bộ thứ sáu, Kendy đặt sáu mà chỉ có năm đường dẫn. Cam an toàn
+             trên thép — lối phổ biến nhất của mẫu sửa chữa, và là hướng màu
+             mà năm bộ trên không ai đi.
+
+   Mỗi mẫu chỉ cho HAI màu có nghĩa: một màu nhấn và một màu tối. Toàn bộ phần
+   còn lại của bảng biến sinh ra từ hai màu đó bằng scratchpad/themes.js, theo
+   đúng ba luật đã dùng cho T-PIC (màu gốc / mức sáng trên trục của màu tối /
+   ngưỡng WCAG). `node themes.js kiem` chạy 14 cặp cho mỗi bộ, tất cả đạt.
+
+   Sáu dáng, nói gọn một dòng mỗi bộ:
+
+     cobalt  chữ IN HOA nét mảnh giãn rộng, góc vuông tuyệt đối, nút dài thấp.
+     dien    hero là BĂNG tràn hết bề ngang màn hình, chữ khổng lồ, nút to,
+             lưới kẻ tháo thành thẻ rời.
+     bien    bộ nhỏ và khẽ nhất: tiêu đề vừa phải, dòng thưa, nút nhẹ nét,
+             bóng tỏa đều thay cho bóng đổ xuống, đầu trang cao.
+     kem     mềm và phẳng: bo 12-22px, thân bài 17px, các ô là mảng màu luân
+             phiên không viền không bóng, khối thở 100px.
+     do      IN HOA nét dày (ngược cobalt), góc vuông, vạch đỏ mép trái mọi ô.
+     cam     vạch cảnh báo chéo thay đường kẻ, nhãn dán như tem, gạch cam
+             trên đỉnh thẻ.
+
+   Cả sáu đều là NỀN SÁNG + tấm hero tối, giống T-PIC — không bộ nào nhận lớp
+   "toi" trong lopThan. Sửa màu thì sửa hai mã trong themes.js rồi sinh lại,
+   đừng gõ tay vào bảng biến; còn dáng thì sửa thẳng trong khối DÁNG của bộ đó.
+   ========================================================================== */
+body.theme-cobalt {
+  --nen:           #FFFFFF;   /* trắng thuần */
+  --nen-2:         #F4F7FD;   /* dải xen kẽ, chỉ đủ khác nền để thấy ranh giới */
+  --the:           #FFFFFF;   /* thẻ trắng, tách nhau bằng viền */
+  --muc:           #13161E;   /* 18.1:1 trên nền */
+  --muc-mo:        #52596A;   /* sáng nhất còn đạt AAA 7:1 */
+  --vien:          #D6D9E2;   /* viền trang trí */
+  --vien-dam:      #8D95A8;   /* nhạt nhất còn đạt 3:1 — WCAG 1.4.11 */
+  --th:            #374FBA;   /* L=0.47 — nền nút, chữ trắng còn AAA */
+  --th-2:          #526FDC;   /* L=0.58 — đầu gradient hero */
+  --th-dam:        #273AA3;   /* màu tối gốc của mẫu */
+  --th-nen:        #E6F0FF;   /* nền chip */
+  --th-vien:       #C2CFF2;   /* viền chip */
+  --sang:          #FEDD02;   /* màu nhấn gốc của mẫu */
+  --sang-muc:      #755300;   /* màu nhấn hạ tối tới AAA 7:1 — khi nó phải làm CHỮ trên nền sáng */
+  --sang-tren-toi: #FEDD02;   /* màu nhấn làm chữ trên tấm hero — 7.0:1 */
+  --tren-sang:     #090B11;   /* chữ trên mảng màu nhấn — 14.6:1 */
+  --tren-th:       #FFFFFF;
+  --tren-dam:      #F0F3FB;   /* 8.5:1 trên nền tối */
+  --tren-dam-mo:   #A9B3CB;   /* mờ nhất còn đạt AA 4.5:1 trên nền tối */
+  --nhan-manh:     #13161E;
+  --bong:          0 1px 2px rgba(39,58,163,.07), 0 12px 28px -14px rgba(39,58,163,.36);
+  --bong-cao:      0 2px 4px rgba(39,58,163,.08), 0 22px 44px -20px rgba(39,58,163,.46);
+  --sv-net:        #474D5C;
+  --sv-mo:         #8D95A8;
+  --sv-to:         #F1F3FA;
+  --sv-man:        #273AA3;
+  --sv-nhan:       #755300;
+}
+body.theme-cobalt header.dau { background: var(--th-dam); border-bottom: 1px solid rgba(255,255,255,.10); }
+body.theme-cobalt .hero-lon > .khung {
+  background: radial-gradient(120% 130% at 78% 8%, var(--th-2) 0%, var(--th-dam) 74%);
+  border: 1px solid rgba(255,255,255,.10);
+}
+.gd-mau-cobalt {
+  background: linear-gradient(180deg, #526FDC 0%, #273AA3 44%, #FFFFFF 44%, #F4F7FD 100%);
+  box-shadow: inset -14px 0 0 -8px #FEDD02;
+}
+
+/* Dáng lấy từ css/style.css của chính mẫu, không phải nhìn ảnh đoán:
+     h1..h6 { font-weight: 500; letter-spacing: .1em; text-transform: uppercase }
+     h1     { font-size: 50px -> 70px; line-height: 1; letter-spacing: .025em }
+     body   { letter-spacing: .075em }
+     .button-sm { padding: 12px 30px; min-width: 160px; font-size: 12px }
+     .button-lg { padding: 20px 45px; min-width: 230px; font-size: 14px }
+   Tức là ngược hẳn luật chung của trang này (800, giãn chữ âm, bo tròn): chữ
+   IN HOA nét mảnh giãn rộng, góc vuông tuyệt đối, nút dài và thấp có bề ngang
+   tối thiểu. Đó là chỗ nhìn phát ra ngay, không phải mã màu. */
+body.theme-cobalt {
+  --r: 0px; --r-nho: 0px; --r-lon: 0px;
+  /* Mẫu giãn .075em cho cả thân bài. Tiếng Việt cỡ 16px mà giãn tới mức đó
+     thì dấu rời khỏi chữ, nên lấy một phần ba: vẫn đọc ra "trang giãn chữ",
+     vẫn đọc được. */
+  letter-spacing: .025em;
+}
+body.theme-cobalt h1, body.theme-cobalt h2,
+body.theme-cobalt h3, body.theme-cobalt h4 { text-transform: uppercase; font-weight: 500; }
+/* Chữ hoa tiếng Việt có dấu chồng (Ẫ, Ệ) nên line-height phải nới hơn số 1
+   của mẫu, nếu không dấu chạm chân dòng trên. */
+body.theme-cobalt h1 { font-size: clamp(29px, 4.4vw, 52px); line-height: 1.13; letter-spacing: .03em; }
+body.theme-cobalt h2 { font-size: clamp(21px, 2.5vw, 30px); line-height: 1.2; letter-spacing: .07em; }
+body.theme-cobalt h3 { font-size: 17px; letter-spacing: .1em; }
+body.theme-cobalt h4 { letter-spacing: .1em; }
+body.theme-cobalt .nut {
+  border-radius: 0; min-width: 200px; text-align: center;
+  padding: 16px 34px; font-size: 13px; letter-spacing: .12em; text-transform: uppercase;
+}
+/* Nút in hoa giãn chữ rộng gấp rưỡi nút thường, hai cái đứng cạnh nhau là
+   1.15 lần cột chữ mặc định — chúng tự xuống dòng thành hai bề ngang lệch
+   nhau. Nới cột chữ thay vì bóp nút: mẫu gốc cũng để cột chữ rộng hơn cột
+   hình, và bóp nút thì mất luôn cái đặc trưng vừa dựng. */
+@media (min-width: 980px) {
+  body.theme-cobalt .hero-canh { grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr); }
+}
+body.theme-cobalt .nut-nho, body.theme-cobalt .dau-trong nav a.nut-nho {
+  border-radius: 0; padding: 10px 20px; font-size: 12.5px;
+  letter-spacing: .1em; text-transform: uppercase;
+}
+body.theme-cobalt .dau-trong nav a { font-size: 13px; letter-spacing: .09em; text-transform: uppercase; }
+body.theme-cobalt .chip, body.theme-cobalt .dv-the .bt-o,
+body.theme-cobalt .bang-anh-khung { border-radius: 0; }
+body.theme-cobalt .the, body.theme-cobalt .dv-the,
+body.theme-cobalt .luoi-vach, body.theme-cobalt .buoc,
+body.theme-cobalt .hero-lon > .khung, body.theme-cobalt .hero > .khung { border-radius: 0; }
+/* Mẫu để khối thở rất rộng — 84px thay cho 60px. */
+body.theme-cobalt section { padding: 84px 0; }
+
+
+body.theme-dien {
+  --nen:           #FFFFFF;   /* trắng thuần */
+  --nen-2:         #F3F7FD;   /* dải xen kẽ, chỉ đủ khác nền để thấy ranh giới */
+  --the:           #FFFFFF;   /* thẻ trắng, tách nhau bằng viền */
+  --muc:           #10171D;   /* 18.1:1 trên nền */
+  --muc-mo:        #4D5A69;   /* sáng nhất còn đạt AAA 7:1 */
+  --vien:          #D3DAE1;   /* viền trang trí */
+  --vien-dam:      #8796A7;   /* nhạt nhất còn đạt 3:1 — WCAG 1.4.11 */
+  --th:            #203D5A;   /* L=0.35 — nền nút, chữ trắng còn AAA */
+  --th-2:          #385574;   /* L=0.44 — đầu gradient hero */
+  --th-dam:        #06233E;   /* màu tối gốc của mẫu */
+  --th-nen:        #EAF1F9;   /* nền chip */
+  --th-vien:       #C7D1DB;   /* viền chip */
+  --sang:          #0080FF;   /* màu nhấn gốc của mẫu */
+  --sang-muc:      #004FCB;   /* màu nhấn hạ tối tới AAA 7:1 — khi nó phải làm CHỮ trên nền sáng */
+  --sang-tren-toi: #1187FF;   /* màu nhấn làm chữ trên tấm hero — 4.5:1 */
+  --tren-sang:     #070C11;   /* chữ trên mảng màu nhấn — 5.2:1 */
+  --tren-th:       #FFFFFF;
+  --tren-dam:      #F2F4F6;   /* 14.5:1 trên nền tối */
+  --tren-dam-mo:   #788B9E;   /* mờ nhất còn đạt AA 4.5:1 trên nền tối */
+  --nhan-manh:     #10171D;
+  --bong:          0 1px 2px rgba(6,35,62,.07), 0 12px 28px -14px rgba(6,35,62,.36);
+  --bong-cao:      0 2px 4px rgba(6,35,62,.08), 0 22px 44px -20px rgba(6,35,62,.46);
+  --sv-net:        #424E5B;
+  --sv-mo:         #8796A7;
+  --sv-to:         #EFF4F9;
+  --sv-man:        #06233E;
+  --sv-nhan:       #004FCB;
+}
+body.theme-dien header.dau { background: var(--th-dam); border-bottom: 1px solid rgba(255,255,255,.10); }
+body.theme-dien .hero-lon > .khung {
+  background: radial-gradient(120% 130% at 78% 8%, var(--th-2) 0%, var(--th-dam) 74%);
+  border: 1px solid rgba(255,255,255,.10);
+}
+.gd-mau-dien {
+  background: linear-gradient(180deg, #385574 0%, #06233E 44%, #FFFFFF 44%, #F3F7FD 100%);
+  box-shadow: inset -14px 0 0 -8px #0080FF;
+}
+
+/* Đo trên trang mẫu: tiêu đề Rajdhani 72px/700 line-height 1.0, thân Rubik
+   16px/1.6, nút vuông 20px 50px cao 66px chữ 700, thẻ trắng góc vuông bóng
+   `0 1px 10px rgba(0,0,0,.1)`, khối thở 150px/90px.
+   Chỗ khác nhìn ra trước nhất không nằm ở màu mà ở HERO: mẫu dựng hero là một
+   BĂNG chạy hết bề ngang màn hình, không phải tấm bo góc nằm trong khung. */
+body.theme-dien { --r: 0px; --r-nho: 0px; --r-lon: 0px; }
+body.theme-dien .hero { padding-top: 0; }
+/* Padding ngang tính bằng max() để chữ trong băng vẫn thẳng hàng với lưới
+   1140px của các khối bên dưới; max-width bỏ đi thì .khung tự giãn hết bề
+   ngang cha nó — không dùng 100vw cho bề rộng, tránh cộng thêm thanh cuộn. */
+body.theme-dien .hero > .khung {
+  max-width: none; border-radius: 0;
+  padding: clamp(46px, 5.4vw, 84px) max(24px, calc((100vw - 1092px) / 2)) clamp(46px, 5vw, 78px);
+}
+body.theme-dien h1 { font-size: clamp(34px, 5.2vw, 60px); line-height: .98; letter-spacing: -.022em; font-weight: 700; }
+body.theme-dien h2 { font-size: clamp(25px, 3.2vw, 38px); line-height: 1.04; letter-spacing: -.018em; font-weight: 700; }
+body.theme-dien .hero-lon h1 { max-width: 13ch; }
+body.theme-dien .nut {
+  border-radius: 0; padding: 19px 32px; font-size: 15px;
+  letter-spacing: .04em; text-transform: uppercase;
+}
+/* Cùng lý do như bộ cobalt: nút to bản cần cột chữ rộng hơn, nếu không hai
+   nút hero xuống dòng lệch nhau. Mẫu gốc cũng chia lệch về phía chữ. */
+@media (min-width: 980px) {
+  body.theme-dien .hero-canh { grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); }
+}
+body.theme-dien .nut-nho, body.theme-dien .dau-trong nav a.nut-nho { border-radius: 0; }
+body.theme-dien .chip, body.theme-dien .dv-the .bt-o,
+body.theme-dien .the, body.theme-dien .dv-the, body.theme-dien .bang-anh-khung { border-radius: 0; }
+body.theme-dien section { padding: 96px 0; }
+body.theme-dien section + section { border-top: none; }
+/* Mẫu không dùng lưới kẻ: từng ô là một thẻ trắng RỜI, góc vuông, bóng rất
+   nhạt trải rộng. Tháo lưới kẻ ra thành thẻ rời — nền lưới, viền và bóng của
+   khung đều phải bỏ, nếu không khe gap 22px sẽ lòi ra một mảng xám. */
+body.theme-dien .luoi-vach, body.theme-dien .buoc {
+  background: none; border: none; box-shadow: none; border-radius: 0; gap: 22px;
+}
+body.theme-dien .luoi-vach > *, body.theme-dien .buoc > div { box-shadow: 0 1px 10px rgba(0,0,0,.1); }
+body.theme-dien .luoi-vach .dv-the:hover {
+  background: var(--the); box-shadow: 0 6px 26px rgba(0,0,0,.15); transform: translateY(-3px);
+}
+
+
+body.theme-bien {
+  --nen:           #FFFFFF;   /* trắng thuần */
+  --nen-2:         #F3F7FD;   /* dải xen kẽ, chỉ đủ khác nền để thấy ranh giới */
+  --the:           #FFFFFF;   /* thẻ trắng, tách nhau bằng viền */
+  --muc:           #12161E;   /* 18.1:1 trên nền */
+  --muc-mo:        #4F596A;   /* sáng nhất còn đạt AAA 7:1 */
+  --vien:          #D4D9E2;   /* viền trang trí */
+  --vien-dam:      #8A95A8;   /* nhạt nhất còn đạt 3:1 — WCAG 1.4.11 */
+  --th:            #3B5988;   /* L=0.46 — nền nút, chữ trắng còn AAA */
+  --th-2:          #5877A9;   /* L=0.57 — đầu gradient hero */
+  --th-dam:        #25426F;   /* màu tối gốc của mẫu */
+  --th-nen:        #E9F1FD;   /* nền chip */
+  --th-vien:       #C6D0E0;   /* viền chip */
+  --sang:          #3BAED4;   /* màu nhấn gốc của mẫu */
+  --sang-muc:      #005F83;   /* màu nhấn hạ tối tới AAA 7:1 — khi nó phải làm CHỮ trên nền sáng */
+  --sang-tren-toi: #4ABAE1;   /* màu nhấn làm chữ trên tấm hero — 4.5:1 */
+  --tren-sang:     #080B11;   /* chữ trên mảng màu nhấn — 7.7:1 */
+  --tren-th:       #FFFFFF;
+  --tren-dam:      #F1F4F7;   /* 9.1:1 trên nền tối */
+  --tren-dam-mo:   #A0AFC5;   /* mờ nhất còn đạt AA 4.5:1 trên nền tối */
+  --nhan-manh:     #12161E;
+  --bong:          0 1px 2px rgba(37,66,111,.07), 0 12px 28px -14px rgba(37,66,111,.36);
+  --bong-cao:      0 2px 4px rgba(37,66,111,.08), 0 22px 44px -20px rgba(37,66,111,.46);
+  --sv-net:        #444E5C;
+  --sv-mo:         #8A95A8;
+  --sv-to:         #F0F4FA;
+  --sv-man:        #25426F;
+  --sv-nhan:       #005F83;
+}
+body.theme-bien header.dau { background: var(--th-dam); border-bottom: 1px solid rgba(255,255,255,.10); }
+body.theme-bien .hero-lon > .khung {
+  background: radial-gradient(120% 130% at 78% 8%, var(--th-2) 0%, var(--th-dam) 74%);
+  border: 1px solid rgba(255,255,255,.10);
+}
+.gd-mau-bien {
+  background: linear-gradient(180deg, #5877A9 0%, #25426F 44%, #FFFFFF 44%, #F3F7FD 100%);
+  box-shadow: inset -14px 0 0 -8px #3BAED4;
+}
+
+/* Đo trên trang mẫu: Roboto 48px/700 line-height 1.33 KHÔNG giãn chữ, thân
+   Open Sans 14px/1.7, nút thấp 41px chữ 14px nét 400 bo 0, thẻ bo 2px với
+   bóng tỏa đều `0 0 8px rgba(0,0,0,.1)` chứ không đổ xuống, đầu trang cao
+   219px vì chia hai tầng.
+   Đây là bộ NHỎ VÀ KHẼ nhất trong sáu: tiêu đề vừa phải, dòng thưa, nút nhẹ
+   nét — chỗ khác với "xanh điện" (chữ khổng lồ, nút to) tuy cùng họ xanh. */
+body.theme-bien {
+  --r: 2px; --r-nho: 2px; --r-lon: 3px;
+  --bong:     0 0 8px rgba(0,0,0,.10);
+  --bong-cao: 0 0 18px rgba(0,0,0,.13);
+  font-size: 15px; line-height: 1.75;
+}
+body.theme-bien h1 { font-size: clamp(28px, 4vw, 48px); line-height: 1.24; letter-spacing: -.01em; font-weight: 700; }
+body.theme-bien h2 { font-size: clamp(21px, 2.4vw, 30px); line-height: 1.3; letter-spacing: -.008em; font-weight: 700; }
+body.theme-bien h3 { font-size: 17.5px; letter-spacing: 0; }
+body.theme-bien .nut { border-radius: 2px; padding: 12px 24px; font-size: 14px; font-weight: 500; }
+body.theme-bien .nut-nho, body.theme-bien .dau-trong nav a.nut-nho { border-radius: 2px; font-size: 14px; }
+body.theme-bien .chip, body.theme-bien .dv-the .bt-o { border-radius: 2px; }
+body.theme-bien .hero-lon > .khung, body.theme-bien .hero > .khung { border-radius: 3px; }
+body.theme-bien .bang-anh-khung { border-radius: 3px; }
+body.theme-bien section { padding: 52px 0; }
+/* Đầu trang của mẫu cao gấp đôi vì chia hai tầng. Ở đây không đổi HTML nên
+   không chia được tầng, nhưng nới chiều cao và phóng logo thì đọc ra cùng
+   một nhịp. */
+body.theme-bien .dau-trong { padding: 18px 0; }
+body.theme-bien .logo-dau { height: 42px; }
+body.theme-bien .dau-trong nav a { font-size: 14px; font-weight: 400; }
+/* Thẻ rời có bóng tỏa đều, không kẻ lưới. */
+body.theme-bien .luoi-vach, body.theme-bien .buoc {
+  background: none; border: none; box-shadow: none; border-radius: 0; gap: 18px;
+}
+body.theme-bien .luoi-vach > *, body.theme-bien .buoc > div {
+  border-radius: 2px; box-shadow: 0 0 8px rgba(0,0,0,.10);
+}
+body.theme-bien .luoi-vach .dv-the:hover {
+  background: var(--the); box-shadow: 0 0 16px rgba(0,0,0,.17); transform: translateY(-2px);
+}
+
+
+body.theme-kem {
+  --nen:           #FFF9ED;   /* nền kem của mẫu gốc */
+  --nen-2:         #F6F0E4;   /* dải xen kẽ, chỉ đủ khác nền để thấy ranh giới */
+  --the:           #FFFFFF;   /* thẻ trắng, tách nhau bằng viền */
+  --muc:           #14151E;   /* 17.3:1 trên nền */
+  --muc-mo:        #525568;   /* sáng nhất còn đạt AAA 7:1 */
+  --vien:          #D7D8E2;   /* viền trang trí */
+  --vien-dam:      #8D90A5;   /* nhạt nhất còn đạt 3:1 — WCAG 1.4.11 */
+  --th:            #343856;   /* L=0.35 — nền nút, chữ trắng còn AAA */
+  --th-2:          #4C5070;   /* L=0.44 — đầu gradient hero */
+  --th-dam:        #1C1F3B;   /* màu tối gốc của mẫu */
+  --th-nen:        #EEF0F8;   /* nền chip */
+  --th-vien:       #CCCFDA;   /* viền chip */
+  --sang:          #FFDC69;   /* màu nhấn gốc của mẫu */
+  --sang-muc:      #715000;   /* màu nhấn hạ tối tới AAA 7:1 — khi nó phải làm CHỮ trên nền sáng */
+  --sang-tren-toi: #FFDC69;   /* màu nhấn làm chữ trên tấm hero — 12.0:1 */
+  --tren-sang:     #0A0B11;   /* chữ trên mảng màu nhấn — 14.7:1 */
+  --tren-th:       #FFFFFF;
+  --tren-dam:      #F3F3F6;   /* 14.5:1 trên nền tối */
+  --tren-dam-mo:   #82879E;   /* mờ nhất còn đạt AA 4.5:1 trên nền tối */
+  --nhan-manh:     #14151E;
+  --bong:          0 1px 2px rgba(28,31,59,.07), 0 12px 28px -14px rgba(28,31,59,.36);
+  --bong-cao:      0 2px 4px rgba(28,31,59,.08), 0 22px 44px -20px rgba(28,31,59,.46);
+  --sv-net:        #494C5C;
+  --sv-mo:         #8D90A5;
+  --sv-to:         #F2F3FA;
+  --sv-man:        #1C1F3B;
+  --sv-nhan:       #715000;
+}
+body.theme-kem header.dau { background: var(--th-dam); border-bottom: 1px solid rgba(255,255,255,.10); }
+body.theme-kem .hero-lon > .khung {
+  background: radial-gradient(120% 130% at 78% 8%, var(--th-2) 0%, var(--th-dam) 74%);
+  border: 1px solid rgba(255,255,255,.10);
+}
+.gd-mau-kem {
+  background: linear-gradient(180deg, #4C5070 0%, #1C1F3B 44%, #FFF9ED 44%, #F6F0E4 100%);
+  box-shadow: inset -14px 0 0 -8px #FFDC69;
+}
+
+/* Đo trên trang mẫu: tiêu đề Manrope 72px/700 line-height 1.2, thân Inter
+   18px/500 — thân bài to hơn hẳn mức thường; nút bo 12px, đệm 14px 24px, nét
+   500; khối thở 150px/150px; và điểm riêng nhất: các ô KHÔNG có bóng, KHÔNG
+   có viền — chúng là những MẢNG MÀU PHẲNG luân phiên (chàm / vàng nắng / kem).
+   Bộ này vì thế đi ngược cả năm bộ kia: mềm, to, phẳng. */
+body.theme-kem {
+  --r: 14px; --r-nho: 10px; --r-lon: 22px;
+  font-size: 17px;
+}
+body.theme-kem h1 { font-size: clamp(33px, 5vw, 58px); line-height: 1.16; letter-spacing: -.026em; font-weight: 700; }
+body.theme-kem h2 { font-size: clamp(24px, 3vw, 36px); line-height: 1.18; letter-spacing: -.022em; font-weight: 700; }
+body.theme-kem .nut { border-radius: 12px; padding: 15px 24px; font-size: 16px; font-weight: 600; }
+body.theme-kem .nut-nho, body.theme-kem .dau-trong nav a.nut-nho { border-radius: 10px; }
+body.theme-kem .dau-trong nav a { border-radius: 10px; }
+body.theme-kem .dv-the .bt-o { border-radius: 14px; }
+body.theme-kem section { padding: 100px 0; }
+/* Mẫu chia khối bằng khoảng trống lớn, không bằng đường kẻ. */
+body.theme-kem section + section { border-top: none; }
+body.theme-kem .the { border: none; box-shadow: none; background: var(--nen-2); border-radius: 14px; }
+body.theme-kem .luoi-vach, body.theme-kem .buoc {
+  background: none; border: none; box-shadow: none; border-radius: 0; gap: 16px;
+}
+body.theme-kem .luoi-vach > *, body.theme-kem .buoc > div { border-radius: 14px; }
+/* Ba màu luân phiên như mẫu. nth-child chứ không phải class vì HTML dùng
+   chung cho mọi giao diện — không đổi template chỉ để đổi màu ô.
+   Ô thứ ba KHÔNG lấy --nen-2: nền trang của bộ này đã là kem, hai màu trùng
+   nhau nên ô thứ ba trông như một lỗ thủng giữa lưới. Pha vàng nắng vào nền
+   thẻ cho nó là một mảng thật. */
+body.theme-kem .luoi-vach > *:nth-child(3n+2) { background: var(--th-nen); }
+body.theme-kem .luoi-vach > *:nth-child(3n)   { background: color-mix(in srgb, var(--sang) 15%, var(--the)); }
+body.theme-kem .buoc > div { background: var(--nen-2); }
+body.theme-kem .luoi-vach .dv-the:hover {
+  background: color-mix(in srgb, var(--sang) 30%, var(--the)); box-shadow: none;
+}
+
+
+body.theme-do {
+  --nen:           #FFFFFF;   /* trắng thuần */
+  --nen-2:         #F6F7F8;   /* dải xen kẽ, chỉ đủ khác nền để thấy ranh giới */
+  --the:           #FFFFFF;   /* thẻ trắng, tách nhau bằng viền */
+  --muc:           #1F2124;   /* 16.1:1 trên nền */
+  --muc-mo:        #57595D;   /* sáng nhất còn đạt AAA 7:1 */
+  --vien:          #D8D9DB;   /* viền trang trí */
+  --vien-dam:      #939599;   /* nhạt nhất còn đạt 3:1 — WCAG 1.4.11 */
+  --th:            #383A3D;   /* L=0.35 — nền nút, chữ trắng còn AAA */
+  --th-2:          #4F5255;   /* L=0.44 — đầu gradient hero */
+  --th-dam:        #1F2124;   /* màu tối gốc của mẫu */
+  --th-nen:        #EFF0F1;   /* nền chip */
+  --th-vien:       #CECFD0;   /* viền chip */
+  --sang:          #E1251B;   /* màu nhấn gốc của mẫu */
+  --sang-muc:      #B60000;   /* màu nhấn hạ tối tới AAA 7:1 — khi nó phải làm CHỮ trên nền sáng */
+  --sang-tren-toi: #F94234;   /* màu nhấn làm chữ trên tấm hero — 4.5:1 */
+  --tren-sang:     #FFFFFF;   /* chữ trên mảng màu nhấn — 4.7:1 */
+  --tren-th:       #FFFFFF;
+  --tren-dam:      #F3F3F4;   /* 14.6:1 trên nền tối */
+  --tren-dam-mo:   #84888C;   /* mờ nhất còn đạt AA 4.5:1 trên nền tối */
+  --nhan-manh:     #1F2124;
+  --bong:          0 1px 2px rgba(31,33,36,.07), 0 12px 28px -14px rgba(31,33,36,.36);
+  --bong-cao:      0 2px 4px rgba(31,33,36,.08), 0 22px 44px -20px rgba(31,33,36,.46);
+  --sv-net:        #4B4D50;
+  --sv-mo:         #939599;
+  --sv-to:         #F3F3F5;
+  --sv-man:        #1F2124;
+  --sv-nhan:       #B60000;
+}
+body.theme-do header.dau { background: var(--th-dam); border-bottom: 1px solid rgba(255,255,255,.10); }
+body.theme-do .hero-lon > .khung {
+  background: radial-gradient(120% 130% at 78% 8%, var(--th-2) 0%, var(--th-dam) 74%);
+  border: 1px solid rgba(255,255,255,.10);
+}
+.gd-mau-do {
+  background: linear-gradient(180deg, #4F5255 0%, #1F2124 44%, #FFFFFF 44%, #F6F7F8 100%);
+  box-shadow: inset -14px 0 0 -8px #E1251B;
+}
+
+/* KHÔNG đo được: trang demo của MobRepair (ThemeForest 19191980) không truy
+   cập được — xem ghi chú màu ở đầu phần này. Dáng dưới đây dựng theo lối
+   chung của dòng mẫu sửa điện thoại chứ không phải đọc từ mẫu thật.
+
+   Nét riêng: chữ tiêu đề IN HOA nét dày (ngược với cobalt — cũng in hoa nhưng
+   nét mảnh giãn rộng), góc vuông, và mọi ô mang một vạch đỏ ở mép trái. Vạch
+   là cách giữ cho đỏ không phải tô thành mảng: đỏ tô mảng lớn thì đọc ra
+   cảnh báo lỗi chứ không đọc ra thương hiệu. */
+body.theme-do { --r: 0px; --r-nho: 0px; --r-lon: 2px; }
+body.theme-do h1 { text-transform: uppercase; font-weight: 800; font-size: clamp(30px, 4.6vw, 54px); line-height: 1.1; letter-spacing: -.012em; }
+body.theme-do h2 { text-transform: uppercase; font-weight: 800; font-size: clamp(22px, 2.7vw, 32px); line-height: 1.16; letter-spacing: -.004em; }
+body.theme-do .nut {
+  border-radius: 0; padding: 15px 30px; font-size: 14px;
+  letter-spacing: .07em; text-transform: uppercase;
+}
+body.theme-do .nut-nho, body.theme-do .dau-trong nav a.nut-nho {
+  border-radius: 0; letter-spacing: .06em; text-transform: uppercase;
+}
+body.theme-do .chip, body.theme-do .dv-the .bt-o,
+body.theme-do .the, body.theme-do .dv-the, body.theme-do .luoi-vach,
+body.theme-do .buoc, body.theme-do .bang-anh-khung { border-radius: 0; }
+body.theme-do .hero-lon > .khung, body.theme-do .hero > .khung { border-radius: 2px; }
+/* Vạch đỏ mép trái. .dv-the đã có sẵn vạch ấy cho lúc rê chuột — ở bộ này nó
+   hiện thường trực, mờ hơn, và đậm lên khi rê. Thẻ tĩnh thì dùng viền trái. */
+/* Nút in hoa cần cột chữ rộng hơn — xem ghi chú ở bộ cobalt. */
+@media (min-width: 980px) {
+  body.theme-do .hero-canh { grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr); }
+}
+body.theme-do .dv-the::before { opacity: .5; }
+body.theme-do .dv-the:hover::before { opacity: 1; }
+body.theme-do .the { border-left: 3px solid var(--sang); }
+body.theme-do .cam-ket .the { border-top: 1px solid var(--vien); border-left: 3px solid var(--th); }
+body.theme-do .buoc .n { border-bottom-width: 3px; }
+body.theme-do .dau-trong nav a.day { box-shadow: inset 0 -3px 0 var(--sang); }
+body.theme-do section { padding: 72px 0; }
+
+
+body.theme-cam {
+  --nen:           #FFFFFF;   /* trắng thuần */
+  --nen-2:         #F2F7FC;   /* dải xen kẽ, chỉ đủ khác nền để thấy ranh giới */
+  --the:           #FFFFFF;   /* thẻ trắng, tách nhau bằng viền */
+  --muc:           #10171D;   /* 18.1:1 trên nền */
+  --muc-mo:        #4B5B68;   /* sáng nhất còn đạt AAA 7:1 */
+  --vien:          #D3DAE1;   /* viền trang trí */
+  --vien-dam:      #8697A6;   /* nhạt nhất còn đạt 3:1 — WCAG 1.4.11 */
+  --th:            #3B4A57;   /* L=0.40 — nền nút, chữ trắng còn AAA */
+  --th-2:          #546371;   /* L=0.49 — đầu gradient hero */
+  --th-dam:        #22303C;   /* màu tối gốc của mẫu */
+  --th-nen:        #EDF1F4;   /* nền chip */
+  --th-vien:       #CBD0D5;   /* viền chip */
+  --sang:          #FF6B00;   /* màu nhấn gốc của mẫu */
+  --sang-muc:      #B01800;   /* màu nhấn hạ tối tới AAA 7:1 — khi nó phải làm CHỮ trên nền sáng */
+  --sang-tren-toi: #FF6B00;   /* màu nhấn làm chữ trên tấm hero — 4.7:1 */
+  --tren-sang:     #070C11;   /* chữ trên mảng màu nhấn — 6.9:1 */
+  --tren-th:       #FFFFFF;
+  --tren-dam:      #F2F3F4;   /* 12.1:1 trên nền tối */
+  --tren-dam-mo:   #8498A9;   /* mờ nhất còn đạt AA 4.5:1 trên nền tối */
+  --nhan-manh:     #10171D;
+  --bong:          0 1px 2px rgba(34,48,60,.07), 0 12px 28px -14px rgba(34,48,60,.36);
+  --bong-cao:      0 2px 4px rgba(34,48,60,.08), 0 22px 44px -20px rgba(34,48,60,.46);
+  --sv-net:        #424F5A;
+  --sv-mo:         #8697A6;
+  --sv-to:         #EFF4F9;
+  --sv-man:        #22303C;
+  --sv-nhan:       #B01800;
+}
+body.theme-cam header.dau { background: var(--th-dam); border-bottom: 1px solid rgba(255,255,255,.10); }
+body.theme-cam .hero-lon > .khung {
+  background: radial-gradient(120% 130% at 78% 8%, var(--th-2) 0%, var(--th-dam) 74%);
+  border: 1px solid rgba(255,255,255,.10);
+}
+.gd-mau-cam {
+  background: linear-gradient(180deg, #546371 0%, #22303C 44%, #FFFFFF 44%, #F2F7FC 100%);
+  box-shadow: inset -14px 0 0 -8px #FF6B00;
+}
+
+/* Bộ thứ sáu, không có mẫu để đo — Kendy đặt sáu mà chỉ có năm đường dẫn.
+   Hướng: nhà trạm / công trường, và nét riêng là VẠCH CẢNH BÁO chéo thay cho
+   các đường kẻ mảnh của trang. Đây là bộ duy nhất có hoa văn trong đường chia
+   khối, nên nhìn lướt cũng không lẫn với năm bộ kia. */
+body.theme-cam { --r: 3px; --r-nho: 2px; --r-lon: 4px; }
+body.theme-cam h2 { text-transform: uppercase; font-size: clamp(21px, 2.6vw, 31px); letter-spacing: -.005em; }
+body.theme-cam .nut {
+  border-radius: 3px; padding: 15px 30px; font-size: 14px;
+  letter-spacing: .08em; text-transform: uppercase;
+}
+body.theme-cam .nut-nho, body.theme-cam .dau-trong nav a.nut-nho {
+  border-radius: 3px; letter-spacing: .07em; text-transform: uppercase;
+}
+body.theme-cam .chip, body.theme-cam .dv-the .bt-o, body.theme-cam .bang-anh-khung { border-radius: 3px; }
+/* Nút in hoa cần cột chữ rộng hơn — xem ghi chú ở bộ cobalt. */
+@media (min-width: 980px) {
+  body.theme-cam .hero-canh { grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr); }
+}
+body.theme-cam .hero-lon > .khung, body.theme-cam .hero > .khung { border-radius: 4px; }
+body.theme-cam section { padding: 68px 0; }
+/* Nhãn mono dán như dán tem: chữ tối trên mảng cam. Trừ đúng loại nhãn có
+   vạch dẫn — cái đó là thẻ flex chạy hết bề ngang, tô nền vào thì thành một
+   thanh cam dài suốt trang. */
+body.theme-cam .nhan-nho:not(.nhan-vach) {
+  background: var(--sang); color: var(--tren-sang);
+  display: inline-block; padding: 4px 9px; border-radius: 2px;
+}
+/* Vạch dẫn đổi thành vạch cảnh báo chéo. */
+body.theme-cam .nhan-vach::after {
+  height: 8px; opacity: .5;
+  background: repeating-linear-gradient(-45deg, var(--muc) 0 6px, transparent 6px 12px);
+}
+body.theme-cam .hero .nhan-vach::after {
+  opacity: .6;
+  background: repeating-linear-gradient(-45deg, rgba(255,255,255,.62) 0 6px, transparent 6px 12px);
+}
+/* Mép dưới đầu trang là một dải cam dày thay cho đường kẻ 1px. */
+body.theme-cam header.dau { border-bottom: 3px solid var(--sang); }
+/* Mọi thẻ có gạch cam trên đỉnh — dấu nhận biết thứ hai của bộ này. */
+body.theme-cam .the { border-top: 3px solid var(--sang); }
+/* Khe giữa các ô trong lưới cũng là vạch cảnh báo. Làm được vì .luoi-vach
+   dựng đường kẻ bằng gap 1px để lộ nền của chính nó (css.html:490) — nới gap
+   lên 5px rồi đổi nền đó thành sọc chéo là xong, không đụng HTML. Viền ngoài
+   dày lên 2px cho khớp với dải cam ở đầu trang. */
+body.theme-cam .luoi-vach {
+  gap: 5px; border-width: 2px; border-color: var(--vien-dam);
+  background: repeating-linear-gradient(-45deg,
+    color-mix(in srgb, var(--muc) 26%, transparent) 0 4px, transparent 4px 8px) var(--nen);
+}
+body.theme-cam .luoi-vach .dv-the:hover { box-shadow: inset 0 3px 0 var(--sang); }
+
+
+/* ==========================================================================
+   BỐ CỤC RIÊNG CỦA TỪNG BỘ
+   --------------------------------------------------------------------------
+   Đổi màu rồi đổi dáng vẫn chưa đủ: sáu bộ vẫn xếp mọi thứ vào cùng một chỗ —
+   hero chia đôi trái phải, lưới dịch vụ ba cột, ô nào cũng biểu tượng nằm trên
+   chữ. Kendy nhìn ra ngay: "giao diện bố cục vẫn thế". Khối này sửa đúng chỗ
+   đó, và vẫn không đụng một dòng HTML nào.
+
+   Ba đòn bẩy có sẵn trong markup, đủ để dựng sáu cách xếp khác hẳn nhau:
+
+     .hero-canh   hai con XẾP DỌC: khối chữ, rồi .hero-duoi. Dồn cả hai vào
+                  cùng một ô lưới (grid-area: 1/1) là cho chữ đè lên hình.
+     .hero-duoi   hai con: khối hình, rồi danh sách việc. Đổi
+                  grid-template-columns là đổi tỉ lệ ảnh/việc; direction: rtl
+                  là đảo trái phải.
+     .luoi-vach   số cột đặt trong media query, mà media query KHÔNG cộng thêm
+                  điểm ưu tiên — nên một dòng body.theme-x .luoi-vach đặt ngoài
+                  media là đè được cả ba mốc 1/2/3 cột.
+     .dv-the      flex dọc. Chuyển sang grid hai cột rồi ghim .bt-o vào cột
+                  trái trải hết chiều dọc là biểu tượng nhảy sang bên trái chữ.
+
+   Bố cục đo được ở đâu thì ghi rõ ở đó; hai bộ không đo được cũng ghi rõ.
+   ========================================================================== */
+
+/* --- cobalt: ảnh phủ kín, chữ đè lên nửa trái ---------------------------- */
+/* Đo từ chính mẫu (curl vì trang chặn trình duyệt không giao diện):
+   <div class="swiper-slide" data-slide-bg="images/slide-1-1920x753.jpg"> —
+   hero KHÔNG có cột hình riêng, ảnh là nền phủ kín, chữ nằm đè lên trong
+   col-lg-6 offset-lg-1, tức nửa trái thụt vào một cột. Đầu trang chỉ cao 60px.
+   Các hàng chữ-hình dùng flex-lg-row-reverse nên ở đây đảo lại toàn bộ. */
+@media (min-width: 980px) {
+  body.theme-cobalt .hero-canh { grid-template-columns: minmax(0, 1fr); align-items: center; }
+  /* Cả hai con vào chung một ô: con sau nằm dưới làm nền, con trước đè lên. */
+  body.theme-cobalt .hero-canh > * { grid-area: 1 / 1; }
+  /* 58% cho cột chữ là mức sàn, không hạ được nữa: nút của bộ này dài và thấp
+     (đệm 34px, tối thiểu 200px), hai nút cộng khe cần 594px, mà 54% chỉ cho
+     559px là chúng rơi xuống hai hàng. Cột hình lấy đúng 42% còn lại — trước
+     đây để 46% và chồng lấn 4%, chịu được vì cột hình lúc ấy chỉ là bản vẽ mờ
+     .34 nằm làm nền. Từ khi tấm đầu trang có ẢNH THẬT phía sau thì cột hình
+     phải rõ hẳn (đục 1), mà đã rõ thì không được đè lên chữ nữa. */
+  body.theme-cobalt .hero-canh > *:first-child { z-index: 2; max-width: 58%; }
+  /* margin:0 là bắt buộc, không phải thừa: .hero-canh .bang-anh có margin:0
+     auto để căn giữa lúc hero xếp một cột. Lề auto nuốt hết khoảng trống trước
+     khi justify-self kịp nói gì, nên bỏ nó đi thì băng ảnh đứng chình ình giữa
+     tấm hero, đè lên đúng chữ tiêu đề. */
+  body.theme-cobalt .hero-canh > *:last-child { justify-self: end; width: 42%; margin: 0; }
+  body.theme-cobalt .hero-canh > *:last-child { align-self: center; }
+  /* Chỉ .sv (bản vẽ dự phòng, nằm TRONG .sv-ve) mới cần kéo rộng hết ô. Băng
+     ảnh .bang-anh chính là con thứ hai của .hero-canh, nên rule width:100% ở
+     đây từng ghi đè mất 42% bên trên và thổi nó ra full chiều ngang — cả tấm
+     đầu trang thành một mảng sữa đè lên tiêu đề. */
+  body.theme-cobalt .hero-canh .sv { max-width: none; width: 100%; }
+  body.theme-cobalt .hero-lon > .khung { min-height: 520px; display: grid; align-content: center; }
+  /* Hàng chữ-hình đảo chiều so với mặc định, đúng như flex-lg-row-reverse. */
+  body.theme-cobalt .doi-hinh { direction: rtl; }
+  body.theme-cobalt .doi-hinh > * { direction: ltr; }
+  body.theme-cobalt .doi-hinh.lat { direction: ltr; }
+}
+body.theme-cobalt .dau-trong { padding: 7px 0; }
+
+/* --- dien: hero một cột căn giữa, hình thành băng rộng dưới chữ ---------- */
+/* KHÔNG đo được: preview.themeforest.net dựng bằng script, không nhả iframe
+   nào để đi tiếp. Bố cục dưới đây chọn theo thể loại chứ không sao từ mẫu.
+   Ghép với băng hero tràn hết bề ngang đã có ở khối DÁNG, bộ này thành bộ duy
+   nhất không chia hero làm hai cột. Lưới hai cột lớn, biểu tượng bên trái. */
+@media (min-width: 980px) {
+  body.theme-dien .hero-canh {
+    grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; gap: 44px;
+  }
+  body.theme-dien .hero-canh > *:first-child { max-width: 820px; }
+  body.theme-dien .hero-dv { justify-self: stretch; text-align: left; }
+  body.theme-dien .hero-lon h1 { max-width: none; }
+  body.theme-dien .hero-lon .dan { max-width: 58ch; margin-inline: auto; }
+  body.theme-dien .hero-nut { justify-content: center; }
+  /* Tran 560px la di san cua bo cuc hero mot cot: hoi do anh an tron be
+     ngang, khong chan thi tam anh ra 880x660 va dau trang cao 174% man hinh.
+     Gio anh nam trong cot cua .hero-duoi va da bi chan CHIEU CAO o khoi duoi,
+     nen chan chieu ngang chi con lam thua mot mang trong ben phai. */
+  body.theme-dien .hero-trai .bang-anh { width: 100%; }
+  body.theme-dien .hero-trai .sv { max-width: 560px; width: 100%; }
+  body.theme-dien .bang-anh-khung { aspect-ratio: 16 / 9; }
+  body.theme-dien .luoi-vach { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+body.theme-dien .dv-the {
+  display: grid; grid-template-columns: 50px minmax(0, 1fr);
+  column-gap: 18px; row-gap: 7px; align-content: start;
+}
+body.theme-dien .dv-the .bt-o { grid-column: 1; grid-row: 1 / -1; margin-bottom: 0; }
+body.theme-dien .dv-the > *:not(.bt-o) { grid-column: 2; }
+/* Con của lưới mặc định kéo giãn hết ô. Nhãn là cái viên chữ ngắn, giãn ra
+   thành một thanh dài suốt bề ngang thẻ thì đọc ra như thanh tiến trình. */
+body.theme-dien .dv-the .chip { justify-self: start; }
+body.theme-dien .dv-the .chan { margin-top: 4px; }
+
+/* --- bien: hình bên TRÁI chữ, lưới bốn cột, đầu trang hai tầng ----------- */
+/* Đo được đủ (repairpress chạy tốt trong trình duyệt không giao diện):
+   hero có anhBenTrai=true, chữ bắt đầu ở x=611 tức nằm nửa phải — ngược hẳn
+   với mặc định của ta. Lưới đếm được 4 ô một hàng, mỗi ô rộng 263px, biểu
+   tượng nằm TRÊN chữ. Đầu trang cao 219px và có 2 tầng. */
+@media (min-width: 980px) {
+  body.theme-bien .hero-canh { direction: rtl; }
+  body.theme-bien .hero-canh > * { direction: ltr; }
+}
+@media (min-width: 1000px) {
+  body.theme-bien .luoi-vach { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  /* Bốn cột thì ô hẹp lại, chữ mô tả và hàng chân phải nhỏ theo. */
+  body.theme-bien .dv-the { padding: 18px 16px; }
+  body.theme-bien .dv-the .mota { font-size: 13px; }
+  body.theme-bien .dv-the .chan { font-size: 12px; gap: 10px; }
+}
+/* Hai tầng: logo một hàng, thanh điều hướng hàng dưới, ngăn bằng một đường kẻ. */
+body.theme-bien .dau-trong { flex-direction: column; align-items: stretch; gap: 0; padding: 16px 0 0; }
+body.theme-bien .dau-trong > a:first-child { align-self: flex-start; }
+body.theme-bien .dau-trong nav {
+  margin-left: 0; justify-content: center; padding: 10px 0;
+  margin-top: 14px; border-top: 1px solid rgba(255,255,255,.12);
+}
+/* Nút "Tra cứu đơn" nằm sẵn trong <nav> nên nó tự đi xuống tầng hai cùng các
+   link — đúng chỗ cần, không phải kéo ra góc phải. */
+
+/* --- kem: khung rộng 1296px, hero một cột căn trái, hình thành băng dưới -- */
+/* Đo được: cột nội dung của mẫu webflow rộng 1296px chứ không phải 1140, và
+   hero cao đúng một màn hình với chữ bắt đầu ở x=72 — tức chữ chạy hết bề
+   ngang cột, không có hình đứng cạnh. */
+/* width: calc(100% - 40px) chứ không chỉ max-width. Màn 1280px mà khung rộng
+   1296px thì khung chạm hai mép: tấm hero mất bo góc, nút "Tra cứu đơn" ở đầu
+   trang bị cắt cụt. Có dòng width thì máy nào hẹp hơn 1336px vẫn còn lề. */
+body.theme-kem .khung { max-width: 1296px; width: calc(100% - 40px); }
+@media (min-width: 980px) {
+  /* Hai cột chứ không còn một: cột phải giờ có danh sách việc bấm được,
+     để một cột thì nó rơi xuống dưới ảnh và khách phải kéo mới thấy —
+     đúng cái phải sửa. Cột phải 360px vừa đủ cho tên việc dài nhất
+     ("Tinh chỉnh cân bằng bằng lead tape") không xuống dòng. */
+  /* Không chặn bề ngang cột trái: chặn 980px là chặn luôn băng ảnh, mà ảnh
+     to là thứ Kendy yêu cầu. Bề ngang chữ đã có h1/dan tự chặn theo số ký
+     tự — đó mới là chỗ cần chặn để còn đọc được. */
+  body.theme-kem .hero-lon h1 { max-width: 20ch; }
+  body.theme-kem .hero-trai .sv { max-width: 560px; width: 100%; margin: 0; }
+  body.theme-kem .hero-lon > .khung { padding-block: clamp(48px, 5vw, 76px); }
+}
+
+/* --- do: khung hẹp, lưới thành DANH SÁCH một cột ------------------------- */
+/* KHÔNG đo được: demo MobRepair (templatemonster 321112) chặn cả trình duyệt
+   không giao diện lẫn curl. Bố cục chọn theo thể loại: bảng thợ đọc từ trên
+   xuống, mỗi việc một hàng ngang, biểu tượng bên trái, thời gian và bảo hành
+   dồn về mép phải. Khung hẹp lại còn 1040px cho hàng không dài quá tầm mắt. */
+body.theme-do .khung { max-width: 1040px; }
+/* Khung hẹp lại 100px thì cột chữ hero còn 569px, mà hai nút cộng khe là
+   578px — thiếu 9px là xuống dòng thành hai hàng so le. Bớt mỗi bên 4px đệm
+   ngang, đủ nằm một hàng mà nút vẫn to bản. */
+body.theme-do .hero-nut .nut { padding-inline: 26px; }
+body.theme-do .luoi-vach { grid-template-columns: minmax(0, 1fr); }
+body.theme-do .dv-the {
+  display: grid; grid-template-columns: 50px minmax(0, 1fr) auto;
+  column-gap: 20px; row-gap: 5px; align-items: center; padding: 18px 22px;
+}
+body.theme-do .dv-the .bt-o { grid-column: 1; grid-row: 1 / -1; margin-bottom: 0; }
+body.theme-do .dv-the .dau-the { grid-column: 2; }
+body.theme-do .dv-the .chip { grid-column: 2; justify-self: start; }
+body.theme-do .dv-the .mota { grid-column: 2; }
+/* Hàng chân nhảy sang cột ba, trải hết chiều dọc để nằm giữa hàng. */
+body.theme-do .dv-the .chan {
+  grid-column: 3; grid-row: 1 / -1; margin-top: 0; padding-top: 0;
+  flex-direction: column; align-items: flex-end; gap: 4px; text-align: right;
+}
+@media (max-width: 620px) {
+  body.theme-do .dv-the { grid-template-columns: 42px minmax(0, 1fr); }
+  body.theme-do .dv-the .chan { grid-column: 2; grid-row: auto; flex-direction: row; align-items: baseline; }
+}
+
+/* --- cam: lưới bốn cột căn giữa, hero nghiêng về phía hình -------------- */
+/* Không có mẫu để đo — bộ này em dựng thêm cho đủ sáu. Chọn cách xếp còn
+   trống trong năm bộ kia: ô dịch vụ căn giữa như bảng hiệu treo tường, bốn ô
+   một hàng, và mọi hàng chữ-hình đảo chiều so với mặc định.
+   Hero từng để cột hình rộng hơn cột chữ (.95/1.05), nhưng đo ra cột chữ chỉ
+   còn 463px trong khi hai nút cần 585px — hai nút rơi xuống hai hàng so le.
+   Đổi lại thành cột chữ rộng hơn; nét riêng của bộ này nằm ở lưới và ở vạch
+   cảnh báo, không cần vay thêm ở hero. */
+@media (min-width: 980px) {
+  body.theme-cam .hero-canh { grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); }
+  body.theme-cam .doi-hinh { direction: rtl; }
+  body.theme-cam .doi-hinh > * { direction: ltr; }
+  body.theme-cam .doi-hinh.lat { direction: ltr; }
+}
+/* Bốn ô một hàng, nhưng dựng bằng flex-wrap chứ không phải grid bốn cột.
+   Lý do: nền của khối này là vạch sọc, nên ô trống ở hàng cuối không phải là
+   chỗ trống mà là một mảng sọc to đùng — sáu dịch vụ chia bốn cột thì dư hai ô.
+   flex-wrap cho các thẻ ở hàng cuối tự nở ra lấp kín hàng, đúng với mọi số
+   dịch vụ chứ không riêng con số sáu hôm nay.
+
+   Đánh đổi đã biết, đọc luật gốc ở css.html:481 trước khi bê cách này sang bộ
+   khác: 5 thẻ thì ra 4 + 1, và cái thứ 5 kéo dài hết bề ngang trông như lỗi.
+   Hôm nay chịu được: 5 dịch vụ hiện trên trang chủ cộng thẻ "Không thấy việc
+   của mình?" là 6 ô, hàng cuối ra 2 ô đều nhau. Bảng giá có 12 dịch vụ, bật
+   thêm 3 cái nữa là 9 ô — chia 4 dư 1, hàng cuối còn ĐÚNG MỘT ô kéo dài hết
+   bề ngang, đúng cái lỗi ghi ở trên. Lúc đó quay lại đây đổi sang grid. */
+@media (min-width: 1000px) {
+  body.theme-cam .luoi-vach { display: flex; flex-wrap: wrap; }
+  body.theme-cam .luoi-vach > * { flex: 1 1 calc(25% - 6px); }
+}
+body.theme-cam .dv-the { align-items: center; text-align: center; padding: 22px 16px; }
+body.theme-cam .dv-the .dau-the { justify-content: center; }
+body.theme-cam .dv-the .chan { justify-content: center; }
+/* .dv-the .chip có align-self: flex-start (css.html:529) để nó khỏi giãn rộng
+   hết thẻ. Ở bộ này mọi thứ căn giữa nên phải gỡ, không thì nhãn nằm lệch hẳn
+   sang mép trái trong khi tên việc ở giữa. */
+body.theme-cam .dv-the .chip { align-self: center; }
+body.theme-cam .dv-the .bt-o { margin-inline: auto; }
+
+/* --- Tấm hero phải nằm gọn trong MỘT màn hình ---------------------------- */
+/* Đây là lần sửa thứ ba. Hai lần trước hỏng vì cùng một sai lầm: tôi ĐOÁN chỗ
+   trống còn lại rồi ghi thẳng con số vào CSS.
+
+   - Lần 1: height cứng + minmax(0,1fr). Gặp .hero > .khung { overflow: hidden }
+     (css.html:340) thì phần thừa bị CẮT chứ không đẩy trang dài ra — mất hẳn
+     hàng nút mà không có thanh cuộn nào báo.
+   - Lần 2: bỏ height, đo riêng băng ảnh bằng calc(100svh - 580px). Sai hai chỗ:
+     580px là con số tôi nhẩm, mà chiều cao khối chữ lại đổi theo BỀ NGANG cửa
+     sổ — cửa sổ hẹp thì h1 xuống ba dòng, mọi con số nhẩm sẵn đều lệch.
+   - Và cái không ai ngờ: body.theme-kem section { padding: 100px 0 } ở
+     css.html:1920 áp cho MỌI section, hero là <section> nên dính đủ 200px trên
+     dưới. Tôi trừ 92px trong khi thực tế phải trừ gần 300px.
+
+   Lần này không đoán nữa. Khung có chiều cao xác định để hàng 1fr có mốc chia,
+   CỘNG min-height: fit-content làm van an toàn — chữ dài quá thì khung tự cao
+   thêm, nên overflow: hidden không còn gì để cắt. Ảnh nhận đúng phần CÒN DƯ,
+   bao nhiêu cũng được, không cần ai nhẩm hộ. Đúng thứ tự đã chốt: co ảnh
+   trước, chữ nhỏ lại chút, không bỏ khối nào. */
+@media (min-width: 980px) {
+  /* Gỡ 200px đệm mà theme-kem phát cho mọi section. Hero là tấm duy nhất bắt
+     buộc nằm gọn một màn; 200px khoảng trắng ở đây là một phần sáu màn hình. */
+  body.theme-tim .hero-lon,
+  body.theme-dien .hero-lon,
+  body.theme-kem .hero-lon { padding: 24px 0 0; }
+
+  body.theme-tim .hero-lon > .khung,
+  body.theme-dien .hero-lon > .khung,
+  body.theme-kem .hero-lon > .khung {
+    display: grid;
+    /* 108px = dải đầu trang (~80px) + đệm trên vừa đặt lại (24px). Trần 1040px
+       để trên màn 2K ảnh đừng kéo thành tấm dọc — cắt dọc là mất cả cây vợt. */
+    height: min(calc(100vh - 108px), 1040px);
+    height: min(calc(100svh - 108px), 1040px);
+    min-height: -webkit-fit-content;
+    min-height: fit-content;
+    padding-block: clamp(22px, 2.8vh, 54px);
+  }
+  /* stretch để cột trái cao bằng khung — có thế hàng 1fr bên trong nó mới có
+     mốc mà chia. Riêng danh sách việc giữ align-self: start, không thì tấm
+     kính mờ bị kéo dài xuống tận đáy trong khi chỉ có tám dòng chữ. */
+  body.theme-tim .hero-canh,
+  body.theme-dien .hero-canh,
+  body.theme-kem .hero-canh { align-items: stretch; }
+  body.theme-tim .hero-canh > .hero-dv,
+  body.theme-dien .hero-canh > .hero-dv,
+  body.theme-kem .hero-canh > .hero-dv { align-self: start; }
+
+  /* Sàn 150px: ảnh có thể co, nhưng biến mất hẳn thì hero còn mỗi chữ. Chạm
+     sàn rồi mà vẫn chật thì fit-content ở trên cho khung cao thêm — cuộn một
+     quãng ngắn, chứ không cắt. */
+  body.theme-tim .hero-trai,
+  body.theme-dien .hero-trai,
+  body.theme-kem .hero-trai {
+    grid-template-rows: auto minmax(150px, 1fr);
+    gap: clamp(16px, 2.2vh, 32px);
+  }
+  body.theme-tim .hero-trai > .bang-anh,
+  body.theme-dien .hero-trai > .bang-anh,
+  body.theme-kem .hero-trai > .bang-anh {
+    display: grid; grid-template-rows: minmax(0, 1fr) auto; min-height: 0;
+  }
+  /* Bỏ tỉ lệ 4:3: chiều cao giờ do ô lưới cấp, ảnh cắt theo object-fit như cũ. */
+  body.theme-tim .hero-trai .bang-anh-khung,
+  body.theme-dien .hero-trai .bang-anh-khung,
+  body.theme-kem .hero-trai .bang-anh-khung {
+    aspect-ratio: auto; height: 100%; min-height: 0;
+  }
+
+  /* 46ch là bề ngang của bố cục MỘT cột cũ. Cột trái giờ rộng chừng 920px, giữ
+     46ch nghĩa là đoạn mô tả chỉ dùng non nửa chiều ngang rồi đổ xuống bảy
+     dòng — ăn mất đúng phần đất của băng ảnh. Nới ra là bớt được hai dòng mà
+     không cắt chữ nào. Bộ tim để yên: nó canh giữa, dòng dài quá đọc mỏi mắt. */
+  body.theme-dien .hero-lon .dan,
+  body.theme-kem .hero-lon .dan { max-width: 68ch; }
+
+  /* Dòng chữ to nhất trang đang 58px — trên màn rộng nó chiếm gần một phần ba
+     chiều cao hero, đẩy ảnh và cả địa chỉ xuống. Hạ xuống 44px vẫn là thứ to
+     nhất trang, mà lấy lại được chỗ cho hai dòng mới. Nới max-width theo, không
+     thì chữ bé đi lại rơi thành ba dòng — chẳng tiết kiệm được gì. */
+  body.theme-tim .hero-lon h1,
+  body.theme-dien .hero-lon h1,
+  body.theme-kem .hero-lon h1 { font-size: clamp(30px, 3.3vw, 44px); max-width: 24ch; }
+
+  /* Bản vẽ giữ chỗ lúc chưa up ảnh: cùng ô lưới ấy, giữ tỉ lệ gốc. */
+  body.theme-tim .hero-trai > .sv-ve,
+  body.theme-dien .hero-trai > .sv-ve,
+  body.theme-kem .hero-trai > .sv-ve {
+    min-height: 0; display: grid; align-content: center; justify-items: center;
+  }
+  body.theme-tim .hero-trai > .sv-ve > svg,
+  body.theme-dien .hero-trai > .sv-ve > svg,
+  body.theme-kem .hero-trai > .sv-ve > svg { max-height: 100%; width: auto; }
+}
+
+/* Màn thấp: chữ nhỏ lại theo chiều cao màn. 880px là chỗ bắt đầu chật — trên
+   mức đó cỡ chữ gốc vẫn vừa, dưới mức đó mà giữ nguyên thì riêng khối chữ đã
+   ăn hết màn, ảnh chạm sàn rồi vẫn phải cuộn. */
+@media (min-width: 980px) and (max-height: 880px) {
+  body.theme-tim .hero-lon h1,
+  body.theme-dien .hero-lon h1,
+  body.theme-kem .hero-lon h1 { font-size: clamp(28px, 4.2vh, 44px); }
+
+  body.theme-tim .hero-lon .dan,
+  body.theme-dien .hero-lon .dan,
+  body.theme-kem .hero-lon .dan { font-size: clamp(14.5px, 1.9vh, 17px); line-height: 1.55; }
+
+  body.theme-tim .hero-lon .hero-nut,
+  body.theme-dien .hero-lon .hero-nut,
+  body.theme-kem .hero-lon .hero-nut { margin-top: clamp(16px, 2.6vh, 34px); }
+
+  /* Màn càng thấp thì càng phải nới ngang: mỗi dòng bớt đi là hai chục pixel
+     trả lại cho băng ảnh. */
+  body.theme-dien .hero-lon .dan,
+  body.theme-kem .hero-lon .dan { max-width: 76ch; }
+}
+
+/* Laptop 1366x768 và các màn còn thấp hơn: hạ sàn băng ảnh xuống 110px. Giữ
+   150px ở đây thì riêng phần chênh ấy đã đủ đẩy hero quá một màn. */
+@media (min-width: 980px) and (max-height: 760px) {
+  body.theme-tim .hero-trai,
+  body.theme-dien .hero-trai,
+  body.theme-kem .hero-trai { grid-template-rows: auto minmax(110px, 1fr); }
+}
+
+
+
+/* ==========================================================================
+   BỐ CỤC — BẢY KHỐI CÒN LẠI CỦA TRANG CHỦ
+   --------------------------------------------------------------------------
+   Khối trên mới đổi tấm hero và lưới dịch vụ. Chụp cả sáu bộ nguyên trang rồi
+   xếp cạnh nhau thì lòi ra: đó là 2 trên 10 khối, còn tám khối kia — dải số
+   liệu, phiếu khám, hai khối chữ-hình, bốn bước, ba cam kết, form, chân trang
+   — giống hệt nhau ở cả sáu bộ, mà chúng chiếm 80% chiều dài trang. Nhìn từ
+   xa vẫn là "một tấm hero màu rồi tám khối trắng xếp y hệt". Kendy trả lại
+   lần thứ tư, đúng.
+
+   Xếp theo KHỐI chứ không theo bộ: mỗi khối ghi luật gốc trước rồi tới sáu
+   cách dựng lại. Sau này sửa luật gốc thì đọc một chỗ là biết bộ nào bị đè.
+
+   Bảy khối này bám vào bảy điểm neo có sẵn trong trangchu.html — không thêm
+   một class nào, không đụng nội dung:
+
+     .bang-so-luoi  ba ô, mỗi ô ba dòng .n / .v / .t
+     .doi-hinh      hai cột hình-chữ (ba lần trên trang), .lat là bản đảo
+     .doc-lon       tiêu đề khối rồi tới nội dung khối (dùng ở 3 mục)
+     .buoc          bốn ô quy trình, mỗi ô có .n
+     .cam-ket       ba thẻ .the[data-so]
+     .doi-cot       form bên trái, .canh hai thẻ bên phải
+     footer .cot    lưới cột link chân trang
+   ========================================================================== */
+
+/* --- 1. Dải số liệu ------------------------------------------------------- */
+/* Gốc (css.html:459): lưới vạch 3 ô, thẻ trắng, kéo lên -26px đè lên hero,
+   trong mỗi ô là nhãn nhỏ → số to → câu giải thích. */
+
+/* cobalt: một dải mực đặc, số trước nhãn sau. Băng tối vắt ngang chân tấm
+   hero xanh cho ra nhịp hai lớp giống mẫu. */
+body.theme-cobalt .bang-so-luoi {
+  background: var(--muc); border-color: var(--muc); box-shadow: none; gap: 1px;
+}
+body.theme-cobalt .bang-so-luoi > div { background: var(--muc); padding: 20px 26px; }
+body.theme-cobalt .bang-so-luoi > div + div { box-shadow: -1px 0 0 rgba(255,255,255,.16); }
+body.theme-cobalt .bang-so-luoi > div { display: flex; flex-direction: column; }
+body.theme-cobalt .bang-so .v { order: 1; color: var(--sang); }
+body.theme-cobalt .bang-so .n { order: 2; margin: 12px 0 0; color: var(--tren-dam); }
+body.theme-cobalt .bang-so .t { order: 3; color: var(--tren-dam-mo); }
+
+/* dien: bỏ hẳn thẻ. Ba con số trần, căn giữa, to gấp rưỡi, ngăn nhau bằng một
+   đường kẻ dọc. Bỏ luôn cú kéo lên -26px: không còn nền thẻ thì chữ đè lên
+   hero là không đọc được. */
+body.theme-dien .bang-so > .khung { margin-top: 40px; }
+body.theme-dien .bang-so-luoi {
+  background: none; border: none; box-shadow: none; border-radius: 0; gap: 0;
+}
+body.theme-dien .bang-so-luoi > div { background: none; text-align: center; padding: 6px 24px; }
+body.theme-dien .bang-so-luoi > div + div { border-left: 1px solid var(--vien); }
+body.theme-dien .bang-so .v { font-size: clamp(34px, 4.6vw, 48px); }
+body.theme-dien .bang-so .t { max-width: 30ch; margin-inline: auto; }
+
+/* bien: số nằm BÊN TRÁI chữ chứ không nằm trên — ô thấp hẳn xuống, hợp với bộ
+   nhỏ và khẽ. */
+body.theme-bien .bang-so-luoi > div {
+  display: grid; grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 16px; align-items: center; padding: 18px 20px;
+}
+body.theme-bien .bang-so .v { grid-column: 1; grid-row: 1 / 3; font-size: 32px; }
+body.theme-bien .bang-so .n { grid-column: 2; margin-bottom: 3px; }
+body.theme-bien .bang-so .t { grid-column: 2; margin-top: 0; font-size: 13px; }
+
+/* kem: ba mảng màu rời nhau, bo góc to, không viền không bóng — cùng công thức
+   với lưới dịch vụ của bộ này. */
+body.theme-kem .bang-so-luoi {
+  background: none; border: none; box-shadow: none; gap: 16px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 700px) { body.theme-kem .bang-so-luoi { grid-template-columns: repeat(3, 1fr); } }
+body.theme-kem .bang-so-luoi > div { border-radius: var(--r); padding: 26px 28px; }
+body.theme-kem .bang-so-luoi > div:nth-child(2) { background: var(--th-nen); }
+body.theme-kem .bang-so-luoi > div:nth-child(3) { background: color-mix(in srgb, var(--sang) 15%, var(--the)); }
+
+/* do: xếp dọc thành ba dòng, số dồn về mép phải — đọc như bảng thông số dán
+   trên tường trạm, cùng mạch với lưới dịch vụ một cột của bộ này. */
+body.theme-do .bang-so-luoi { grid-template-columns: 1fr; }
+body.theme-do .bang-so-luoi > div {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 24px; align-items: center; padding: 14px 22px;
+}
+body.theme-do .bang-so .n { grid-column: 1; margin-bottom: 4px; }
+body.theme-do .bang-so .t { grid-column: 1; margin-top: 0; }
+body.theme-do .bang-so .v { grid-column: 2; grid-row: 1 / 3; font-size: 34px; }
+
+/* cam: căn giữa, khe là vạch cảnh báo — đúng công thức đã dùng cho lưới. */
+body.theme-cam .bang-so-luoi {
+  gap: 5px; border-width: 2px; border-color: var(--vien-dam);
+  background: repeating-linear-gradient(-45deg,
+    color-mix(in srgb, var(--muc) 26%, transparent) 0 4px, transparent 4px 8px) var(--nen);
+}
+body.theme-cam .bang-so-luoi > div { text-align: center; }
+body.theme-cam .bang-so .t { max-width: 28ch; margin-inline: auto; }
+
+/* --- 2. Hai khối chữ-hình ------------------------------------------------- */
+/* Gốc (css.html:610): cột hình 460px cố định, cột chữ 1fr, .lat đảo bên. */
+
+/* cobalt: chia đôi đều, không khe, hình vuông góc chạm mép cột — kiểu ấn phẩm,
+   khớp với hero phủ kín của bộ này. */
+@media (min-width: 900px) {
+  body.theme-cobalt .doi-hinh { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0; }
+  body.theme-cobalt .doi-hinh > *:last-child { padding-inline: 44px; }
+  body.theme-cobalt .hinh-o { border-radius: 0; margin: 0; }
+}
+
+/* dien: một cột, hình NẰM TRÊN chữ, cả hai căn giữa. Riêng danh sách gạch đầu
+   dòng phải kéo về căn trái: chữ chạy dài mà căn giữa thì mỗi dòng một mép,
+   mắt không bắt được đầu dòng. */
+@media (min-width: 900px) {
+  body.theme-dien .doi-hinh { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; gap: 40px; }
+  body.theme-dien .doi-hinh .hinh-o { max-width: 640px; }
+  body.theme-dien .doi-hinh > * { max-width: 860px; }
+  body.theme-dien .doi-hinh .gach { max-width: 64ch; margin-inline: auto; text-align: left; }
+  body.theme-dien .doi-hinh .dan-lon { max-width: 62ch; margin-inline: auto; }
+}
+
+/* bien: cột hình hẹp lại còn 360px cho cột chữ dài ra — bộ này chữ nhỏ, dòng
+   thưa, cần bề ngang chứ không cần hình to. */
+@media (min-width: 900px) {
+  body.theme-bien .doi-hinh { grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: 44px; }
+}
+
+/* kem: đảo tỉ lệ — hình rộng hơn chữ. Khung bộ này đã 1296px nên bản vẽ có chỗ
+   để thở, và đó là thứ duy nhất trên trang chưa được dùng to. */
+@media (min-width: 900px) {
+  body.theme-kem .doi-hinh { grid-template-columns: minmax(0, 1fr) minmax(0, .74fr); gap: 56px; }
+  body.theme-kem .hinh-o { border-radius: 22px; padding: 30px; }
+}
+
+/* do: hình co lại thành bản vẽ kỹ thuật ghim bên cạnh, vuông góc, viền dày —
+   chữ mới là phần chính. */
+@media (min-width: 900px) {
+  body.theme-do .doi-hinh { grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 40px; align-items: start; }
+  body.theme-do .hinh-o { border-radius: 0; border-width: 2px; }
+}
+
+/* cam: đã đảo chiều ở khối trên. Thêm vạch cam trên nóc khung hình cho khớp
+   với gạch cam ở đỉnh mỗi thẻ. */
+body.theme-cam .hinh-o { border-top: 3px solid var(--sang); border-radius: 0; }
+
+/* --- 3. Khối "tiêu đề rồi tới nội dung" ----------------------------------- */
+/* Gốc (css.html:237): .doc-lon xếp dọc, tiêu đề trên, nội dung dưới. Dùng ở ba
+   mục: bảng dịch vụ, bốn bước, ba cam kết — nên đổi một dòng là đổi ba mục. */
+
+/* kem và do: tiêu đề tách sang một cột trái, nội dung chạy bên phải. Đây là
+   đòn đổi dáng trang mạnh nhất trong cả khối này vì nó ăn vào ba mục một lúc.
+   Chỉ hai bộ được dùng: kem có khung 1296px và do có lưới một cột, cả hai còn
+   chỗ cho cột trái. Bốn bộ kia lưới 3-4 cột, cắt thêm 300px là ô bẹp dí.
+   CHÚ Ý: chỉ ăn khi con ĐẦU của .doc-lon thật sự là khối tiêu đề (nhận ra qua
+   .nhan-vach bên trong). Bốn trang — dịch vụ, quy trình, bài viết, tra cứu —
+   đặt thẳng lưới vào con đầu, không có tiêu đề; thiếu chốt :has() thì lưới bị
+   nhét vào cột 320px và thẻ bẹp còn 96px, mỗi dòng một chữ. */
+@media (min-width: 1000px) {
+  body.theme-kem .doc-lon:has(> *:first-child .nhan-vach) { grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: 48px; align-items: start; }
+  body.theme-do .doc-lon:has(> *:first-child .nhan-vach)  { grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 40px; align-items: start; }
+}
+
+/* dien và cam: tiêu đề khối căn giữa. Hai bộ này căn giữa từ hero xuống nên
+   tiêu đề lệch trái sẽ lạc quẻ. */
+body.theme-dien .doc-lon > *:first-child:has(.nhan-vach),
+body.theme-cam .doc-lon > *:first-child:has(.nhan-vach) { text-align: center; max-width: 70ch; margin-inline: auto; }
+body.theme-dien .doc-lon > *:first-child .nhan-vach,
+body.theme-cam .doc-lon > *:first-child .nhan-vach { justify-content: center; }
+
+/* --- 4. Bốn bước --------------------------------------------------------- */
+/* Gốc (css.html:589): lưới vạch 4 ô ngang, mỗi ô nhãn BƯỚC N gạch chân. */
+
+/* cobalt: bỏ nền thẻ, bốn cột chỉ ngăn bằng vạch vàng dựng đứng ở đầu mỗi cột. */
+body.theme-cobalt .buoc { background: none; border: none; box-shadow: none; gap: 0; border-radius: 0; }
+body.theme-cobalt .buoc > div { background: none; padding: 0 26px; border-left: 2px solid var(--sang); }
+@media (max-width: 760px) { body.theme-cobalt .buoc > div { padding: 14px 0 14px 20px; } }
+body.theme-cobalt .buoc .n { border-bottom: none; padding-bottom: 0; }
+
+/* dien: bốn cột nhưng căn giữa, số bước to đùng nằm trên tên bước. */
+body.theme-dien .buoc { background: none; border: none; box-shadow: none; gap: 18px; border-radius: 0; }
+body.theme-dien .buoc > div { background: var(--the); border: 1px solid var(--vien); border-radius: var(--r); justify-items: center; text-align: center; }
+body.theme-dien .buoc .n {
+  justify-self: center; border-bottom: none; padding-bottom: 0;
+  font-size: 26px; letter-spacing: .02em; color: var(--sang-muc);
+}
+
+/* bien: 2x2 thay vì 4 ngang — bộ này ô nhỏ, xếp bốn ô ngang thì mỗi ô chỉ còn
+   248px mà chữ mô tả dài bốn dòng. */
+@media (min-width: 760px) { body.theme-bien .buoc { grid-template-columns: repeat(2, 1fr); } }
+
+/* kem: 2x2, các ô rời nhau bo góc to, màu luân phiên. */
+body.theme-kem .buoc { background: none; border: none; box-shadow: none; gap: 16px; }
+@media (min-width: 760px) { body.theme-kem .buoc { grid-template-columns: repeat(2, 1fr); } }
+body.theme-kem .buoc > div { border-radius: var(--r); padding: 28px 26px; }
+body.theme-kem .buoc > div:nth-child(2n) { background: var(--th-nen); }
+
+/* do: bốn bước xếp DỌC thành bốn hàng, số bước nằm trong ô vuông bên trái —
+   cùng một mạch với bảng dịch vụ một cột. */
+body.theme-do .buoc { grid-template-columns: 1fr; }
+@media (min-width: 760px) { body.theme-do .buoc { grid-template-columns: 1fr; } }
+body.theme-do .buoc > div {
+  grid-template-columns: 96px minmax(0, 1fr); column-gap: 22px; row-gap: 4px;
+  align-content: center; padding: 18px 22px;
+}
+body.theme-do .buoc .n {
+  grid-column: 1; grid-row: 1 / 3; align-self: center; justify-self: stretch;
+  display: grid; place-content: center; text-align: center;
+  border-bottom: none; padding: 12px 0; margin: 0;
+  background: var(--th-nen); color: var(--th); border-left: 3px solid var(--sang);
+}
+body.theme-do .buoc > div > h4,
+body.theme-do .buoc > div > p { grid-column: 2; }
+
+/* cam: bốn ô căn giữa, nhãn bước thành một tem dán chứ không phải chữ gạch chân. */
+body.theme-cam .buoc {
+  gap: 5px; border-width: 2px; border-color: var(--vien-dam);
+  background: repeating-linear-gradient(-45deg,
+    color-mix(in srgb, var(--muc) 26%, transparent) 0 4px, transparent 4px 8px) var(--nen);
+}
+body.theme-cam .buoc > div { justify-items: center; text-align: center; }
+body.theme-cam .buoc .n {
+  justify-self: center; border-bottom: none; padding: 5px 12px;
+  background: var(--sang); color: var(--tren-sang);
+}
+
+/* --- 5. Ba cam kết ------------------------------------------------------- */
+/* Gốc (css.html:573): ba thẻ ngang, viền trên 3px, số 01/02/03 mờ ở góc phải. */
+
+/* cobalt: bỏ thẻ, ba cột chữ trần dưới một vạch vàng dày. */
+body.theme-cobalt .cam-ket .the {
+  background: none; border: none; border-top: 4px solid var(--sang);
+  border-radius: 0; box-shadow: none; padding: 20px 0 0;
+}
+body.theme-cobalt .cam-ket .the::after { top: -2px; right: 0; opacity: .1; }
+
+/* dien: ba cột căn giữa, số thứ tự kéo ra làm tiêu đề chứ không nấp ở góc. */
+body.theme-dien .cam-ket .the { text-align: center; padding-top: 58px; }
+body.theme-dien .cam-ket .the::after {
+  left: 0; right: 0; top: 14px; text-align: center; font-size: 40px;
+  opacity: .55; color: var(--sang-muc);
+}
+
+/* bien: ba cột nhỏ, bỏ vạch trên, dùng bóng tỏa — bộ này khẽ, không gạch đầu. */
+body.theme-bien .cam-ket { gap: 16px; }
+body.theme-bien .cam-ket .the { border-top-width: 1px; border-top-color: var(--vien); }
+
+/* kem: ba mảng màu luân phiên, không viền. */
+body.theme-kem .cam-ket { gap: 16px; }
+body.theme-kem .cam-ket .the { border: none; border-radius: var(--r); padding: 26px 28px; }
+body.theme-kem .cam-ket .the:nth-child(2) { background: var(--th-nen); }
+body.theme-kem .cam-ket .the:nth-child(3) { background: color-mix(in srgb, var(--sang) 15%, var(--the)); }
+
+/* do: ba hàng dọc, số thứ tự to bên trái làm cột mốc. */
+body.theme-do .cam-ket { grid-template-columns: 1fr; gap: 1px; background: var(--vien); border: 1px solid var(--vien); }
+body.theme-do .cam-ket .the {
+  border: none; border-radius: 0; border-left: 3px solid var(--sang);
+  padding: 20px 24px 20px 92px; overflow: visible;
+}
+body.theme-do .cam-ket .the::after {
+  left: 22px; right: auto; top: 50%; transform: translateY(-50%);
+  font-size: 40px; opacity: .3;
+}
+
+/* cam: ba ô căn giữa, khe vạch cảnh báo. */
+body.theme-cam .cam-ket {
+  gap: 5px; padding: 0; border: 2px solid var(--vien-dam);
+  background: repeating-linear-gradient(-45deg,
+    color-mix(in srgb, var(--muc) 26%, transparent) 0 4px, transparent 4px 8px) var(--nen);
+}
+body.theme-cam .cam-ket .the { text-align: center; border-radius: 0; }
+/* Số thứ tự mờ ở đây phải nằm nguyên góc phải như luật gốc. Từng thử kéo nó ra
+   giữa cho khớp với chữ căn giữa: nó rơi đúng sau tiêu đề, mờ 7% vẫn đủ làm
+   chữ nhòe ở chỗ mắt nhìn vào đầu tiên. Ở góc thì không đụng ai. */
+
+/* --- 6. Khối form gửi yêu cầu -------------------------------------------- */
+/* Gốc (css.html:604): form bên trái 1fr, .canh hai thẻ bên phải 340px, dính
+   theo khi cuộn. */
+
+/* cobalt: hai thẻ phụ sang bên TRÁI. direction: rtl đảo thứ tự cột, con phải
+   trả về ltr không thì dấu câu nhảy sang đầu dòng. */
+@media (min-width: 900px) {
+  body.theme-cobalt .doi-cot { direction: rtl; }
+  body.theme-cobalt .doi-cot > * { direction: ltr; }
+}
+
+/* dien: một cột, form căn giữa, hai thẻ phụ xuống dưới nằm ngang. */
+@media (min-width: 900px) {
+  body.theme-dien .doi-cot { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+  body.theme-dien .doi-cot > *:first-child { max-width: 780px; width: 100%; }
+  body.theme-dien .doi-cot > .canh {
+    position: static; grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 780px; width: 100%;
+  }
+}
+
+/* bien: cột phụ hẹp lại 280px và thôi dính theo — bộ này khối nào cũng đứng
+   yên, một mảng bám theo màn hình là thứ duy nhất động đậy, chỏi. */
+@media (min-width: 900px) {
+  body.theme-bien .doi-cot { grid-template-columns: minmax(0, 1fr) 280px; }
+  body.theme-bien .doi-cot > .canh { position: static; }
+}
+
+/* kem: một cột, form chạy hết khung 1296px, hai thẻ phụ thành hai mảng rộng
+   bên dưới. */
+@media (min-width: 900px) {
+  body.theme-kem .doi-cot { grid-template-columns: minmax(0, 1fr); }
+  body.theme-kem .doi-cot > .canh { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+}
+
+/* do: hai thẻ phụ nhảy LÊN TRÊN form, nằm ngang như hai dòng thông báo dán
+   trước cửa. order âm được vì .doi-cot là lưới. */
+@media (min-width: 900px) {
+  body.theme-do .doi-cot { grid-template-columns: minmax(0, 1fr); }
+  body.theme-do .doi-cot > .canh {
+    position: static; order: -1; grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* cam: hai thẻ phụ sang trái và căn giữa nội dung, cho khớp với mọi ô khác. */
+@media (min-width: 900px) {
+  body.theme-cam .doi-cot { direction: rtl; }
+  body.theme-cam .doi-cot > * { direction: ltr; }
+}
+body.theme-cam .doi-cot > .canh .the { text-align: center; }
+
+/* --- 7. Chân trang ------------------------------------------------------- */
+/* Gốc (css.html:791): auto-fit từ 190px, ra bốn cột đều nhau ở màn rộng. */
+body.theme-dien footer .cot { text-align: center; }
+body.theme-bien footer .cot { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 40px; }
+@media (min-width: 900px) {
+  body.theme-do footer .cot { grid-template-columns: 1.6fr 1fr 1fr 1fr; }
+  body.theme-kem footer .cot { grid-template-columns: 2fr 1fr 1fr; gap: 40px; }
+}
+body.theme-cam footer .cot { text-align: center; }
+
+
+/* ==========================================================================
+   CHUYỂN ĐỘNG
+   --------------------------------------------------------------------------
+   Ba thứ, không hơn: nút và thẻ nhấc lên khi rê chuột, mỗi khối nội dung trôi
+   lên một quãng ngắn khi cuộn tới, và vệt sáng trên hero thở rất chậm. Trang
+   bán hàng cần thấy sống, nhưng thứ nhảy múa quá tay thì đọc mệt, và trên máy
+   yếu là giật — mà khách của trạm phần lớn mở bằng điện thoại giữa sân.
+
+   Cả khối này tự tắt trong @media (prefers-reduced-motion: reduce) phía trên,
+   vì rule ở đó dùng !important.
+   ========================================================================== */
+.nut, .dv-the, .the, .bt-o, .phieu {
+  transition: transform .18s ease, box-shadow .22s ease,
+              background-color .18s ease, border-color .18s ease, color .18s ease;
+}
+.nut-chinh:hover, .nut-vien:hover { transform: translateY(-2px); }
+.nut-chinh:active, .nut-vien:active { transform: translateY(0); }
+.nut-chinh:hover {
+  box-shadow: 0 10px 24px -10px color-mix(in srgb, var(--sang) 70%, transparent);
+}
+.dv-the:hover { transform: translateY(-3px); }
+/* Trong lưới có vạch ngăn thì thẻ không được nhấc: nhấc lên là hở vạch. */
+.luoi-vach .dv-the:hover { transform: none; }
+
+/* Vệt sáng hero thở. 16 giây một nhịp — chậm tới mức không ai bắt được nó
+   đang động, chỉ thấy tấm hero không chết cứng. Chỉ animate opacity: ::before
+   phủ inset:0 nên scale sẽ tràn khỏi bo góc. */
+@keyframes tho-sang { 0%, 100% { opacity: .82; } 50% { opacity: 1; } }
+.hero-lon > .khung::before { animation: tho-sang 16s ease-in-out infinite; }
+
+/* Khối nội dung trôi lên khi cuộn tới.
+   Trạng thái ẩn ban đầu CHỈ bật khi JS đã chạy và đã gắn class lên body —
+   không có JS (hoặc JS lỗi) thì trang vẫn hiện đủ chữ. Ẩn bằng CSS thuần rồi
+   trông chờ JS hiện ra là cách nhanh nhất để có một trang trắng. */
+@keyframes troi-len { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+body.js-troi .troi { opacity: 0; }
+body.js-troi .troi.vao { animation: troi-len .55s cubic-bezier(.22,.68,.36,1) both; }
+
+
+/* ==========================================================================
+   ẢNH, TRANG TRÍ VÀ CHUYỂN ĐỘNG — RIÊNG TỪNG BỘ
+   --------------------------------------------------------------------------
+   Khối này sinh ra từ một lần bị trả lại: "nó vẫn chỉ là thay màu sắc thôi mà".
+   Đo lại thì đúng thật. Trước khối này cả bảy bộ dùng CHUNG bốn @keyframes
+   (ve-net, hien-dan, tho-sang, troi-len) và chung đúng một luật rê chuột —
+   nghĩa là màu khác, dáng khác, bố cục khác, nhưng trang ĐỘNG y hệt nhau.
+   Đo ba mẫu gốc bằng scratchpad/hieuung.js:
+
+     mẫu Compair (cobalt)   30 ảnh · 368 transition · 40 keyframes · WOW+Swiper
+     mẫu Gogrin  (đỏ)       12 ảnh · 491 transition · 40 keyframes · WOW+Swiper
+     mẫu RepairPress (biển) 12 ảnh ·  79 transition · 11 keyframes · không thư viện
+     trang mình               3 ảnh ·  30 transition ·  4 keyframes
+
+   Ba con số đầu tiên mới là chỗ chênh lệch thật: ẢNH. Mẫu nào cũng 12-30 tấm,
+   mình có 3 tấm line-art xanh volt dùng chung cho cả bảy bộ. Không có ảnh thì
+   sáu trang chỉ còn là sáu cách xếp chữ, mà xếp chữ thì nhìn lướt qua giống
+   nhau hết.
+
+   Nên khối này làm ba việc, theo đúng thứ tự sức nặng:
+
+   1. ẢNH. Mỗi bộ hai tấm riêng, nhúng trong binary ở ui/anh/, phục vụ qua
+      /anh-gd/{ten}. Gắn bằng background-image chứ không phải thẻ <img>: HTML
+      không phải đổi một chữ, và mỗi bộ tự chọn tấm của mình. Ảnh lấy ở
+      Unsplash — giấy phép cho dùng thương mại, không bắt ghi nguồn. Đây là
+      ảnh ĐỆM: Kendy up ảnh trạm thật vào /qt/anh-trang-chu thì ảnh thật
+      thắng ở tấm đầu trang, mấy chỗ còn lại vẫn là ảnh kho cho tới khi có đủ.
+
+   2. TRANG TRÍ. Mỗi bộ một món, không bộ nào trùng bộ nào:
+        cobalt  băng ảnh phủ kín dưới dải số
+        điện    số to hơn nữa, ảnh làm nền rất mờ sau ba cam kết
+        biển    tấm đè lấn — hình có một tấm phẳng lệch 22px sau lưng
+        kem     huy hiệu tròn thay ô vuông, băng ảnh ấm ở chân trang
+        đỏ      dải ảnh trạm làm kết cấu sau bốn bước
+        cam     đường cắt chéo trên tấm đầu trang, ảnh chạy hết bề ngang
+
+   3. CHUYỂN ĐỘNG. Mỗi bộ một hướng hiện, một nhịp, một kiểu rê chuột. Nhịp
+      là thứ ít ai gọi tên được nhưng nhận ra ngay: đỏ nảy trong 0.1s, kem
+      trôi 0.42s. Cùng một trang, hai cảm giác khác nhau.
+
+   Ba luật giữ khối này không thành trang trí rởm:
+     · Chữ trên ảnh luôn có màn lọc bằng chính --th của bộ, đủ dày để tỉ lệ
+       tương phản không rơi. Ảnh chỉ được nằm dưới chữ khi có màn lọc.
+     · Dưới 900px mọi kiểu cắt chéo/chia đôi đều rơi về "ảnh phủ kín + màn lọc
+       dày", vì ở đó chữ chạy hết bề ngang, không còn nửa nào trống để đặt ảnh.
+     · Cả khối tự tắt trong prefers-reduced-motion nhờ rule * !important ở trên.
+   ========================================================================== */
+
+/* --- Từ vựng chuyển động dùng chung -------------------------------------- */
+/* Ảnh nền thở rất chậm. Chỉ transform, không đụng background-size: đổi
+   background-size là trình duyệt vẽ lại ảnh mỗi khung hình, điện thoại giữa
+   sân là giật ngay. */
+@keyframes anh-tho { from { transform: scale(1); } to { transform: scale(1.07); } }
+
+@keyframes troi-trai { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: none; } }
+@keyframes troi-phai { from { opacity: 0; transform: translateX(26px);  } to { opacity: 1; transform: none; } }
+@keyframes troi-no   { from { opacity: 0; transform: scale(.945);       } to { opacity: 1; transform: none; } }
+@keyframes troi-mo   { from { opacity: 0;                               } to { opacity: 1; } }
+@keyframes troi-roi  { from { opacity: 0; transform: translateY(-22px); } to { opacity: 1; transform: none; } }
+/* Quét từ trái sang như kéo tờ giấy ra khỏi máy in. Giữ opacity 1 suốt vì
+   thứ tạo hiệu ứng là mép cắt, mờ thêm nữa thì mất luôn cái mép ấy. */
+@keyframes troi-quet { from { opacity: 1; clip-path: inset(0 100% 0 0); } to { opacity: 1; clip-path: inset(0 0 0 0); } }
+
+
+/* --- T-PIC (bộ mặc định) -------------------------------------------------- */
+/* Bộ này Kendy đã duyệt hình dáng rồi, nên chỉ thêm ảnh chứ không đụng bố cục.
+   Tấm đầu trang là bàn tay quấn grip — đúng nghề, và tông xám lạnh của nó
+   không cãi nhau với volt. Màn lọc nghiêng 158deg trùng hướng gradient gốc để
+   ảnh trông như nằm TRONG tấm hero chứ không phải dán đè lên. */
+body.theme-tpic .hero > .khung::before {
+  background:
+    linear-gradient(158deg, var(--th) 4%, color-mix(in srgb, var(--th-dam) 78%, transparent) 58%, color-mix(in srgb, var(--th-dam) 46%, transparent) 100%),
+    url("/anh-gd/chung-grip.jpg") 62% 40%/cover no-repeat;
+  animation: anh-tho 34s ease-in-out infinite alternate;
+}
+/* Dải số: ảnh chỉ làm kết cấu, 5% thôi. Ba con số ở đây là thứ khách đọc đầu
+   tiên sau tiêu đề — ảnh rõ hơn nữa là ăn mất chúng. */
+/* Đệm 14px là phần việc chính ở đây, không phải cái ảnh. Lưới số liệu vốn
+   gap:1px và không đệm, nên ảnh đặt làm nền chỉ lộ ra ở khe 1px giữa ba ô —
+   tức là không ai thấy. Có đệm thì ảnh thành một cái nẹp bo quanh ba ô, đúng
+   kiểu đóng khung ảnh. Màn lọc hạ 92%→82% vì bộ này nền trắng: lọc dày quá thì
+   nẹp thành mảng xám phẳng, người xem đọc ra là lỗi chứ không phải chủ ý.
+   Đã thử 92% rồi 82%: cả hai đều ra mảng xám. 74% mới thấy được vân giày. */
+body.theme-tpic .bang-so-luoi {
+  background:
+    linear-gradient(0deg, color-mix(in srgb, var(--vien) 74%, transparent), color-mix(in srgb, var(--vien) 74%, transparent)),
+    url("/anh-gd/chung-giay.jpg") center/cover no-repeat;
+  padding: 14px;
+}
+body.theme-tpic .bang-so-luoi > div { background: var(--the); }
+
+
+/* --- COBALT: băng ảnh phủ kín ---------------------------------------------- */
+/* Mẫu gốc (Compair) mở trang bằng một tấm ảnh chiếm hết bề ngang, chữ nằm đè
+   lên góc trái. Chép đúng cái đó: ảnh phủ kín, màn lọc xanh đặc ở trái loãng
+   dần sang phải, nên chữ trắng ở cột trái vẫn đủ tương phản còn nửa phải để
+   lộ ảnh. */
+body.theme-cobalt .hero > .khung::before {
+  background:
+    linear-gradient(94deg, var(--th-dam) 2%, color-mix(in srgb, var(--th-dam) 88%, transparent) 34%, color-mix(in srgb, var(--th) 34%, transparent) 100%),
+    url("/anh-gd/cobalt-hero.jpg") 68% center/cover no-repeat;
+  animation: anh-tho 30s linear infinite alternate;
+}
+/* Dải số của bộ này vốn đã là một băng mực đặc. Giờ băng ấy đứng trên ảnh
+   tường đồ nghề: nền là ảnh, từng ô phủ mực 88% nên chữ vẫn đọc được mà mắt
+   vẫn thấy có ảnh phía sau. Đây là món trang trí riêng của cobalt. */
+body.theme-cobalt .bang-so-luoi {
+  background: url("/anh-gd/cobalt-bang.jpg") center/cover no-repeat;
+  border-color: var(--muc);
+}
+body.theme-cobalt .bang-so-luoi > div {
+  background: color-mix(in srgb, var(--muc) 88%, transparent);
+}
+/* Hiện khi cuộn: trượt từ trái vào. Mẫu gốc dùng WOW fadeInLeft cho gần như
+   mọi khối — đây là bản không thư viện của đúng cử chỉ đó. */
+body.theme-cobalt.js-troi .troi.vao { animation: troi-trai .5s cubic-bezier(.16,.84,.44,1) both; }
+/* Bốn bước và ba cam kết vào lệch nhau 90ms một ô, thành một đợt sóng chạy từ
+   trái sang. Ô đầu không delay: chờ rồi mới thấy gì đó là trang trông chậm. */
+body.theme-cobalt.js-troi .troi .buoc > div,
+body.theme-cobalt.js-troi .troi .cam-ket .the { opacity: 0; }
+body.theme-cobalt.js-troi .troi.vao .buoc > div,
+body.theme-cobalt.js-troi .troi.vao .cam-ket .the { animation: troi-trai .46s cubic-bezier(.16,.84,.44,1) both; }
+body.theme-cobalt.js-troi .troi.vao .buoc > div:nth-child(2),
+body.theme-cobalt.js-troi .troi.vao .cam-ket .the:nth-child(2) { animation-delay: .09s; }
+body.theme-cobalt.js-troi .troi.vao .buoc > div:nth-child(3),
+body.theme-cobalt.js-troi .troi.vao .cam-ket .the:nth-child(3) { animation-delay: .18s; }
+body.theme-cobalt.js-troi .troi.vao .buoc > div:nth-child(4) { animation-delay: .27s; }
+/* Rê chuột: thẻ không nhấc lên mà nhích sang phải, vạch vàng mép trái dày ra.
+   Nhấc lên là cử chỉ của thẻ bo góc; bộ này góc vuông tuyệt đối nên nhấc lên
+   trông như thẻ bị bung ra khỏi lưới. */
+body.theme-cobalt .dv-the { transition-duration: .18s; }
+body.theme-cobalt .dv-the:hover { transform: translateX(5px); }
+body.theme-cobalt .luoi-vach .dv-the:hover { transform: translateX(5px); }
+body.theme-cobalt .dv-the::before { width: 4px; transition: opacity .18s ease, width .18s ease; }
+body.theme-cobalt .dv-the:hover::before { width: 8px; }
+body.theme-cobalt .nut-chinh:hover, body.theme-cobalt .nut-vien:hover { transform: none; }
+body.theme-cobalt .nut-chinh:hover { box-shadow: inset 0 -3px 0 var(--muc); }
+body.theme-cobalt .nut-vien:hover { box-shadow: inset 0 0 0 2px var(--sang); }
+
+
+/* --- ĐIỆN: số to, ảnh mờ sau cam kết -------------------------------------- */
+/* Bộ này căn giữa suốt trang nên chữ chiếm gần hết bề ngang — không còn nửa
+   nào trống để đặt ảnh. Vậy chia theo CHIỀU DỌC: dải tối nằm ngang chỗ có chữ
+   (24%-76%), ảnh chỉ lộ ra ở mép trên và mép dưới. Từng thử vignette tròn ở
+   giữa: bán kính phải to tới mức che kín cả tấm, ảnh mua về mà không ai thấy. */
+body.theme-dien .hero > .khung::before {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--th-dam) 30%, transparent) 0%, color-mix(in srgb, var(--th-dam) 90%, transparent) 24%, color-mix(in srgb, var(--th-dam) 90%, transparent) 76%, color-mix(in srgb, var(--th-dam) 26%, transparent) 100%),
+    url("/anh-gd/dien-hero.jpg") center 38%/cover no-repeat;
+  animation: anh-tho 18s ease-in-out infinite alternate;
+}
+/* Ba cam kết đứng trên một tấm ảnh mờ hẳn. Không viền, không thẻ nổi — cả
+   khối là một mảng ảnh nhạt, chữ nằm thẳng lên. */
+body.theme-dien .cam-ket {
+  background:
+    linear-gradient(0deg, color-mix(in srgb, var(--nen) 90%, transparent), color-mix(in srgb, var(--nen) 90%, transparent)),
+    url("/anh-gd/dien-bang.jpg") center/cover no-repeat;
+  padding: 44px 30px; border-radius: var(--r);
+}
+/* Thẻ trong suốt 18% để ảnh xuyên qua cả thẻ, chứ không phải ba tấm trắng đục
+   dán lên ảnh. Vẫn giữ viền: bỏ viền thì ba cột dính thành một mảng chữ. */
+body.theme-dien .cam-ket .the { background: color-mix(in srgb, var(--the) 82%, transparent); box-shadow: none; }
+/* Số thứ tự là món trang trí riêng của bộ này — kéo từ 40px lên 58px. Phải
+   đẩy padding-top lên 76px cùng lúc: số cao 58 + top 6 = chạm mốc 64, chữ bắt
+   đầu ở 76 nên còn 12px hở. Đổi một trong hai số mà quên số kia là số đè lên
+   tiêu đề ngay. */
+body.theme-dien .cam-ket .the { padding-top: 76px; }
+body.theme-dien .cam-ket .the::after { top: 6px; font-size: 58px; }
+/* Hiện khi cuộn: nở ra từ tâm. Trang căn giữa thì mọi thứ phải lớn ra từ giữa,
+   trượt ngang là lộ ngay rằng bố cục không thật sự đối xứng. */
+body.theme-dien.js-troi .troi.vao { animation: troi-no .62s cubic-bezier(.16,1,.3,1) both; }
+/* Rê chuột: nhấc cao hơn mặc định và có quầng sáng màu nhấn. Bộ này nhịp
+   chậm nhất trong sáu bộ — .3s, đủ để thấy nó đi lên chứ không phải nhảy. */
+body.theme-dien .dv-the, body.theme-dien .the, body.theme-dien .nut {
+  transition-duration: .3s;
+}
+body.theme-dien .dv-the:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 34px -18px color-mix(in srgb, var(--sang) 62%, transparent);
+}
+body.theme-dien .luoi-vach .dv-the:hover { transform: none; }
+body.theme-dien .nut-chinh:hover, body.theme-dien .nut-vien:hover { transform: translateY(-3px); }
+
+
+/* --- BIỂN: tấm đè lấn ------------------------------------------------------ */
+/* Mẫu RepairPress là mẫu ÍT hiệu ứng nhất trong ba mẫu đo được: 79 transition,
+   11 keyframes, không dùng thư viện nào. Bộ này chép cả cái tiết chế đó —
+   đây là bộ khẽ nhất, và khẽ là một lựa chọn chứ không phải làm thiếu. */
+body.theme-bien .hero > .khung::before {
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--th-dam) 90%, transparent) 0%, color-mix(in srgb, var(--th-dam) 82%, transparent) 62%, color-mix(in srgb, var(--th-dam) 74%, transparent) 100%),
+    url("/anh-gd/bien-hero.jpg") center 45%/cover no-repeat;
+  animation: none;
+}
+/* Món trang trí riêng của biển: TẤM ĐÈ LẤN. Khung hình có một tấm phẳng màu
+   nhấn lệch 22px sau lưng, như hai tờ giấy chồng lệch. Làm bằng box-shadow
+   chứ không bằng margin âm: khối .doi-hinh có bản .lat đảo chiều bằng
+   direction:rtl, margin âm ở đó sẽ đẩy hình ra ngoài mép container. box-shadow
+   không tính vào bố cục nên đảo chiều kiểu gì cũng không lệch, và không đẻ ra
+   thanh cuộn ngang. */
+body.theme-bien .hinh-o {
+  background:
+    linear-gradient(0deg, color-mix(in srgb, var(--the) 88%, transparent), color-mix(in srgb, var(--the) 88%, transparent)),
+    url("/anh-gd/bien-bang.jpg") center/cover no-repeat;
+  box-shadow: 22px 22px 0 -1px color-mix(in srgb, var(--sang) 20%, transparent);
+}
+@media (max-width: 680px) {
+  /* Tấm lệch 22px ăn hết lề phải trên điện thoại. Rút còn 10px. */
+  body.theme-bien .hinh-o { box-shadow: 10px 10px 0 -1px color-mix(in srgb, var(--sang) 20%, transparent); }
+}
+/* Hiện khi cuộn: chỉ mờ dần, không dịch chuyển. Bộ này là bộ ngắn nhất —
+   trang ngắn thì khối nào cũng vào tầm mắt gần như cùng lúc, cho chúng trượt
+   ngang nữa là bốn khối bò ngang màn hình một lượt. */
+body.theme-bien.js-troi .troi.vao { animation: troi-mo .45s ease both; }
+/* Rê chuột: thẻ đứng yên, chỉ vạch trên đậm lên. Nhịp nhanh .14s cho cảm giác
+   dứt khoát mà không ồn. */
+body.theme-bien .dv-the, body.theme-bien .the, body.theme-bien .nut { transition-duration: .14s; }
+body.theme-bien .dv-the { box-shadow: inset 0 0 0 0 var(--sang); }
+body.theme-bien .dv-the:hover { transform: none; border-color: var(--sang); box-shadow: inset 0 3px 0 0 var(--sang); }
+body.theme-bien .nut-chinh:hover, body.theme-bien .nut-vien:hover { transform: none; }
+body.theme-bien .nut-vien:hover { border-color: var(--sang); color: var(--sang); }
+
+
+/* --- KEM: huy hiệu tròn, băng ảnh ấm ở chân trang ------------------------- */
+/* Nửa trái đặc màu tới mốc 46% rồi loãng dần — ảnh gỗ ấm chỉ sáng lên ở nửa
+   phải. Bộ này khung rộng 1296px, chữ dẫn 54ch chạy tới quãng 52% bề ngang,
+   nên mốc đặc phải là 46% chứ không thấp hơn. Từng để radial 150% ở góc phải
+   trên: bán kính lớn quá nên tới giữa tấm màn lọc mới được 40%, chữ xám nằm
+   thẳng trên vân gỗ sáng. */
+body.theme-kem .hero > .khung::before {
+  background:
+    linear-gradient(96deg, var(--th-dam) 0 46%, color-mix(in srgb, var(--th-dam) 72%, transparent) 74%, color-mix(in srgb, var(--th-dam) 44%, transparent) 100%),
+    url("/anh-gd/kem-hero.jpg") 76% 22%/cover no-repeat;
+  animation: anh-tho 40s ease-in-out infinite alternate;
+  transform-origin: 78% 20%;
+}
+/* Món trang trí riêng của kem: HUY HIỆU TRÒN. Ô biểu tượng vuông bo 14px
+   thành đĩa tròn có vành màu nhấn. Ô sẵn là 50x50 nên tròn đều, không méo. */
+body.theme-kem .dv-the .bt-o {
+  border-radius: 50%; border: 2px solid color-mix(in srgb, var(--sang) 45%, transparent);
+  background: var(--nen-2);
+}
+body.theme-kem .dv-the:hover .bt-o { border-color: var(--sang); }
+/* Chân trang đứng trên một băng ảnh ấm. Màn lọc 88% giữ nguyên độ tương phản
+   của chữ chân trang — chỗ này chữ đã nhỏ 13.5px, không được phép mờ thêm. */
+body.theme-kem footer {
+  background:
+    linear-gradient(0deg, color-mix(in srgb, var(--th-dam) 88%, transparent), color-mix(in srgb, var(--th-dam) 92%, transparent)),
+    url("/anh-gd/kem-bang.jpg") center 35%/cover no-repeat;
+}
+/* Hiện khi cuộn: trôi từ phải sang, chậm nhất trong sáu bộ (.7s). Bộ này là
+   bộ giãn nhất — khối cách nhau 100px — nên chuyển động cũng phải thong thả
+   theo, nhanh thì lệch hẳn với khoảng trống xung quanh. */
+body.theme-kem.js-troi .troi.vao { animation: troi-phai .7s cubic-bezier(.22,.72,.28,1) both; }
+/* Rê chuột: thẻ trượt sang phải, không nhấc. Bộ này thẻ không có viền cũng
+   không có bóng, nhấc lên thì chẳng thấy gì thay đổi vì không có mép để nhìn. */
+body.theme-kem .dv-the, body.theme-kem .the, body.theme-kem .nut { transition-duration: .42s; }
+body.theme-kem .dv-the:hover { transform: translateX(6px); background: var(--th-nen); }
+body.theme-kem .luoi-vach .dv-the:hover { transform: translateX(6px); }
+body.theme-kem .nut-chinh:hover, body.theme-kem .nut-vien:hover { transform: translateY(-2px); }
+
+
+/* --- ĐỎ: dải ảnh trạm sau bốn bước --------------------------------------- */
+/* Mẫu Gogrin dùng ảnh tối, tương phản cao, gần như đen trắng, để màu đỏ là
+   thứ duy nhất có màu trên trang. Chép đúng cách đó: ảnh tấm đầu trang bị màn
+   lọc gần như đơn sắc, chỉ chừa cho --sang chỗ nổi lên. */
+body.theme-do .hero > .khung::before {
+  background:
+    linear-gradient(102deg, var(--th-dam) 0%, color-mix(in srgb, var(--th-dam) 90%, transparent) 40%, color-mix(in srgb, var(--th-dam) 52%, transparent) 100%),
+    url("/anh-gd/do-hero.jpg") 64% center/cover no-repeat;
+  animation: none;
+}
+/* Món trang trí riêng của đỏ: DẢI ẢNH TỐI CHẠY HẾT BỀ NGANG ở khối quy trình.
+   Mẫu Gogrin cắt trang bằng những dải tối phủ hết bề ngang, chữ trắng, đỏ là
+   thứ duy nhất có màu — cả trang sáng rồi đột ngột tối một khoảng.
+
+   Lần đầu đặt ảnh vào riêng .buoc và phủ --vien 82%: sai. Bộ này nền sáng nên
+   màn lọc sáng dày 82% xoá sạch ảnh, mà bốn hàng lại phủ kín gần hết .buoc,
+   chỉ chừa khe 1px. Kết quả là mua ảnh về rồi giấu đi. Muốn ảnh có mặt thì
+   phải cho nó một khoảng RỘNG và phải lọc bằng màu TỐI.
+
+   Nới ra cả section: bốn hàng vẫn trắng đục nổi trên nền tối, tiêu đề khối
+   phải đổi sang chữ sáng — đó là lý do có ba dòng đè màu chữ ngay dưới. Dùng
+   :has() để bắt đúng section chứa .buoc; trang chủ chỉ có một khối như vậy. */
+body.theme-do section.nen2:has(.buoc) {
+  background:
+    linear-gradient(0deg, color-mix(in srgb, var(--th-dam) 86%, transparent), color-mix(in srgb, var(--th-dam) 78%, transparent)),
+    url("/anh-gd/do-bang.jpg") center/cover no-repeat;
+}
+body.theme-do section.nen2:has(.buoc) h2 { color: var(--tren-dam); }
+body.theme-do section.nen2:has(.buoc) .nhan-nho { color: var(--sang); }
+/* Vạch dẫn của nhãn nhỏ vẽ bằng --vien, tức màu sáng — trên dải tối nó biến
+   mất. Vẽ lại bằng màu trắng loãng, giống cách hero vẫn làm. */
+body.theme-do section.nen2:has(.buoc) .nhan-vach::after {
+  background: linear-gradient(90deg, rgba(255,255,255,.30), transparent);
+}
+/* Bốn hàng đục hẳn, không pha trong suốt: chúng là bốn tấm trắng đặt trên dải
+   tối, khe 1px giữa chúng để lọt ảnh qua chính là đường kẻ. */
+body.theme-do .buoc { background: none; }
+body.theme-do .buoc > div { background: var(--the); }
+/* Hiện khi cuộn: quét từ trái sang, như tờ giấy chui ra khỏi máy in. Không mờ
+   dần — mép cắt CHÍNH LÀ hiệu ứng. */
+body.theme-do.js-troi .troi.vao { animation: troi-quet .5s cubic-bezier(.65,0,.35,1) both; }
+/* Rê chuột: nhịp .1s, nhanh nhất trong sáu bộ. Bộ này in hoa, góc vuông, viền
+   dày — cử chỉ phải dứt khoát cho khớp. Thẻ không nhấc mà đổi nền, và ô số
+   bước lật sang màu đỏ. */
+body.theme-do .dv-the, body.theme-do .the, body.theme-do .nut, body.theme-do .bt-o {
+  transition-duration: .1s;
+}
+body.theme-do .dv-the:hover { transform: none; background: var(--th-nen); box-shadow: none; }
+body.theme-do .buoc > div { transition: background-color .1s ease; }
+body.theme-do .buoc > div:hover { background: var(--the); }
+body.theme-do .buoc .n { transition: background-color .1s ease, color .1s ease; }
+body.theme-do .buoc > div:hover .n { background: var(--sang); color: var(--tren-sang); }
+body.theme-do .nut-chinh:hover, body.theme-do .nut-vien:hover { transform: none; }
+body.theme-do .nut-chinh:hover { box-shadow: 4px 4px 0 0 var(--muc); }
+
+
+/* --- CAM: đường cắt chéo -------------------------------------------------- */
+/* Món trang trí riêng của cam: ĐƯỜNG CẮT CHÉO. Ảnh phủ kín tấm đầu trang,
+   nhưng màn lọc là một gradient 100deg có mốc dừng cứng ở 54% — không chuyển
+   dần mà cắt phựt. Cột chữ nằm hết bên trái mốc ấy nên tương phản không đổi
+   một chút nào so với lúc chưa có ảnh; bên phải mốc là ảnh gần như trần. */
+body.theme-cam .hero > .khung::before {
+  background:
+    linear-gradient(100deg, var(--th-dam) 0 54%, color-mix(in srgb, var(--th-dam) 34%, transparent) 54.5%, color-mix(in srgb, var(--th) 16%, transparent) 100%),
+    url("/anh-gd/cam-hero.jpg") 72% center/cover no-repeat;
+  animation: none;
+}
+/* Cột chữ phải dừng TRƯỚC nhát cắt. Đoạn dẫn mặc định rộng 54ch: ở 1280px nó
+   chạy tới x≈703 trong khi nhát cắt ở quãng x≈600, nên ba dòng đầu nằm một
+   nửa trên ảnh gỗ — chữ --tren-dam-mo trên gỗ sáng là chỗ tương phản rơi thấp
+   nhất cả trang. 40ch là mức dòng dài nhất còn dừng kịp. Đổi mốc 47% thì phải
+   đổi lại số này. */
+@media (min-width: 900px) {
+  body.theme-cam .hero .dan, body.theme-cam .hero > .khung > .dan { max-width: 38ch; }
+}
+@media (max-width: 899px) {
+  /* Dưới 900px hero về một cột: chữ chạy hết bề ngang, tràn qua mốc 54% và
+     rơi thẳng lên phần ảnh trần. Ở đây bỏ hẳn nhát cắt, quay về màn lọc dày
+     đều. Cùng một ảnh, chỉ khác cách che. */
+  body.theme-cam .hero > .khung::before {
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--th-dam) 92%, transparent), color-mix(in srgb, var(--th-dam) 80%, transparent)),
+      url("/anh-gd/cam-hero.jpg") center/cover no-repeat;
+  }
+}
+/* Khối gửi yêu cầu — khối cuối và dài nhất trang — đứng trên một băng ảnh
+   chạy hết bề ngang. Màn lọc 94%: dưới nó là form, mà nhãn form với ô nhập
+   thì không được phép nhòe dù chỉ một chút. */
+body.theme-cam #gui-yeu-cau {
+  background:
+    linear-gradient(0deg, color-mix(in srgb, var(--nen-2) 94%, transparent), color-mix(in srgb, var(--nen-2) 94%, transparent)),
+    url("/anh-gd/cam-bang.jpg") center 30%/cover no-repeat;
+}
+/* Hiện khi cuộn: rơi từ trên xuống, có nảy nhẹ (mốc 1.56 vượt quá 1 nên nó đi
+   quá đích rồi bật lại). Nhanh — .38s. Bộ công trường thì cử chỉ phải là
+   "đặt xuống", không phải "trôi lên". */
+body.theme-cam.js-troi .troi.vao { animation: troi-roi .38s cubic-bezier(.34,1.56,.64,1) both; }
+body.theme-cam .dv-the, body.theme-cam .the, body.theme-cam .nut { transition-duration: .16s; }
+/* Thẻ ở bộ này đã có vạch cam trên đỉnh. Rê chuột thì vạch ấy dày gấp đôi —
+   không nhấc thẻ, vì lưới của bộ này ngăn nhau bằng vạch sọc chéo, nhấc lên
+   là hở sọc ra. */
+body.theme-cam .dv-the { transition: border-top-width .16s ease, background-color .16s ease; }
+body.theme-cam .dv-the:hover { transform: none; box-shadow: none; }
+body.theme-cam .the:hover { border-top-width: 6px; }
+body.theme-cam .nut-chinh:hover, body.theme-cam .nut-vien:hover { transform: translateY(-1px); }
+body.theme-cam .nut-chinh:hover { box-shadow: 0 6px 0 -2px var(--muc); }
+
+/* ==========================================================================
+   MÀN HÌNH APP (/app) và thanh mời cài
+   Chạy trên body.la-app, tách hẳn khỏi khung web. Mọi màu lấy từ biến của
+   giao diện đang bật, nên đổi giao diện ở /qt/giao-dien là app đổi theo,
+   không phải sửa chỗ này.
+   ========================================================================== */
+body.la-app {
+  background: var(--nen-2);
+  /* Chừa chỗ cho thanh đáy cố định, cộng lề an toàn của iPhone tai thỏ. */
+  padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+}
+body.la-app main { min-height: 0; }
+
+.app-dau {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 16px calc(10px) 16px;
+  padding-top: calc(10px + env(safe-area-inset-top, 0px));
+  background: var(--the); border-bottom: 1px solid var(--vien);
+}
+/* --- Bảng hiệu ở màn hình đầu ------------------------------------------
+   Logo, tên trạm, dòng nghề — xếp giữa thành một tấm biển. Trước đây ba thứ
+   này nằm chen một hàng ngang bên trái, chữ 16px, lọt thỏm cạnh cái logo;
+   khách mở app ra không thấy tên trạm đâu.
+
+   Tấm biển này KHÔNG dính đỉnh: nó cao gần trăm điểm ảnh, dính lại thì suốt
+   lúc cuộn cứ chiếm mất một phần bảy màn hình để lặp lại thứ khách đã đọc.
+   Đường về vẫn còn nguyên ở nút Trang chủ dưới thanh đáy. */
+/* --- Hàng rào: chặn giao diện web tràn vào vỏ app ----------------------
+   Sáu bộ giao diện web đều khai luật theo dạng `body.theme-X <thẻ>`, đặc
+   hiệu (0,1,2). Luật của app viết bằng class trần — (0,1,0) hay (0,2,0) —
+   thua sạch, nằm sau bao nhiêu dòng cũng vô ích. Hậu quả thấy trên máy
+   Kendy: <section class="app-hero"> ăn nguyên `body.theme-kem section
+   { padding: 100px 0 }`, thành hai khoảng trắng hai trăm điểm ảnh kẹp lấy
+   đúng một câu; h1 trong đó nhảy lên 33px, to ngang tên trạm trên tấm biển;
+   .app-muc ở trang con cũng phồng y như vậy.
+
+   Không sửa bằng cách hạ luật theme xuống: chúng đúng cho trang web trên
+   màn 24 inch. Dựng hàng rào ở đây thay vào đó — mọi luật trong khối này
+   đều kèm body.la-app nên vượt được body.theme-*, mà không rơi giọt nào ra
+   ngoài, vì lớp la-app chỉ có trên các trang /app. Luật app nào đụng cùng
+   một thẻ với theme thì phải nằm trong hàng rào này, không viết class trần
+   ở ngoài rồi mong nó thắng. */
+body.la-app .app-than section { padding: 0; border-top: none; }
+body.la-app .app-than section.app-muc { padding: 16px 15px 17px; }
+body.la-app .app-h2 { font-size: 16px; line-height: 1.3; letter-spacing: -.01em; font-weight: 700; }
+body.la-app .app-dv-ten { font-size: 21px; line-height: 1.2; letter-spacing: -.02em; font-weight: 700; }
+
+.app-bia {
+  text-align: center;
+  padding: calc(20px + env(safe-area-inset-top, 0px)) 16px 18px;
+  background: var(--the); border-bottom: 1px solid var(--vien);
+}
+.app-bia-lk { display: block; text-decoration: none; color: var(--muc); }
+.app-bia .logo-dau { height: 44px; width: auto; margin: 0 auto; display: block; }
+.app-bia img.logo-dau { max-width: 200px; object-fit: contain; }
+/* Ba màu trong logo mặc định là bản nền tối — chữ T-PIC màu paper. Thân app
+   nền sáng, để nguyên là chữ trắng trên nền trắng, mất hẳn. Đổi sang bản một
+   màu theo mực của giao diện đang bật; riêng quả bóng lấy màu nhấn đã hạ tối
+   đủ tương phản (assets/logo/README.md: nền sáng thì dùng bản mono). */
+body.la-app .app-bia .logo-dau, body.la-app .app-dau .logo-dau {
+  --lg-do: var(--muc-mo); --lg-chu: var(--muc); --lg-bong: var(--sang-muc);
+}
+.app-bia-ten {
+  display: block; margin-top: 12px;
+  font-size: clamp(23px, 6.6vw, 29px); font-weight: 800;
+  letter-spacing: -.03em; line-height: 1.08;
+}
+.app-bia-mo {
+  display: block; margin: 6px auto 0; max-width: 32ch;
+  font-size: 12.5px; line-height: 1.42; color: var(--muc-mo);
+}
+
+.app-than { max-width: 620px; margin: 0 auto; padding: 18px 16px 8px; }
+.app-dan { margin: 2px 2px 14px; color: var(--muc-mo); font-size: 14px; line-height: 1.5; }
+
+/* Dòng chữ to nhất màn app. Tên trạm trên đầu trang là tên riêng — nó không
+   nói ra nghề, mà khách mới cài xong thì cần biết ngay app này làm gì với cây
+   vợt. Cỡ chữ co theo bề ngang máy: máy 320px vẫn hai dòng, không tràn. */
+/* Mọi khối trong thân app ăn chung lề của .app-than. Trước đây mỗi khối tự
+   thêm 2-3px lề riêng, ba khối ba mép lệch nhau vài điểm ảnh — không ai chỉ
+   ra được là lệch, nhưng nhìn vào thấy nó xộc xệch. */
+.app-hero { margin: 0 0 20px; }
+/* Nhỏ hơn tên trạm trên tấm biển một bậc rõ ràng. Hai dòng chữ to bằng nhau
+   cách nhau hai chục điểm ảnh thì không dòng nào còn là dòng to nhất. */
+body.la-app .app-hero h1 {
+  margin: 0; font-size: clamp(18.5px, 5.2vw, 23px); line-height: 1.2;
+  font-weight: 800; letter-spacing: -.022em;
+}
+.app-hero-chu { margin: 7px 0 0; font-size: 13.5px; line-height: 1.45; color: var(--muc-mo); }
+.app-hero-chu b, .app-hero-chu strong { color: var(--muc); font-weight: 700; }
+
+/* Nhãn nhóm chứ không phải tiêu đề: chữ nhỏ, in hoa, giãn nét. Nó chỉ có
+   việc nói mấy ô dưới là gì, không được to bằng câu hero ngay trên. */
+.app-nhan-nhom {
+  margin: 0 0 10px; font-size: 11.5px; font-weight: 700;
+  letter-spacing: .09em; text-transform: uppercase; color: var(--muc-mo);
+}
+
+.app-luoi { display: grid; grid-template-columns: repeat(2, 1fr); gap: 11px; }
+@media (min-width: 520px) { .app-luoi { grid-template-columns: repeat(3, 1fr); } }
+
+/* Bản nhỏ của lưới, dùng ở màn hình đầu: ba cột, biểu tượng với tên việc,
+   không có dòng số ngày. Ô cao 76px thay vì 116px — sáu việc gói trong hai
+   hàng, còn chỗ cho ba khối gấp bên dưới nằm cùng một màn hình. Số ngày làm
+   vẫn còn nguyên ở trang từng dịch vụ. Khai sau media query trên kia để
+   thắng nó, hai bên cùng một mức đặc hiệu. */
+.app-luoi-nho { grid-template-columns: repeat(2, 1fr); gap: 9px; }
+@media (min-width: 520px) { .app-luoi-nho { grid-template-columns: repeat(4, 1fr); } }
+.app-luoi-nho .app-o {
+  flex-direction: row; align-items: center; justify-content: flex-start;
+  min-height: 60px; padding: 10px 12px; gap: 10px; text-align: left;
+}
+/* Biểu tượng ngồi trong một khung bo tròn thay vì thả trôi: tám ô xếp thành
+   bốn hàng, không có khung thì tám cái hình line-art nhạt trôi giữa khoảng
+   trắng, mắt không bám vào đâu để dò xuống. */
+.app-luoi-nho .app-bt {
+  flex: none; width: 34px; height: 34px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--th-nen);
+}
+.app-luoi-nho .app-bt .bt { width: 19px; height: 19px; }
+.app-luoi-nho .app-ten { margin-top: 0; font-size: 13.5px; line-height: 1.22; }
+.app-luoi-nho .app-phu { display: none; }
+/* Số dịch vụ lẻ thì ô cuối đứng một mình, nửa hàng còn lại là một lỗ trống
+   to bằng cả cái ô. Cho nó chiếm hết hàng. Bốn cột thì lỗ chỉ hở khi ô cuối
+   rơi đúng đầu hàng — bắt đúng trường hợp ấy, mấy trường hợp còn lại màn đã
+   rộng, một khe hở cuối lưới không thành vấn đề. */
+.app-luoi-nho > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+@media (min-width: 520px) {
+  .app-luoi-nho > :last-child:nth-child(odd) { grid-column: auto; }
+  .app-luoi-nho > :last-child:nth-child(4n+1) { grid-column: 1 / -1; }
+}
+
+/* Ô vuông cỡ ngón tay: cạnh ngắn nhất vẫn trên 44px kể cả trên máy 320px. */
+.app-o {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 7px;
+  min-height: 116px; padding: 14px 13px;
+  background: var(--the); border: 1px solid var(--vien); border-radius: var(--r);
+  color: var(--muc); text-decoration: none;
+  transition: transform .14s ease, border-color .14s ease, box-shadow .14s ease;
+}
+.app-o:active { transform: scale(.97); }
+.app-o:hover { border-color: var(--vien-dam); box-shadow: var(--bong); }
+.app-bt { display: block; color: var(--sang-muc); }
+.app-bt .bt { width: 30px; height: 30px; }
+.app-ten { font-weight: 650; font-size: 14.5px; line-height: 1.25; margin-top: auto; }
+.app-phu { font-size: 11.5px; color: var(--muc-mo); }
+.app-o-hoi { border-style: dashed; }
+.app-trong { margin: 22px 4px; color: var(--muc-mo); text-align: center; }
+
+.app-chan {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+  display: flex; align-items: flex-end;
+  background: var(--the); border-top: 1px solid var(--vien);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.app-chan a {
+  flex: 1 1 0; min-width: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 9px 3px 10px; color: var(--muc-mo); text-decoration: none;
+  font-size: 11px; line-height: 1.2; text-align: center;
+}
+.app-chan a:active { background: var(--th-nen); }
+.app-chan a.dang { color: var(--sang-muc); font-weight: 650; }
+.app-chan .bt { width: 22px; height: 22px; }
+
+/* Nút giữa nhô hẳn lên khỏi thanh. Vành 4px cùng màu nền trang để nó trông
+   như xuyên qua thanh chứ không dán đè lên. */
+.app-chan a.app-chan-tron { padding-top: 0; color: var(--muc); font-weight: 650; }
+.app-chan-tron .tron {
+  flex: none; width: 54px; height: 54px; border-radius: 50%; margin: -24px 0 1px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--sang); color: var(--tren-sang);
+  border: 4px solid var(--nen); box-shadow: 0 5px 14px rgba(0, 0, 0, .2);
+}
+.app-chan-tron .tron .bt { width: 25px; height: 25px; stroke-width: 1.9; }
+/* Số điện thoại in thẳng dưới nút. Nhỏ hơn nhãn mấy nút kia vì mười chữ số
+   phải lọt vào một ô rộng bằng một phần năm màn hình; tabular-nums cho các
+   chữ số đều bề ngang, không so le. */
+.app-chan a.app-chan-tron { flex-grow: 1.3; }
+.app-chan-so {
+  font-size: 10.5px; letter-spacing: -.01em; white-space: nowrap;
+  font-variant-numeric: tabular-nums; font-weight: 700;
+}
+
+/* Bảng soi máy ở /app/kiem. Chữ nhỏ và cho phép ngắt giữa chừng vì cột phải
+   chứa cả chuỗi userAgent dài ngoằng lẫn địa chỉ trang. */
+.kiem-ds { margin: 0; font-size: 13px; }
+.kiem-ds dt { color: var(--muc-mo); margin-top: 10px; }
+.kiem-ds dd {
+  margin: 1px 0 0; font-weight: 650;
+  overflow-wrap: anywhere; word-break: break-word;
+}
+.app-chan a.app-chan-tron:active { background: none; }
+.app-chan a.app-chan-tron:active .tron { filter: brightness(.93); }
+
+/* Web trên điện thoại đeo luôn thanh này — vào bằng trình duyệt hay bằng icon
+   ngoài màn hình chính thì thao tác như nhau. Màn hình rộng thì thôi, ở đó đã
+   có nav trên đầu và chân trang bốn cột. */
+@media (min-width: 761px) { body:not(.la-app) .app-chan { display: none; } }
+@media (max-width: 760px) {
+  body:not(.la-app) { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* --- Thẻ mời cài, nổi giữa màn hình ------------------------------------ */
+.moi-nen {
+  position: fixed; inset: 0; z-index: 59;
+  background: rgba(8, 12, 18, .38);
+  animation: moi-mo .2s ease both;
+}
+.moi-cai {
+  position: fixed; z-index: 60;
+  left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: min(340px, calc(100vw - 40px));
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  gap: 8px; padding: 22px 20px 14px;
+  background: var(--the); border: 1px solid var(--vien-dam);
+  border-radius: 18px; box-shadow: var(--bong-cao);
+  animation: moi-len .26s cubic-bezier(.34, 1.4, .64, 1) both;
+}
+@keyframes moi-mo { from { opacity: 0; } to { opacity: 1; } }
+@keyframes moi-len {
+  from { opacity: 0; transform: translate(-50%, -46%) scale(.94); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) { .moi-cai, .moi-nen { animation: none; } }
+/* Chốt chặn thứ hai, không dính gì tới JavaScript: màn hình rộng thì thẻ mời
+   cài không có cửa hiện, kể cả khi đoạn script trên kia tính sai. Lời mời chỉ
+   dành cho máy cầm tay. */
+@media (min-width: 1025px) { .moi-cai, .moi-nen { display: none !important; } }
+
+.moi-anh { display: flex; }
+.moi-anh svg { width: 52px; height: 52px; }
+.moi-cai b { font-size: 18px; line-height: 1.25; letter-spacing: -.01em; }
+.moi-cai > span { font-size: 13px; color: var(--muc-mo); line-height: 1.45; }
+.moi-cai .moi-nut {
+  width: 100%; margin-top: 6px; padding: 15px 18px;
+  font-size: 16px; min-height: 52px;
+}
+.moi-sau {
+  background: none; border: none; cursor: pointer; padding: 5px 10px;
+  font-size: 13px; color: var(--muc-mo); text-decoration: underline;
+}
+.moi-sau:hover { color: var(--muc); }
+.moi-dong {
+  position: absolute; top: 5px; right: 7px;
+  width: 32px; height: 32px; padding: 0; line-height: 1;
+  font-size: 22px; background: none; border: none; cursor: pointer; color: var(--muc-mo);
+}
+.moi-dong:hover { color: var(--muc); }
+
+/* Hai bước của iPhone. Vẽ đúng biểu tượng Chia sẻ vì khách phải nhận ra nó
+   trên thanh dưới của Safari, không phải đoán từ chữ. */
+.moi-ios { width: 100%; margin-top: 2px; display: flex; flex-direction: column; gap: 9px; }
+.moi-ios p {
+  margin: 0; display: flex; align-items: center; gap: 8px;
+  font-size: 13.5px; line-height: 1.35; text-align: left;
+}
+.moi-so {
+  flex: none; width: 21px; height: 21px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font: 700 11px/1 "JetBrains Mono", ui-monospace, monospace;
+  background: var(--sang); color: var(--tren-sang);
+}
+.moi-ios-bt {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 8px;
+  background: var(--th-nen); color: var(--th);
+}
+.moi-ios-bt .bt { width: 17px; height: 17px; }
+.moi-mui {
+  font-size: 20px; line-height: 1; color: var(--muc-mo);
+  animation: moi-nhun 1.4s ease-in-out infinite;
+}
+@keyframes moi-nhun { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+@media (prefers-reduced-motion: reduce) { .moi-mui { animation: none; } }
+
+/* --- Hai khối dưới lưới app: làm thế nào, và gọi ai --------------------- */
+.app-muc {
+  margin-top: 22px; padding: 16px 15px 17px;
+  background: var(--the); border: 1px solid var(--vien); border-radius: var(--r);
+}
+.app-h2 { margin: 0 0 12px; font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
+.app-gap:first-of-type { margin-top: 22px; }
+
+/* --- Khối gấp ở màn hình đầu -------------------------------------------
+   Cùng cái vỏ thẻ như .app-muc, nhưng đóng lại chỉ còn một dòng cao 50px —
+   đủ để đọc tên khối và bấm bằng ngón cái. Ba khối đóng lại tốn 170px thay
+   vì hơn chín trăm, nhờ đó cả màn hình chính lọt vào một lần nhìn. */
+.app-gap {
+  margin-top: 10px;
+  background: var(--the); border: 1px solid var(--vien); border-radius: var(--r);
+}
+.app-gap > summary {
+  display: flex; align-items: center; gap: 11px;
+  min-height: 50px; padding: 12px 14px; box-sizing: border-box;
+  cursor: pointer; color: var(--muc);
+  font-size: 14.5px; font-weight: 650; letter-spacing: -.01em;
+  /* Hai dòng: bỏ tam giác mặc định của Chrome/Safari và của Firefox. */
+  list-style: none;
+}
+.app-gap > summary::-webkit-details-marker { display: none; }
+.app-gap > summary::marker { content: ""; }
+.app-gap > summary:active { background: var(--th-nen); border-radius: var(--r); }
+.app-gap > summary:focus-visible { outline: 2px solid var(--sang); outline-offset: -3px; }
+.app-gap[open] > summary { border-bottom: 1px solid var(--vien); border-radius: 0; }
+.app-gap-bt { flex: none; display: flex; color: var(--sang-muc); }
+.app-gap-bt .bt { width: 20px; height: 20px; }
+.app-gap-ten { flex: 1 1 auto; min-width: 0; }
+.app-gap-mui { flex: none; display: flex; color: var(--muc-mo); transition: transform .18s ease; }
+.app-gap-mui .bt { width: 18px; height: 18px; }
+.app-gap[open] .app-gap-mui { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) { .app-gap-mui { transition: none; } }
+.app-gap-than { padding: 13px 14px 15px; }
+.app-gap-than > :first-child { margin-top: 0; }
+
+.app-buoc { margin: 0; padding: 0; list-style: none; counter-reset: b; }
+.app-buoc li {
+  position: relative; counter-increment: b;
+  padding: 0 0 14px 34px; display: flex; flex-direction: column; gap: 2px;
+}
+.app-buoc li:last-child { padding-bottom: 2px; }
+.app-buoc li::before {
+  content: counter(b); position: absolute; left: 0; top: 0;
+  width: 23px; height: 23px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font: 700 12px/1 "JetBrains Mono", ui-monospace, monospace;
+  background: var(--sang); color: var(--tren-sang);
+}
+/* Vạch nối các bước: đọc ra ngay là ba việc nối nhau, không phải ba gạch đầu
+   dòng rời rạc. */
+.app-buoc li:not(:last-child)::after {
+  content: ""; position: absolute; left: 11px; top: 27px; bottom: 6px;
+  width: 1px; background: var(--vien-dam);
+}
+.app-buoc b { font-size: 14px; font-weight: 650; line-height: 1.3; }
+.app-buoc span { font-size: 12.5px; color: var(--muc-mo); line-height: 1.45; }
+
+.app-nut-hang { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 15px; }
+.app-nut-hang .nut { flex: 1 1 auto; text-align: center; padding: 11px 14px; font-size: 13.5px; }
+
+/* Số điện thoại: to bằng ngón tay, bấm là gọi. Đây là thứ khách mở app ra
+   tìm nhiều nhất sau danh sách việc. */
+.app-so {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 13px 14px; border-radius: var(--r);
+  background: var(--th-nen); color: var(--th); text-decoration: none;
+  font: 700 20px/1 "JetBrains Mono", ui-monospace, monospace; letter-spacing: .01em;
+}
+.app-so:active { filter: brightness(.96); }
+.app-so .bt { width: 20px; height: 20px; stroke-width: 1.8; }
+
+.app-lh-hang { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 10px; }
+.app-lh-hang .nut { flex: 1 1 auto; text-align: center; padding: 10px 14px; font-size: 13px; }
+
+.app-lh-ds { margin: 14px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; }
+.app-lh-ds dt { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muc-mo); padding-top: 2px; }
+.app-lh-ds dd { margin: 0; font-size: 13.5px; line-height: 1.4; }
+
+/* Hai ô tra đơn nằm cạnh nhau. Mã đơn dài hơn số điện thoại nên chia
+   1.5/1 — chia đôi đều thì ô mã hết chỗ ngay trên máy 360px. */
+.app-tra-doi { display: grid; grid-template-columns: 1.5fr 1fr; gap: 10px; margin-top: 13px; }
+.app-tra-doi label { display: block; margin: 0; font-size: 13px; }
+.app-tra-doi input {
+  width: 100%; box-sizing: border-box; margin-top: 5px;
+  /* 16px chẵn: nhỏ hơn là Safari trên iPhone tự phóng to cả trang lúc
+     con trỏ nhảy vào ô, rồi để nguyên như thế. */
+  padding: 12px 13px; font-size: 16px;
+}
+#tra-don .app-nut-to { margin-top: 13px; }
+
+/* --- Màn hình con của app: tra đơn, gửi ảnh, quy trình -------------------
+   Ba trang này đều đã có bản web. Bản app không phải bản web thu nhỏ: ô nhập
+   to bằng ngón cái, xếp một cột, và thêm mấy thứ chỉ có nghĩa khi cầm điện
+   thoại — nhớ đơn vừa tra, gấp bớt ô không bắt buộc, mở thẳng camera. */
+
+.app-dau-2 { justify-content: flex-start; gap: 4px; }
+.app-lui {
+  flex: none; display: flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px; margin-left: -10px; border-radius: 50%;
+  color: var(--muc); text-decoration: none;
+}
+.app-lui:active { background: var(--th-nen); }
+.app-lui .bt { width: 21px; height: 21px; stroke-width: 2; }
+.app-tieu { font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
+
+/* Ô nhập cỡ ngón tay. 16px không phải cho to đẹp: dưới 16px là Safari tự
+   phóng cả trang lên lúc khách chạm vào ô, rồi để nguyên đấy — khách gõ xong
+   không thấy cái nút gửi đâu nữa. */
+.app-form { margin: 2px 0 20px; }
+.app-form label { margin-bottom: 14px; font-size: 13.5px; }
+.app-form input, .app-form textarea { margin-top: 5px; padding: 13px 14px; font-size: 16px; }
+.app-form textarea { min-height: 96px; }
+.app-nut-to { width: 100%; padding: 15px 18px; font-size: 16px; min-height: 52px; }
+/* Cùng lớp ấy đặt lên thẻ <a>: thẻ a không có kiểu nút sẵn nên phải tự căn
+   giữa chữ, còn <button> thì trình duyệt lo hộ. */
+a.app-nut-to { display: flex; align-items: center; justify-content: center; box-sizing: border-box; }
+.app-nut-hang-doc { flex-direction: column; }
+
+/* Hai lối nạp ảnh ở màn gửi ảnh: chụp ngay, hoặc lấy tấm đã có trong máy.
+   Ô input thật nấp sau nhãn — giấu bằng display:none thì bàn phím Tab không
+   tới được nữa, nên đẩy ra khỏi tầm nhìn mà vẫn để nó tồn tại. */
+.tep-an {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.app-tep { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 6px 0 4px; }
+.app-tep-nut {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 16px 10px; text-align: center; cursor: pointer;
+  border: 1px solid var(--vien-dam); border-radius: var(--r);
+  background: var(--the); color: var(--muc);
+}
+.app-tep-nut .bt { width: 26px; height: 26px; color: var(--sang-muc); }
+.app-tep-nut b { font-size: 14px; font-weight: 650; }
+.app-tep-nut span { font-size: 11.5px; color: var(--muc-mo); line-height: 1.35; }
+.app-tep-nut:active { background: var(--th-nen); }
+/* Ô input nấp sau nhãn nên vòng focus phải mượn nhãn mà hiện, không thì người
+   dùng bàn phím Tab tới đây là mất dấu con trỏ. */
+.tep-an:focus-visible + .app-tep-nut,
+.app-tep-nut:focus-visible { outline: 2px solid var(--muc); outline-offset: 2px; }
+.app-nhan { display: block; font-weight: 650; font-size: 14px; margin-top: 4px; }
+
+/* Màn hình một dịch vụ. Tên việc đứng cạnh đúng cái biểu tượng khách vừa bấm
+   ngoài lưới trang chủ. */
+.app-dv-dau { display: flex; align-items: center; gap: 13px; margin: 2px 2px 14px; }
+.app-dv-bt { flex: none; display: flex; color: var(--sang-muc); }
+.app-dv-bt .bt { width: 40px; height: 40px; }
+.app-dv-ten { margin: 0 0 5px; font-size: 21px; line-height: 1.2; letter-spacing: -.02em; }
+/* Ba con số: mấy ngày, bảo hành mấy tháng, cân sai lệch bao nhiêu. */
+.app-so3 {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0 4px;
+}
+.app-so3 > div {
+  padding: 12px 6px; text-align: center;
+  border: 1px solid var(--vien); border-radius: var(--r); background: var(--the);
+}
+.app-so3 b { display: block; font-size: 19px; line-height: 1.15; letter-spacing: -.02em; }
+.app-so3 span { display: block; margin-top: 3px; font-size: 11px; color: var(--muc-mo); line-height: 1.3; }
+.app-ds-so { margin: 0; padding-left: 20px; display: grid; gap: 10px; font-size: 13.5px; line-height: 1.55; }
+.app-ds-so::marker, .app-ds-so li::marker { color: var(--muc-mo); }
+
+/* Thẻ đơn máy nhớ giùm, nằm trên cùng: mở app ra là đã thấy đường vào đơn
+   cũ, không phải moi mã đơn trong tin nhắn. */
+.app-luu { display: flex; align-items: center; gap: 4px; margin: 0 0 18px; }
+.app-luu-mo {
+  flex: 1 1 auto; min-width: 0;
+  display: flex; align-items: center; gap: 10px; text-align: left;
+  padding: 12px 14px; border-radius: var(--r);
+  background: var(--th-nen); color: var(--th); border: 1px solid var(--th-vien);
+  font: 600 13.5px/1.3 "Be Vietnam Pro", system-ui, sans-serif;
+}
+.app-luu-mo:hover { background: var(--th-nen); }
+.app-luu-mo:active { filter: brightness(.96); }
+.app-luu-mo .bt { flex: none; width: 19px; height: 19px; }
+.app-luu-mo b {
+  display: block; margin-top: 2px; overflow-wrap: anywhere;
+  font: 500 12.5px/1.35 "JetBrains Mono", ui-monospace, monospace;
+}
+.app-luu-quen {
+  flex: none; padding: 12px 8px; background: none; color: var(--muc-mo);
+  font-size: 12.5px; font-weight: 500; text-decoration: underline;
+}
+.app-luu-quen:hover { background: none; color: var(--muc); }
+
+.app-kq { margin-top: 16px; }
+.app-kq h3 { overflow-wrap: anywhere; }
+.app-duoi { margin: 12px 2px 0; }
+
+/* Gửi xong thì dẹp form, chỉ còn mã yêu cầu và hai đường đi tiếp. */
+.app-xong { display: grid; justify-items: center; text-align: center; gap: 13px; padding: 20px 2px 6px; }
+.app-xong-bt { color: var(--nhan); }
+.app-xong-bt .bt { width: 46px; height: 46px; stroke-width: 1.7; }
+.app-xong .bao { width: 100%; text-align: left; }
+.app-xong .ma-yc { width: 100%; }
+.app-xong p { margin: 0; }
+.app-xong .app-nut-hang { width: 100%; margin-top: 2px; }
+
+/* Nếp gấp cho mấy ô không bắt buộc ở màn gửi ảnh. */
+.app-them { margin: -6px 0 16px; }
+.app-them > summary {
+  display: flex; align-items: center; gap: 8px; list-style: none; cursor: pointer;
+  padding: 10px 2px; font-size: 13.5px; font-weight: 600; color: var(--th);
+}
+.app-them > summary::-webkit-details-marker { display: none; }
+.app-them > summary::before {
+  content: "+"; flex: none; width: 21px; height: 21px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--th-nen); font: 700 15px/1 ui-monospace, monospace;
+}
+.app-them[open] > summary::before { content: "2"; }
+.app-them-noi { padding-top: 4px; }
+
+/* Quy trình gấp thành nếp: nhìn hết dàn bước trong một màn, cần đọc kỹ bước
+   nào thì mở bước ấy. */
+.app-xep { display: grid; gap: 8px; margin: 2px 0 4px; }
+.app-xep details { background: var(--the); border: 1px solid var(--vien); border-radius: var(--r); }
+.app-xep summary {
+  display: flex; align-items: center; gap: 11px; list-style: none;
+  padding: 13px 14px; cursor: pointer;
+}
+.app-xep summary::-webkit-details-marker { display: none; }
+.app-xep .n {
+  flex: none; width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font: 700 12px/1 "JetBrains Mono", ui-monospace, monospace;
+  background: var(--sang); color: var(--tren-sang);
+}
+.app-xep summary b { font-size: 14.5px; font-weight: 650; line-height: 1.3; }
+.app-xep summary::after {
+  content: "A"; margin-left: auto; padding-left: 8px;
+  font-size: 21px; line-height: 1; color: var(--muc-mo);
+  transform: rotate(90deg); transition: transform .18s ease;
+}
+.app-xep details[open] summary::after { transform: rotate(-90deg); }
+.app-xep p { margin: 0; padding: 0 15px 15px 51px; font-size: 13.5px; line-height: 1.55; color: var(--muc-mo); }
+
+.app-muc p { margin: 0; font-size: 13.5px; line-height: 1.55; }
+.app-muc h3 { font-size: 14.5px; }
+.app-doi { display: grid; gap: 15px; }
+.app-doi p { margin-top: 6px; }
+@media (min-width: 560px) { .app-doi { grid-template-columns: 1fr 1fr; gap: 18px; } }
+</style>
+{{end}}

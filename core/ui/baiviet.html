@@ -1,0 +1,28 @@
+{{define "baiviet.html"}}
+{{template "html-dau" .}}
+
+<section class="hero">
+  <div class="khung">
+    <div class="nhan-nho">{{nd "baiviet.nhan"}}</div>
+    <h1 style="margin-top:16px">{{nd "baiviet.h1"}}</h1>
+    <p class="dan">{{ndd "baiviet.dan"}}</p>
+  </div>
+</section>
+
+<section>
+  <div class="khung doc-lon">
+    <div class="bv-luoi">
+      {{range .DS}}
+      <article class="the bv-the">
+        <div class="nho mo so">{{ngaydep .Ngay}}</div>
+        <h2 style="margin-top:8px"><a href="/bai-viet/{{.Slug}}">{{.TieuDe}}</a></h2>
+        <p class="mo" style="margin-top:10px">{{.TomTat}}</p>
+        <p><a class="nut nut-vien" href="/bai-viet/{{.Slug}}">{{nd "baiviet.nut"}}</a></p>
+      </article>
+      {{end}}
+    </div>
+  </div>
+</section>
+
+{{template "html-chan" .}}
+{{end}}

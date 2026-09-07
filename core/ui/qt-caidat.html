@@ -1,0 +1,90 @@
+{{define "qt-caidat.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang"><h1>Khóa API &amp; model</h1></div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .KetQua}}<div class="bao bao-ok">{{.KetQua}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<p class="mo" style="max-width:64ch">
+  Khóa dán ở đây có hiệu lực ngay, không phải ssh vào máy chủ, không phải khởi
+  động lại. Gemini là thứ trợ lý kỹ thuật ở <a href="/noi-bo">/noi-bo</a> dùng
+  để trả lời; Resend là thứ gửi mã yêu cầu về hòm thư khách.
+</p>
+<p class="nho mo" style="max-width:64ch">
+  Ghi ra <code>{{.Tep}}</code>, quyền 600. Đây là file <b>bí mật</b>: đừng
+  commit, đừng gửi qua chat. Lệnh kéo <code>data/</code> từ máy chủ về máy nhà
+  trong README sẽ kéo luôn cả nó.
+</p>
+
+<form method="post" action="/qt/cai-dat" style="max-width:760px;margin-top:24px">
+
+  <div class="o-nguong" style="border-left:3px solid var(--nhan,#d6f32f);padding:12px 0 12px 16px;margin:16px 0">
+    <label for="gemini"><b>Khóa Gemini</b></label>
+    <div class="nho mo" style="margin:4px 0 8px">
+      {{if .CheGemini}}Đang dùng: <code class="so">{{.CheGemini}}</code>{{else}}<b>Chưa có khóa.</b> Trợ lý kỹ thuật sẽ báo lỗi khi bấm Hỏi.{{end}}
+      {{if .EnvGemini}}<br><b>Biến môi trường GEMINI_API_KEY đang đè lên file này</b> — sửa ở đây chưa có tác dụng cho tới khi bỏ biến đó.{{end}}
+    </div>
+    <div style="margin:8px 0">
+      <input id="gemini" name="gemini" type="password" autocomplete="off"
+             placeholder="{{if .CheGemini}}để trống = giữ khóa đang dùng{{else}}dán khóa vào đây{{end}}"
+             style="width:100%;max-width:520px">
+    </div>
+    <div class="nho mo">
+      Lấy ở <code>aistudio.google.com/apikey</code> — bản miễn phí 1.000 request/ngày, không cần thẻ.
+    </div>
+    <div class="hang-nut" style="margin-top:10px">
+      <button class="nut nut-phu" type="submit" name="viec" value="thu-gemini">Lưu &amp; kiểm tra khóa</button>
+      {{if .CheGemini}}<button class="nut nut-phu" type="submit" name="viec" value="xoa-gemini">Xóa khóa</button>{{end}}
+    </div>
+  </div>
+
+  <div class="o-nguong" style="border-left:3px solid var(--nhan,#d6f32f);padding:12px 0 12px 16px;margin:16px 0">
+    <label for="resend"><b>Khóa Resend</b></label>
+    <div class="nho mo" style="margin:4px 0 8px">
+      {{if .CheResend}}Đang dùng: <code class="so">{{.CheResend}}</code>{{else}}<b>Chưa có khóa.</b> Web vẫn nhận yêu cầu, chỉ là khách không nhận được mail xác nhận.{{end}}
+      {{if .EnvResend}}<br><b>Biến môi trường RESEND_API_KEY đang đè lên file này.</b>{{end}}
+    </div>
+    <div style="margin:8px 0">
+      <input id="resend" name="resend" type="password" autocomplete="off"
+             placeholder="{{if .CheResend}}để trống = giữ khóa đang dùng{{else}}dán khóa vào đây{{end}}"
+             style="width:100%;max-width:520px">
+    </div>
+    <div class="nho mo">
+      Khóa đúng vẫn chưa gửi được cho khách nếu chưa xác thực tên miền bên Resend.
+    </div>
+    <div class="hang-nut" style="margin-top:10px">
+      <button class="nut nut-phu" type="submit" name="viec" value="thu-resend">Lưu &amp; kiểm tra khóa</button>
+      {{if .CheResend}}<button class="nut nut-phu" type="submit" name="viec" value="xoa-resend">Xóa khóa</button>{{end}}
+    </div>
+  </div>
+
+  <div class="o-nguong" style="border-left:3px solid var(--nhan,#d6f32f);padding:12px 0 12px 16px;margin:16px 0">
+    <label for="nha_cung_cap"><b>Model trả lời</b></label>
+    <div style="margin:8px 0">
+      <select id="nha_cung_cap" name="nha_cung_cap" style="max-width:320px">
+        <option value=""        {{if eq .NhaCungCap ""}}selected{{end}}>Theo config.yaml (đang là {{.MacDinhCfg}})</option>
+        <option value="gemini"  {{if eq .NhaCungCap "gemini"}}selected{{end}}>Gemini — qua mạng, cần khóa ở trên</option>
+        <option value="ollama"  {{if eq .NhaCungCap "ollama"}}selected{{end}}>Ollama — chạy trên chính máy này</option>
+      </select>
+    </div>
+    <div class="nho mo">Đang thực sự dùng: <b>{{.DangDung}}</b>.</div>
+
+    <div style="margin:14px 0 0">
+      <label>
+        <input type="checkbox" name="tat_du_phong" value="1" {{if .TatDuPhong}}checked{{end}}>
+        Tắt model dự phòng{{if .DuPhongCfg}} (config.yaml đang để dự phòng là <b>{{.DuPhongCfg}}</b>){{end}}
+      </label>
+    </div>
+    <div class="nho mo" style="margin-top:6px">
+      Máy chủ không cài Ollama. Để nguyên dự phòng thì mọi lỗi Gemini đều hiện
+      ra thành “Ollama connection refused” — sai chỗ, khó lần. Trên máy chủ nên bật ô này.
+    </div>
+  </div>
+
+  <button class="nut nut-chinh" type="submit" name="viec" value="luu" style="margin-top:20px">Lưu</button>
+</form>
+
+{{template "qt-chan" .}}
+{{end}}

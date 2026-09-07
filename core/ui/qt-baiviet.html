@@ -1,0 +1,69 @@
+{{define "qt-baiviet.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang">
+  <h1>Bài viết</h1>
+  <div class="phai"><a class="nut nut-chinh" href="/qt/bai-viet/moi">+ Viết bài mới</a></div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<p class="mo" style="max-width:70ch">
+  Mỗi bài là một tệp trong <code>data/bai-viet/</code>. Sửa ở đây là đổi ngay trên
+  trang khách, không phải build lại. Bài để cờ <b>nháp</b> thì không hiện trên
+  trang khách và cũng không vào sitemap.
+</p>
+
+{{if .DS}}
+<div class="the-nhom" style="margin-top:22px">
+  <div class="cuon">
+    <table class="bang">
+      <thead>
+        <tr>
+          <th style="width:70px">Thứ tự</th>
+          <th>Tiêu đề</th>
+          <th style="width:110px">Đăng</th>
+          <th style="width:110px">Sửa</th>
+          <th style="width:90px">Trạng thái</th>
+          <th style="width:140px"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .DS}}
+        <tr>
+          <td class="so">{{.ThuTu}}</td>
+          <td>
+            <a href="/qt/bai-viet/{{.Slug}}"><b>{{.TieuDe}}</b></a>
+            <div class="nho mo so" style="margin-top:4px">/bai-viet/{{.Slug}}</div>
+          </td>
+          <td class="so nho">{{ngaydep .Ngay}}</td>
+          <td class="so nho">{{if .Sua}}{{ngaydep .Sua}}{{else}}<span class="mo">—</span>{{end}}</td>
+          <td>
+            {{if .Nhap}}<span class="chip chip-trung">Nháp</span>
+            {{else}}<span class="chip chip-nhan">Đang đăng</span>{{end}}
+          </td>
+          <td>
+            <div class="hang" style="gap:6px">
+              <a class="nut-nho" href="/qt/bai-viet/{{.Slug}}">Sửa</a>
+              <a class="nut-nho" href="/bai-viet/{{.Slug}}" target="_blank">Xem ↗</a>
+            </div>
+          </td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+</div>
+{{else}}
+<div class="the" style="margin-top:22px;max-width:62ch">
+  <p class="mo">
+    Chưa có bài nào trong <code>data/bai-viet/</code>. Nếu vừa mang binary lên máy
+    khác mà mục bài viết trống, khả năng cao là quên chép thư mục
+    <code>data/bai-viet/</code> theo — bài viết không nằm trong binary.
+  </p>
+</div>
+{{end}}
+
+{{template "qt-chan" .}}
+{{end}}

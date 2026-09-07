@@ -1,0 +1,18 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "TramVot",
+  "outputfilename": "TramVot",
+  "frontend:install": "",
+  "frontend:build": "",
+  "frontend:dev:watcher": "",
+  "wailsjsdir": "",
+  "author": {
+    "name": "Tram Vot"
+  },
+  "info": {
+    "companyName": "Tram Vot",
+    "productName": "Tram Vot",
+    "productVersion": "0.1.0",
+    "comments": "Quan ly don sua vot pickleball"
+  }
+}

@@ -1,0 +1,159 @@
+{{define "noibo.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang">
+  <h1>Trợ lý kỹ thuật</h1>
+  <div class="phai"><span class="chip chip-trung">Chỉ chạy trên máy nhà</span></div>
+</div>
+
+{{with .ThongKe}}
+<div class="luoi-so" style="margin-bottom:16px">
+  <div class="o-so{{if lt .SoCa .NguongTinDuoc}} canh-bao{{end}}">
+    <div class="v">{{.SoCa}}</div><div class="t">ca đã ghi</div>
+  </div>
+  <div class="o-so{{if gt .ConThieuCa 0}} canh-bao{{end}}">
+    <div class="v">{{.ConThieuCa}}</div><div class="t">ca nữa mới đủ tin ({{.NguongTinDuoc}})</div>
+  </div>
+  <div class="o-so"><div class="v">{{.Rag.SoDoan}}</div><div class="t">đoạn trong index RAG</div></div>
+  <div class="o-so"><div class="v" style="font-size:19px">{{.NhaCungCapLLM}}</div><div class="t">model đang dùng</div></div>
+  <div class="o-so"><div class="v">{{.QuotaDaDung}}<span class="mo" style="font-size:15px">/{{.QuotaTran}}</span></div><div class="t">request Gemini hôm nay</div></div>
+  <div class="o-so"><div class="v">{{.TranNguCanh}}</div><div class="t">ký tự nhét vừa ngữ cảnh</div></div>
+</div>
+
+{{if lt .SoCa .NguongTinDuoc}}
+<div class="canh-bao-dong" style="margin-bottom:20px">
+  Kho mới có {{.SoCa}} ca, dưới ngưỡng {{.NguongTinDuoc}}. Agent trả lời được,
+  nhưng đó là gợi ý để nghĩ tiếp — không phải căn cứ để quyết định nhận hay từ chối
+  một cây vợt của khách.
+</div>
+{{end}}
+{{end}}
+
+<div class="the-nhom">
+  <h3>Hỏi trợ lý</h3>
+  <div class="noi">
+    <p class="mo nho" style="margin:0 0 14px">
+      Trả lời dựa trên checklist từ chối (luôn nạp nguyên vẹn) cộng các đoạn tài liệu
+      và ca cũ lấy về theo câu hỏi. Mở phần "căn cứ" để xem đúng đoạn đã dùng.
+    </p>
+
+    <textarea id="cauhoi" rows="3" placeholder="Ví dụ: khách gửi vợt Joola 3 triệu, gõ nghe đục một vùng sát vành, ấn ngón cái thấy lún nhẹ. Có nhận không?"></textarea>
+    <div class="hang-nut">
+      <button id="nut-hoi">Hỏi</button>
+      {{if not .CongKhai}}<button id="nut-index" class="nut-phu">Dựng lại index RAG</button>{{end}}
+      <span id="trang-thai" class="mo" style="font-size:14px"></span>
+    </div>
+
+    <div id="ket-qua"></div>
+  </div>
+</div>
+
+<div class="the-nhom" style="margin-top:18px">
+  <h3>Yêu cầu khách gửi từ web</h3>
+  <div class="noi">
+    {{if .YeuCau}}
+      {{range .YeuCau}}
+      <div class="yc">
+        <div class="d so">{{.Ngay}}</div>
+        <div><b>{{if .Ten}}{{.Ten}}{{else}}(không để tên){{end}}</b> — <span class="so">{{.LienHe}}</span></div>
+        {{if .VotHang}}<div class="mo" style="font-size:14px">{{.VotHang}}</div>{{end}}
+        <div style="margin-top:4px">{{.MoTa}}</div>
+      </div>
+      {{end}}
+      <p class="nho mo" style="margin-top:12px">Biến thành đơn thật ở <a href="/qt/yeu-cau">trang yêu cầu</a>.</p>
+    {{else}}
+      <p class="mo nho" style="margin:0">Chưa có yêu cầu nào.</p>
+    {{end}}
+  </div>
+</div>
+
+<p class="nho mo" style="margin-top:22px;max-width:70ch">
+  Trang này chỉ chủ trạm vào được, ở cả máy nhà lẫn máy chủ — mỗi câu hỏi là một
+  request Gemini, đếm chung một hạn mức. Nút dựng lại index chỉ hiện ở máy nhà.
+  Ghi ca mới bằng giọng nói:
+  <code class="so">python scripts/add_case.py --voice ...</code>
+</p>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const nutHoi = $("#nut-hoi"), nutIdx = $("#nut-index"),
+      tt = $("#trang-thai"), kq = $("#ket-qua");
+
+function thoat(s) {
+  const d = document.createElement("div");
+  d.textContent = s == null ? "" : String(s);
+  return d.innerHTML;
+}
+
+// nutIdx không tồn tại ở bản chạy trên máy chủ, nên mọi chỗ đụng vào nó
+// đều phải hỏi trước — thiếu một chỗ là cả trang hỏng vì ReferenceError.
+function khoaNut(b) {
+  nutHoi.disabled = b;
+  if (nutIdx) nutIdx.disabled = b;
+}
+
+async function hoi() {
+  const q = $("#cauhoi").value.trim();
+  if (!q) return;
+  khoaNut(true);
+  tt.textContent = "Đang hỏi… (Ollama có thể mất vài phút)";
+  kq.innerHTML = "";
+  try {
+    const r = await fetch("/api/hoi", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({cau_hoi: q}),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.loi || "lỗi không rõ");
+
+    let h = "";
+    for (const c of (d.canh_bao || [])) {
+      h += `<div class="canh-bao-dong">${thoat(c)}</div>`;
+    }
+    h += `<div class="tra-loi">${thoat(d.cau_tra_loi)}</div>`;
+    if (d.doan_da_dung && d.doan_da_dung.length) {
+      h += `<div class="can-cu"><details><summary>Căn cứ đã dùng — ${d.doan_da_dung.length} đoạn`
+         + `${d.dung_rag ? "" : " (nhồi thẳng, chưa có index)"}</summary>`;
+      for (const x of d.doan_da_dung) {
+        h += `<pre><b>[${(x.Diem ?? 0).toFixed(3)}] ${thoat(x.TieuDe)}</b> — ${thoat(x.Nguon)}\n`
+           + `${thoat((x.Text || "").slice(0, 600))}</pre>`;
+      }
+      h += `</details></div>`;
+    }
+    h += `<p class="mo" style="font-size:13px;margin-top:10px">Trả lời bởi ${thoat(d.nha_cung_cap)}.</p>`;
+    kq.innerHTML = h;
+    tt.textContent = "";
+  } catch (e) {
+    kq.innerHTML = `<div class="bao bao-loi" style="margin-top:14px">${thoat(e.message)}</div>`;
+    tt.textContent = "";
+  } finally {
+    khoaNut(false);
+  }
+}
+
+async function dungIndex() {
+  khoaNut(true);
+  tt.textContent = "Đang nhúng vector…";
+  try {
+    const r = await fetch("/api/index", {method: "POST"});
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.loi || "lỗi không rõ");
+    tt.textContent = `Xong: ${d.so_doan} đoạn (${d.so_doan_moi} mới), ${d.so_chieu} chiều, qua ${d.nha_cung_cap}.`;
+  } catch (e) {
+    tt.textContent = "";
+    kq.innerHTML = `<div class="bao bao-loi" style="margin-top:14px">${thoat(e.message)}</div>`;
+  } finally {
+    khoaNut(false);
+  }
+}
+
+nutHoi.addEventListener("click", hoi);
+if (nutIdx) nutIdx.addEventListener("click", dungIndex);
+$("#cauhoi").addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") hoi();
+});
+</script>
+
+{{template "qt-chan" .}}
+{{end}}

@@ -1,0 +1,247 @@
+{{define "app-tracuu.html"}}<!doctype html>
+{{/* Tra đơn, bản app. Khác bản web ở ba chỗ, và cả ba đều vì cái điện thoại:
+     bỏ nav bảy mục với chân trang bốn cột để ô nhập nằm ngay dưới ngón cái;
+     xếp một cột chứ không hai, vì màn hình 5 inch không có cột thứ hai; và
+     nhớ mã đơn vừa tra vào máy khách — người gửi vợt đi sửa mở app ngày mấy
+     lượt để xem xong chưa, bắt gõ lại mã hai chục ký tự mỗi lượt là hỏng. */}}
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{nd "app.nut.tra-cuu"}} — {{.Brand.Ten}}</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="{{iconURL}}" type="{{iconMIME}}">
+{{template "pwa-dau" .}}
+{{template "css" .}}
+</head>
+<body class="{{.LopThan}} la-app">
+
+<header class="app-dau app-dau-2">
+  <a class="app-lui" href="/app" aria-label="Quay lại">{{template "bt-lui"}}</a>
+  <b class="app-tieu">{{nd "app.nut.tra-cuu"}}</b>
+</header>
+
+<main class="app-than">
+
+  {{/* Đơn đã tra lần trước, đọc từ máy khách. Ẩn sẵn: chưa có gì thì JS không
+       mở, và máy tắt JS cũng không thấy một thẻ rỗng. */}}
+  <div class="app-luu" id="tra-luu" hidden>
+    <button type="button" class="app-luu-mo" id="tra-mo">
+      {{template "bt-tim"}}
+      <span>{{nd "app.tra.luu-nhan"}}<b class="so" id="tra-luu-ma"></b></span>
+    </button>
+    <button type="button" class="app-luu-quen" id="tra-quen">{{nd "app.tra.quen"}}</button>
+  </div>
+
+  {{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+  <form method="post" action="/app/tra-cuu" class="app-form" id="tra-form">
+    <label>{{nd "tracuu.ma-nhan"}}
+      <input name="ma" id="tra-ma" value="{{.Ma}}" placeholder="{{nd "tracuu.ma-goi-y"}}"
+             maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false" required>
+    </label>
+    <label>{{nd "tracuu.dt-nhan"}}
+      <input name="dien_thoai" id="tra-dt" value="{{.DienThoai}}" inputmode="numeric"
+             maxlength="12" autocomplete="off" required>
+    </label>
+    <button class="app-nut-to" type="submit">{{nd "tracuu.nut"}}</button>
+  </form>
+
+  {{/* Yêu cầu gửi ảnh chưa thành đơn: chưa có thợ, chưa có tiền, chưa có ngày
+       hẹn. Hiện đúng những gì có thật, đừng dựng khung đơn rỗng. */}}
+  {{if and .YeuCau (not .Don)}}
+  {{with .YeuCau}}
+  <div class="the-nhom app-kq" id="tra-kq">
+    <h3>{{nd "tracuu.yc.tieu"}} <span class="so">{{.Ma}}</span></h3>
+    <div class="noi doc">
+      <div>
+        {{if .DaXuLy}}
+          <span class="chip chip-nhan">{{nd "tracuu.yc.xong-chip"}}</span>
+          <p style="margin-top:10px">{{ndd "tracuu.yc.xong-chu"}}</p>
+        {{else}}
+          <span class="chip chip-cho">{{nd "tracuu.yc.cho-chip"}}</span>
+          <p style="margin-top:10px">{{ndd "tracuu.yc.cho-chu"}}</p>
+        {{end}}
+      </div>
+      <dl class="kv">
+        <dt>{{nd "tracuu.yc.ngay"}}</dt><dd>{{ngaydep .Ngay}}</dd>
+        {{if .Ten}}<dt>{{nd "tracuu.yc.k-ten"}}</dt><dd>{{.Ten}}</dd>{{end}}
+        {{if .VotHang}}<dt>{{nd "tracuu.k-vot"}}</dt><dd>{{.VotHang}}</dd>{{end}}
+        {{if .MoTa}}<dt>{{nd "tracuu.yc.k-mota"}}</dt><dd>{{.MoTa}}</dd>{{end}}
+        {{if .Tep}}<dt>{{nd "tracuu.yc.k-tep"}}</dt><dd>{{len .Tep}} {{nd "tracuu.yc.tep-dv"}}</dd>{{end}}
+      </dl>
+    </div>
+  </div>
+  <p class="nho mo app-duoi">{{ndd "tracuu.yc.duoi"}}</p>
+  {{end}}
+  {{end}}
+
+  {{with .Don}}
+  <div class="the-nhom app-kq" id="tra-kq">
+    <h3>{{nd "tracuu.don.tieu"}} <span class="so">{{.Ma}}</span></h3>
+    <div class="noi doc">
+      {{$t := tt .TrangThai}}
+      <div>
+        <span class="chip chip-{{$t.Mau}}">{{$t.Ten}}</span>
+        <p style="margin-top:10px">{{$t.TenKhach}}</p>
+      </div>
+      <dl class="kv">
+        <dt>{{nd "tracuu.don.ngay"}}</dt><dd>{{ngaydep .Ngay}}</dd>
+        {{if .VotHang}}<dt>{{nd "tracuu.k-vot"}}</dt><dd>{{.VotHang}}</dd>{{end}}
+        {{if .ChanDoan}}<dt>{{nd "tracuu.don.k-chan"}}</dt><dd>{{.ChanDoan}}</dd>{{end}}
+        {{if .HenTraNgay}}<dt>{{nd "tracuu.don.k-hen"}}</dt><dd>{{ngaydep .HenTraNgay}}</dd>{{end}}
+        {{if .BaoHanhDen}}<dt>{{nd "tracuu.don.k-bh"}}</dt><dd>{{ngaydep .BaoHanhDen}}</dd>{{end}}
+      </dl>
+      {{if $.YeuCau}}
+      <p class="nho mo">{{nd "tracuu.don.tu-yc-1"}} <span class="so">{{$.YeuCau.Ma}}</span> {{nd "tracuu.don.tu-yc-2"}} {{ngaydep $.YeuCau.Ngay}}.</p>
+      {{end}}
+    </div>
+  </div>
+
+  {{if .LichSu}}
+  <div class="the-nhom app-kq">
+    <h3>{{nd "tracuu.don.dien-bien"}}</h3>
+    <div class="noi">
+      <div class="moc">
+        {{range .LichSu}}
+        <div>
+          <div class="khi">{{.Luc}}</div>
+          {{(tt .TrangThai).TenKhach}}
+        </div>
+        {{end}}
+      </div>
+    </div>
+  </div>
+  {{end}}
+
+  {{if .DongTien}}
+  <div class="the-nhom app-kq">
+    <h3>{{nd "tracuu.tien.h3"}}</h3>
+    <div class="cuon">
+      <table class="bang">
+        <tbody>
+        {{range .DongTien}}<tr><td>{{.Ten}}</td><td class="p">{{tien .SoTien}}</td></tr>{{end}}
+        <tr><td><b>{{nd "tracuu.tien.tong"}}</b></td><td class="p">{{tien .TongTien}}</td></tr>
+        <tr><td class="mo">{{nd "tracuu.tien.da-thu"}}</td><td class="p mo">{{tien .DaThu}}</td></tr>
+        <tr><td><b>{{nd "tracuu.tien.con"}}</b></td><td class="p">{{tien .ConNo}}</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {{end}}
+
+  {{/* Ảnh đi qua token của đơn chứ không qua /qt/anh — khách không đăng nhập được. */}}
+  {{if .Anh}}
+  {{$t := .Token}}{{$m := .Ma}}
+  <div class="the-nhom app-kq">
+    <h3>{{nd "tracuu.anh.h3"}}</h3>
+    <div class="noi doc">
+      {{if .AnhTruoc}}
+      <div>
+        <div class="nhan-nho">{{nd "tracuu.anh.truoc"}}</div>
+        <div class="anh-luoi" style="margin-top:10px">
+          {{range .AnhTruoc}}
+          <div class="anh-o">
+            <a href="/don-anh/{{$t}}/{{.}}" target="_blank" rel="noopener"><img src="/don-anh/{{$t}}/{{.}}" alt="{{nd "tracuu.anh.alt-truoc"}} — đơn {{$m}}" loading="lazy"></a>
+          </div>
+          {{end}}
+        </div>
+      </div>
+      {{end}}
+      {{if .AnhSau}}
+      <div>
+        <div class="nhan-nho">{{nd "tracuu.anh.sau"}}</div>
+        <div class="anh-luoi" style="margin-top:10px">
+          {{range .AnhSau}}
+          <div class="anh-o">
+            <a href="/don-anh/{{$t}}/{{.}}" target="_blank" rel="noopener"><img src="/don-anh/{{$t}}/{{.}}" alt="{{nd "tracuu.anh.alt-sau"}} — đơn {{$m}}" loading="lazy"></a>
+          </div>
+          {{end}}
+        </div>
+      </div>
+      {{end}}
+      <p class="nho mo" style="margin:0">{{ndd "tracuu.anh.chu"}}</p>
+    </div>
+  </div>
+  {{end}}
+
+  <div class="the app-kq">
+    <h3>{{nd "tracuu.sai.h3"}}</h3>
+    <p class="nho mo" style="margin-top:8px">{{ndd "tracuu.sai.chu"}}</p>
+    <div class="app-nut-hang">
+      <a class="nut nut-vien" href="{{if .LienHe.DienThoai}}tel:{{soGoi .LienHe.DienThoai}}{{else}}/lien-he{{end}}">{{nd "chung.nut.lien-he"}}</a>
+    </div>
+  </div>
+  {{end}}
+</main>
+
+{{template "thanh-app" .}}
+
+<script>
+// Nhớ mã đơn ngay trên máy khách. Không gửi đi đâu, không đặt cookie: chỉ
+// localStorage của chính điện thoại ấy. Nhớ giùm luôn: app cài từ màn hình
+// chính và Safari là hai kho riêng, tra ở bên này không hiện ở bên kia — đó
+// là Apple ngăn chứ không phải hỏng.
+(function () {
+  var KHOA = 'tram-don';
+  var CO_MO = 'tram-don-da-mo';   // trong phiên này đã tự mở giùm lần nào chưa
+
+  var form = document.getElementById('tra-form');
+  if (!form) { return; }
+  var oMa = document.getElementById('tra-ma');
+  var oDT = document.getElementById('tra-dt');
+  var the = document.getElementById('tra-luu');
+  var nhan = document.getElementById('tra-luu-ma');
+  var nutMo = document.getElementById('tra-mo');
+  var nutQuen = document.getElementById('tra-quen');
+  var coKQ = !!document.getElementById('tra-kq');
+
+  function doc() {
+    try { return JSON.parse(localStorage.getItem(KHOA) || 'null'); } catch (e) { return null; }
+  }
+  function ghi(o) {
+    try { localStorage.setItem(KHOA, JSON.stringify(o)); } catch (e) {}
+  }
+
+  // Chỉ nhớ khi đã tra ra thật. Nhớ cả cái mã gõ nhầm thì lần sau mở app lên
+  // là thấy ngay dòng "không tìm thấy".
+  if (coKQ && oMa.value && oDT.value) {
+    ghi({ ma: oMa.value, dt: oDT.value });
+  }
+
+  var luu = doc();
+  if (!coKQ && !oMa.value && luu && luu.ma) {
+    nhan.textContent = luu.ma;
+    the.hidden = false;
+    // Mở thẳng đơn cũ, mỗi phiên một lần: vào app là thấy tình trạng vợt
+    // luôn, không phải bấm gì. Đặt cờ TRƯỚC khi gửi để lỡ tra hỏng cũng
+    // không quay vòng.
+    var daMo = true;
+    try { daMo = !!sessionStorage.getItem(CO_MO); } catch (e) {}
+    if (!daMo && luu.dt) {
+      try { sessionStorage.setItem(CO_MO, '1'); } catch (e) {}
+      oMa.value = luu.ma;
+      oDT.value = luu.dt;
+      form.submit();
+      return;
+    }
+  }
+
+  nutMo.addEventListener('click', function () {
+    var l = doc();
+    if (!l) { return; }
+    oMa.value = l.ma;
+    oDT.value = l.dt || '';
+    if (oDT.value) { form.submit(); } else { oDT.focus(); }
+  });
+  nutQuen.addEventListener('click', function () {
+    try { localStorage.removeItem(KHOA); } catch (e) {}
+    the.hidden = true;
+  });
+})();
+</script>
+
+{{template "pwa-chan" .}}
+</body>
+</html>
+{{end}}

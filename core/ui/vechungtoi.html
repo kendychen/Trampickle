@@ -1,0 +1,70 @@
+{{define "vechungtoi.html"}}
+{{template "html-dau" .}}
+
+<section class="hero">
+  <div class="khung">
+    <div class="nhan-nho">{{nd "vechungtoi.nhan"}}</div>
+    <h1 style="margin-top:16px">{{nd "vechungtoi.h1"}}</h1>
+    <p class="dan">{{ndd "vechungtoi.dan"}}</p>
+  </div>
+</section>
+
+{{/* Địa chỉ đứng ngay đầu trang chứ không nằm cuối: khách vào trang này là để
+     hỏi đúng một câu "trạm có thật không, ở đâu" — bắt cuộn xuống mới trả lời
+     là trả lời sai chỗ. Địa chỉ lấy từ /qt/lien-he nên sửa một lần đổi cả
+     trang chủ, chân trang và đây. */}}
+<section>
+  <div class="khung doi-cot">
+    <div class="doc-lon">
+      <div class="nhan-nho nhan-vach">{{nd "vechungtoi.o.nhan"}}</div>
+      <h2 style="margin-top:16px">{{nd "vechungtoi.o.h2"}}</h2>
+      {{if .LienHe.DiaChi}}
+      <p class="tram-o">{{.LienHe.DiaChi}}</p>
+      {{if .LienHe.GioLamVic}}
+      <p class="tram-gio"><span>{{nd "vechungtoi.o.gio-nhan"}}</span> {{.LienHe.GioLamVic}}</p>
+      {{end}}
+      <p style="margin-top:18px">
+        <a class="nut nut-chinh" href="{{.BanDo}}" target="_blank" rel="noopener">{{nd "vechungtoi.o.chi-duong"}}</a>
+        {{if .LienHe.DienThoai}}
+        <a class="nut nut-vien" href="tel:{{soGoi .LienHe.DienThoai}}">{{.LienHe.DienThoai}}</a>
+        {{end}}
+      </p>
+      <div class="doc" style="margin-top:18px"><p>{{ndd "vechungtoi.o.chu"}}</p></div>
+      {{else}}
+      <div class="doc" style="margin-top:14px"><p>{{ndd "vechungtoi.o.chua-co"}}</p></div>
+      {{end}}
+    </div>
+
+    <div class="canh">
+      <div class="the">
+        <h3>{{nd "vechungtoi.chot.h2"}}</h3>
+        <div class="doc" style="margin-top:10px"><p class="nho">{{ndd "vechungtoi.chot.chu"}}</p></div>
+        <p style="margin-top:14px"><a class="nut nut-chinh" href="/#gui">{{nd "chung.nut.gui-anh"}}</a></p>
+        <p style="margin-top:10px"><a class="nut nut-vien" href="/dich-vu">{{nd "chung.nut.dich-vu"}}</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="khung">
+    <div class="nhan-nho nhan-vach">{{nd "vechungtoi.anh.nhan"}}</div>
+    <h2 style="margin-top:16px">{{nd "vechungtoi.anh.h2"}}</h2>
+    {{if .Anh}}
+    <div class="doc" style="margin-top:12px"><p>{{ndd "vechungtoi.anh.chu"}}</p></div>
+    <div class="tram-anh">
+      {{range .Anh}}
+      <figure>
+        <img src="/anh-trang-chu/{{.Ten}}" alt="{{.ChuThich}}" loading="lazy">
+        {{if .ChuThich}}<figcaption>{{.ChuThich}}</figcaption>{{end}}
+      </figure>
+      {{end}}
+    </div>
+    {{else}}
+    <div class="doc" style="margin-top:12px"><p class="mo">{{ndd "vechungtoi.anh.chua-co"}}</p></div>
+    {{end}}
+  </div>
+</section>
+
+{{template "html-chan" .}}
+{{end}}

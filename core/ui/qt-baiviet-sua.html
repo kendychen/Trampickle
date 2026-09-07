@@ -1,0 +1,249 @@
+{{define "qt-baiviet-sua.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang">
+  <h1>{{if .Moi}}Viết bài mới{{else}}Sửa bài{{end}}</h1>
+  <div class="phai hang" style="gap:8px">
+    <a class="nut nut-vien" href="/qt/bai-viet">← Danh sách bài</a>
+    {{if not .Moi}}<a class="nut nut-vien" href="/bai-viet/{{.Bai.Slug}}" target="_blank">Xem trên web ↗</a>{{end}}
+  </div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<form method="post" action="/qt/bai-viet/luu" id="f-bai">
+  <input type="hidden" name="cu" value="{{if .Moi}}{{else}}{{.Bai.Slug}}{{end}}">
+
+  <div class="the-nhom">
+    <h3>Phần máy tìm kiếm đọc</h3>
+    <div class="noi doc">
+      <label>Tiêu đề
+        <span class="hd">Vừa là dòng chữ to đầu bài, vừa là tên tab trình duyệt.
+          Dài chừng 55–65 ký tự thì Google hiện đủ, dài hơn thì bị cắt đuôi.</span>
+        <input name="tieu_de" value="{{.Bai.TieuDe}}" maxlength="200" required>
+      </label>
+
+      <label>Đường dẫn
+        <span class="hd">Phần sau <code>/bai-viet/</code>. Chữ thường không dấu, số và
+          gạch nối. Đổi đường dẫn của bài đã đăng là đổi luôn địa chỉ khách đã lưu
+          và Google đã đánh chỉ mục — chỉ đổi khi thật cần.</span>
+        <input name="slug" value="{{.Bai.Slug}}" maxlength="80" pattern="[a-z0-9-]+" required
+               style="font-family:'JetBrains Mono',monospace">
+      </label>
+
+      <label>Mô tả cho Google
+        <span class="hd">Đoạn chữ nhỏ dưới tiêu đề trong kết quả tìm kiếm. 150–160 ký tự.</span>
+        <textarea name="mo_ta" rows="2" maxlength="400">{{.Bai.MoTa}}</textarea>
+      </label>
+
+      <label>Tóm tắt
+        <span class="hd">Hiện ở trang danh sách bài viết, không hiện trong bài.
+          Viết dài hơn mô tả Google được — đây là chỗ mời người ta bấm vào đọc.</span>
+        <textarea name="tom_tat" rows="3" maxlength="800">{{.Bai.TomTat}}</textarea>
+      </label>
+
+      <div class="hang" style="align-items:flex-end">
+        <label style="margin:0">Ngày đăng
+          <input name="ngay" value="{{.Bai.Ngay}}" placeholder="2026-09-05" maxlength="10">
+        </label>
+        <label style="margin:0">Ngày sửa
+          <span class="hd">Để trống nếu chưa sửa lần nào.</span>
+          <input name="sua" value="{{.Bai.Sua}}" placeholder="2026-09-05" maxlength="10">
+        </label>
+        <label style="margin:0" class="co-hep">Thứ tự
+          <span class="hd">Nhỏ đứng trước.</span>
+          <input name="thu_tu" value="{{.Bai.ThuTu}}" inputmode="numeric" maxlength="6">
+        </label>
+      </div>
+
+      <label class="o-chon" style="margin-top:14px">
+        <input type="checkbox" name="nhap" value="1" {{if .Bai.Nhap}}checked{{end}}>
+        <span>Để nháp — chưa hiện trên trang khách, chưa vào sitemap</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="the-nhom">
+    <h3>Thân bài</h3>
+    <div class="noi">
+      <div class="soan-2cot">
+        <div>
+          <textarea name="than" id="o-than" rows="30" spellcheck="false"
+                    style="font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.7">{{.Bai.Than}}</textarea>
+          <div class="hang" style="gap:10px;margin-top:12px">
+            <button type="button" id="nut-xem" class="phu" style="flex:0 0 auto">Xem thử</button>
+            <button type="submit" style="flex:0 0 auto">Lưu bài</button>
+            <span class="nho mo" id="bao-xem"></span>
+          </div>
+        </div>
+
+        <div>
+          <div class="nhan-nho">Xem thử</div>
+          <div id="khung-xem" class="bai xem-thu">
+            <p class="mo nho">Bấm <b>Xem thử</b> để dựng ra đúng cái sẽ lên trang.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<div class="ct-2cot" style="margin-top:8px">
+  <div>
+    <div class="the-nhom">
+      <h3>Cách gõ</h3>
+      <div class="noi doc">
+        <table class="bang">
+          <thead><tr><th style="width:42%">Gõ</th><th>Ra</th></tr></thead>
+          <tbody>
+            <tr><td class="so">## Tiêu đề mục</td><td>Tiêu đề mục lớn trong bài</td></tr>
+            <tr><td class="so">### Tiểu mục</td><td>Tiêu đề nhỏ hơn</td></tr>
+            <tr><td class="so">**đậm**</td><td>chữ <b>đậm</b></td></tr>
+            <tr><td class="so">*nghiêng*</td><td>chữ <em>nghiêng</em></td></tr>
+            <tr><td class="so">- gạch đầu dòng</td><td>Danh sách có dấu chấm vuông</td></tr>
+            <tr><td class="so">1. đánh số</td><td>Danh sách đánh số</td></tr>
+            <tr><td class="so">&gt; câu dặn dò</td><td>Khung lưu ý nền vàng</td></tr>
+            <tr><td class="so">[chữ](/dich-vu)</td><td>Đường dẫn</td></tr>
+            <tr><td class="so">| a | b |</td><td>Bảng — nhớ dòng <code>|---|---|</code> ngay dưới hàng đầu</td></tr>
+            <tr><td class="so">---</td><td>Vạch ngang</td></tr>
+          </tbody>
+        </table>
+        <p class="nho mo" style="margin-top:12px">
+          Đoạn đầu tiên của bài tự thành đoạn dẫn khổ chữ to. Dòng trống là thứ
+          ngăn hai đoạn — xuống dòng một cái thôi thì vẫn cùng một đoạn.
+        </p>
+      </div>
+    </div>
+
+    <div class="the-nhom">
+      <h3>Số liệu lấy từ bảng giá</h3>
+      <div class="noi doc">
+        <p class="nho">
+          Gõ <code>{nguong_can}</code> thì lúc lên trang nó thành con số ngưỡng chênh
+          cân đang ghi trong bảng giá. Đừng gõ thẳng con số: sửa bảng giá mà bài viết
+          còn ghi số cũ là trạm hứa một đằng, phiếu in một nẻo.
+        </p>
+        <table class="bang">
+          <tbody>
+            <tr><td class="so">{nguong_can}</td><td>Ngưỡng chênh cân vợt, tính bằng gram</td></tr>
+            <tr><td class="so">{free_ship}</td><td>Mức đơn được miễn phí gửi trả</td></tr>
+            <tr><td class="so">{ten_xuong}</td><td>Tên trạm</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="the-nhom">
+      <h3>Hình vẽ có sẵn</h3>
+      <div class="noi doc">
+        <p class="nho mo">
+          Mấy bản vẽ nét dùng trong bài. Gõ khối này vào chỗ muốn đặt hình:
+        </p>
+<pre class="so nho" style="background:var(--th-nen);padding:12px;overflow-x:auto">:::hinh vot-bo
+Chú thích dưới hình.
+:::</pre>
+        <table class="bang">
+          <tbody>
+            {{range $ma, $mo := .Hinh}}
+            <tr><td class="so">{{$ma}}</td><td>{{$mo}}</td></tr>
+            {{end}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="the-nhom">
+      <h3>Ảnh chèn trong bài</h3>
+      <div class="noi">
+        <form method="post" action="/qt/bai-viet/anh" enctype="multipart/form-data" class="doc">
+          <input type="hidden" name="ve" value="{{if .Moi}}moi{{else}}{{.Bai.Slug}}{{end}}">
+          <label>Tải ảnh lên
+            <span class="hd">JPG, PNG hoặc WEBP, dưới 8MB. Tải xong thì sao đường dẫn
+              bên dưới dán vào bài.</span>
+            <input type="file" name="anh" accept="image/*" multiple required>
+          </label>
+          <button type="submit" style="margin-top:10px">Tải lên</button>
+        </form>
+
+        {{if .Anh}}
+        <div class="anh-ds" style="margin-top:16px">
+          {{range .Anh}}
+          <div class="anh-o">
+            <img src="/bai-viet-anh/{{.}}" alt="">
+            <div class="anh-viec">
+              <input class="so nho" readonly value="![chú thích](/bai-viet-anh/{{.}})"
+                     onclick="this.select()">
+              <div class="anh-nut">
+                <form method="post" action="/qt/bai-viet/anh-xoa"
+                      onsubmit="return confirm('Xoá hẳn tệp ảnh này? Bài nào đang dùng sẽ mất ảnh.')">
+                  <input type="hidden" name="ten" value="{{.}}">
+                  <input type="hidden" name="ve" value="{{if $.Moi}}moi{{else}}{{$.Bai.Slug}}{{end}}">
+                  <button class="phu nho" type="submit">Xoá</button>
+                </form>
+              </div>
+            </div>
+          </div>
+          {{end}}
+        </div>
+        {{else}}
+        <p class="nho mo" style="margin-top:12px">Chưa có ảnh nào tải lên.</p>
+        {{end}}
+      </div>
+    </div>
+
+    {{if not .Moi}}
+    <div class="the-nhom">
+      <h3>Xoá bài</h3>
+      <div class="noi doc">
+        <p class="nho mo">
+          Xoá là xoá hẳn tệp, không có thùng rác. Muốn gỡ bài khỏi trang khách mà vẫn
+          giữ nội dung thì tích ô <b>Để nháp</b> ở trên rồi lưu.
+        </p>
+        <form method="post" action="/qt/bai-viet/{{.Bai.Slug}}/xoa"
+              onsubmit="return confirm('Xoá hẳn bài “{{.Bai.TieuDe}}”? Không lấy lại được.')">
+          <button class="phu" type="submit">Xoá bài này</button>
+        </form>
+      </div>
+    </div>
+    {{end}}
+  </div>
+</div>
+
+{{/* Xem thử gọi về server dựng, không dựng bằng JS: hai trình dựng là hai kết
+     quả, mà chỗ này thì thấy sao phải ra vậy. */}}
+<script>
+(function () {
+  var nut = document.getElementById('nut-xem');
+  var o = document.getElementById('o-than');
+  var khung = document.getElementById('khung-xem');
+  var bao = document.getElementById('bao-xem');
+  nut.addEventListener('click', function () {
+    bao.textContent = 'đang dựng…';
+    var d = new URLSearchParams();
+    d.append('than', o.value);
+    fetch('/qt/bai-viet/xem-thu', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+      body: d.toString()
+    }).then(function (res) {
+      if (!res.ok) throw new Error(res.status);
+      return res.text();
+    }).then(function (h) {
+      khung.innerHTML = h;
+      bao.textContent = 'dựng lúc ' + new Date().toLocaleTimeString('vi-VN');
+    }).catch(function (e) {
+      bao.textContent = 'không dựng được: ' + e.message;
+    });
+  });
+  // Ctrl+Enter cũng xem thử — soạn bài thì tay đang ở bàn phím.
+  o.addEventListener('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); nut.click(); }
+  });
+})();
+</script>
+
+{{template "qt-chan" .}}
+{{end}}

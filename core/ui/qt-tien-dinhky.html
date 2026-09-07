@@ -1,0 +1,125 @@
+{{define "qt-tien-dinhky.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang">
+  <h1>Khoản định kỳ</h1>
+  <div class="phai"><a class="nut nut-vien" href="/qt/tien">← Sổ tiền</a></div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<p class="mo" style="max-width:74ch;margin-bottom:20px">
+  Những thứ tháng nào cũng trả: tiền nhà, điện nước, internet, VPS, tên miền.
+  Khai một lần ở đây, đầu mỗi tháng hệ thống dựng sẵn một khoản
+  <b>chờ xác nhận</b> trong sổ. Trả rồi thì bấm một nút, chưa trả thì để đó —
+  máy không tự ghi là đã chi, vì tháng nào quên trả mà sổ vẫn ghi đã trả thì
+  lãi tháng đó là lãi giả.
+</p>
+
+<div class="the-nhom">
+  <h3>Bảng khai</h3>
+  <form method="post" action="/qt/tien/dinh-ky">
+    <div class="cuon">
+      <table class="bang">
+        <thead>
+          <tr>
+            <th style="min-width:190px">Việc</th><th style="width:150px">Nhóm</th>
+            <th style="width:140px">Số tiền</th><th style="width:110px">Ngày trả</th>
+            <th style="width:140px">Trả bằng</th><th style="min-width:140px">Ghi chú</th>
+            <th style="width:110px">Còn dùng?</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{range .DinhKy}}
+          <tr>
+            <td>
+              <input type="hidden" name="ma" value="{{.Ma}}">
+              <input name="ten" maxlength="120" value="{{.Ten}}" style="width:100%">
+            </td>
+            <td>
+              <select name="nhom" style="width:100%">
+                {{$n := .Nhom}}
+                {{range $.NhomChi}}<option value="{{.Ma}}" {{if eq .Ma $n}}selected{{end}}>{{.Ten}}</option>{{end}}
+              </select>
+            </td>
+            <td><input name="so_tien" inputmode="numeric" value="{{oso .SoTien}}" style="width:100%"></td>
+            <td><input name="ngay_trong_thang" inputmode="numeric" value="{{.NgayTrongThang}}" style="width:100%"></td>
+            <td>
+              <select name="phuong_thuc" style="width:100%">
+                <option value="chuyen_khoan" {{if eq .PhuongThuc "chuyen_khoan"}}selected{{end}}>Chuyển khoản</option>
+                <option value="tien_mat" {{if eq .PhuongThuc "tien_mat"}}selected{{end}}>Tiền mặt</option>
+              </select>
+            </td>
+            <td><input name="ghi_chu" maxlength="200" value="{{.GhiChu}}" style="width:100%"></td>
+            <td>
+              <select name="bat" style="width:100%">
+                <option value="1" {{if .Bat}}selected{{end}}>Còn</option>
+                <option value="0" {{if not .Bat}}selected{{end}}>Nghỉ</option>
+              </select>
+            </td>
+          </tr>
+          {{end}}
+          {{range lap 3}}
+          <tr>
+            <td><input type="hidden" name="ma" value=""><input name="ten" maxlength="120" placeholder="thêm khoản mới" style="width:100%"></td>
+            <td>
+              <select name="nhom" style="width:100%">
+                {{range $.NhomChi}}<option value="{{.Ma}}" {{if eq .Ma "dinh_phi"}}selected{{end}}>{{.Ten}}</option>{{end}}
+              </select>
+            </td>
+            <td><input name="so_tien" inputmode="numeric" style="width:100%"></td>
+            <td><input name="ngay_trong_thang" inputmode="numeric" value="1" style="width:100%"></td>
+            <td>
+              <select name="phuong_thuc" style="width:100%">
+                <option value="chuyen_khoan">Chuyển khoản</option>
+                <option value="tien_mat">Tiền mặt</option>
+              </select>
+            </td>
+            <td><input name="ghi_chu" maxlength="200" style="width:100%"></td>
+            <td>
+              <select name="bat" style="width:100%">
+                <option value="1" selected>Còn</option>
+                <option value="0">Nghỉ</option>
+              </select>
+            </td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+    </div>
+    <div class="noi">
+      <label style="display:flex;align-items:center;gap:8px;margin:0 0 12px">
+        <input type="checkbox" name="sinh_ngay" value="1">
+        Dựng luôn khoản chờ xác nhận cho {{thangDep .ThangNay}}
+      </label>
+      <p class="nho mo" style="margin:0 0 14px">
+        Bấm lại nhiều lần cũng không sao: tháng nào đã có khoản của việc nào thì
+        không dựng thêm cái thứ hai.
+      </p>
+      <button type="submit">Lưu</button>
+    </div>
+  </form>
+</div>
+
+<div class="the-nhom">
+  <h3>Ngày trả nghĩa là gì</h3>
+  <div class="noi doc">
+    <p class="nho">
+      Là ngày trong tháng ghi lên khoản được dựng, để sổ xếp cho đúng thứ tự —
+      không phải một cái nhắc hẹn. Chỉ nhận từ 1 tới 28: 29, 30, 31 thì tháng hai
+      khoản đó không bao giờ tới hạn.
+    </p>
+    <p class="nho">
+      Đổi số tiền ở đây không sửa các khoản đã dựng của tháng trước. Tháng này
+      trả nhiều hơn khai thì sửa thẳng số tiền lúc bấm xác nhận trong sổ.
+    </p>
+    <p class="nho">
+      Ngừng thuê chỗ, cắt gói VPS: để <b>Nghỉ</b> chứ đừng xoá dòng — lịch sử
+      những tháng đã trả vẫn nằm trong sổ và cần cái tên này để đọc.
+    </p>
+  </div>
+</div>
+
+{{template "qt-chan" .}}
+{{end}}

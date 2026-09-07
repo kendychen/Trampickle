@@ -1,0 +1,268 @@
+{{define "qt-tien.html"}}
+{{template "qt-dau" .}}
+{{$tq := .TongQuan}}
+{{$vv := $tq.VeVon}}
+{{$tn := $tq.ThangNay}}
+
+<div class="qt-dau-trang">
+  <h1>Sổ tiền</h1>
+  <div class="phai">
+    <a class="nut nut-vien" href="/qt/tien/sao-ke">Dán sao kê</a>
+    <a class="nut nut-vien" href="/qt/tien/dinh-ky">Khoản định kỳ</a>
+  </div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<div class="the-nhom" style="margin-bottom:18px">
+  <h3>Bao giờ về vốn</h3>
+  <div class="noi">
+    {{if or (not $vv.CoSo) (eq $vv.TongDauTu 0)}}
+      <p style="margin:0;font-size:16px">Chưa khai khoản đầu tư nào nên chưa có gì để bù.</p>
+      <p class="nho mo" style="margin:8px 0 0">
+        Máy móc, đồ nghề, bàn ghế, cọc thuê chỗ — ghi vào nhóm <b>Đầu tư</b> ở dưới.
+        Đó là mẫu số của bài toán này.
+      </p>
+    {{else if $vv.DaVeVon}}
+      <p style="margin:0;font-size:17px"><b>Đã về vốn từ {{thangDep $vv.ThangVeVon}}.</b></p>
+      <p class="nho mo" style="margin:8px 0 0">
+        Tổng đầu tư {{tien $vv.TongDauTu}}, luỹ kế lãi {{tien $vv.LuyKeLai}}.
+        Từ đây lãi là lãi thật, không còn phải trả nợ cho cái máy nữa.
+      </p>
+    {{else if $vv.DangLo}}
+      <p style="margin:0;font-size:17px" class="chip chip-tuchoi">Đang lỗ, chưa có ngày về vốn</p>
+      <p class="nho" style="margin:10px 0 0">
+        Tính trên {{$vv.SoThangTinh}} tháng gần nhất thì lãi trung bình không dương,
+        nên không có con số "còn mấy tháng" nào trung thực để đưa ra.
+        Còn phải bù <b>{{tien $vv.ConThieu}}</b>.
+      </p>
+      <p class="nho mo" style="margin:8px 0 0">Năm đầu của một trạm mới thường nằm ở đây. Nó không nói trạm hỏng, nó nói chưa đủ đơn.</p>
+    {{else}}
+      <p style="margin:0;font-size:17px">
+        Còn thiếu <b>{{tien $vv.ConThieu}}</b> — với đà lãi {{tien $vv.LaiTBThang}}/tháng thì
+        khoảng <b>{{printf "%.1f" $vv.ConMayThang}} tháng</b> nữa{{if $vv.NgayDuKien}}, quanh {{thangDep $vv.NgayDuKien}}{{end}}.
+      </p>
+      <p class="nho mo" style="margin:8px 0 0">
+        Đà lãi lấy trung bình {{$vv.SoThangTinh}} tháng gần nhất. Tháng nào ế thì con số
+        này dài ra, đó là chuyện đúng chứ không phải lỗi.
+      </p>
+    {{end}}
+  </div>
+</div>
+
+<div class="luoi-so" style="margin-bottom:22px">
+  <div class="o-so"><div class="v" style="font-size:19px">{{tien $tn.Thu}}</div><div class="t">thu tháng này</div></div>
+  <div class="o-so"><div class="v" style="font-size:19px">{{tien $tn.ChiVanHanh}}</div><div class="t">chi vận hành</div></div>
+  <div class="o-so {{if $tn.Lo}}canh-bao{{end}}"><div class="v" style="font-size:19px">{{tien $tn.Lai}}</div><div class="t">lãi tháng này</div></div>
+  <div class="o-so"><div class="v" style="font-size:19px">{{tien $tn.DauTu}}</div><div class="t">đầu tư tháng này</div></div>
+  <div class="o-so"><div class="v" style="font-size:19px">{{tien $tq.CongNoKhach}}</div><div class="t">khách còn nợ</div></div>
+  <div class="o-so"><div class="v" style="font-size:19px">{{tien $tq.GiaTriTon}}</div><div class="t">hàng còn trong kho</div></div>
+</div>
+
+<p class="nho mo" style="max-width:74ch;margin:-8px 0 22px">
+  Sổ này ghi <b>tiền thật đã vào và đã ra</b>. Khách còn nợ và hàng trong kho để
+  riêng hai ô cuối, không cộng vào lãi — chưa cầm được thì chưa phải tiền.
+</p>
+
+{{if .ChoDuyet}}
+<div class="the-nhom">
+  <h3>Chờ xác nhận đã trả ({{len .ChoDuyet}})</h3>
+  <div class="noi doc" style="padding-bottom:0">
+    <p class="nho mo" style="margin:0">
+      Máy dựng sẵn từ khoản định kỳ và phiếu nhập còn nợ. Chưa bấm xác nhận thì
+      chưa tính vào lãi lỗ — tháng nào quên trả tiền nhà mà sổ vẫn ghi đã chi thì
+      sổ nói dối.
+    </p>
+  </div>
+  {{/* Form để ngoài bảng, ô nhập trỏ vào bằng thuộc tính form=: <form> nằm
+       giữa <tr> và <td> là HTML sai, trình duyệt sẽ lôi nó ra khỏi bảng và
+       nút bấm gửi đi một form rỗng. */}}
+  {{range .ChoDuyet}}<form method="post" action="/qt/tien/duyet" id="duyet-{{.Ma}}"><input type="hidden" name="ma" value="{{.Ma}}"></form>{{end}}
+  <div class="cuon">
+    <table class="bang">
+      <thead><tr><th>Việc</th><th>Nhóm</th><th style="width:150px">Ngày trả</th><th style="width:150px">Số tiền</th><th style="width:110px"></th></tr></thead>
+      <tbody>
+      {{range .ChoDuyet}}
+        <tr>
+          <td>{{.DienGiai}}{{if .MaPhieu}} <a class="nho so" href="/qt/kho/phieu/{{.MaPhieu}}">{{.MaPhieu}}</a>{{end}}</td>
+          <td class="nho mo">{{.TenNhom}}</td>
+          <td><input type="date" name="ngay" value="{{.Ngay}}" form="duyet-{{.Ma}}" style="width:100%"></td>
+          <td><input name="so_tien" inputmode="numeric" value="{{oso .SoTien}}" form="duyet-{{.Ma}}" style="width:100%"></td>
+          <td><button type="submit" form="duyet-{{.Ma}}" class="nut-nho">Đã trả</button></td>
+        </tr>
+      {{end}}
+      </tbody>
+    </table>
+  </div>
+</div>
+{{end}}
+
+<div class="ct-2cot">
+  <div>
+    <div class="the-nhom">
+      <h3>Sổ {{thangDep .Thang}}</h3>
+      <div class="noi" style="padding-bottom:8px">
+        <form method="get" action="/qt/tien" class="hang" style="align-items:flex-end;margin:0">
+          <label style="margin:0" class="co-hep">Xem tháng
+            <select name="thang" onchange="this.form.submit()">
+              {{$t := .Thang}}
+              {{range .DsThang}}<option value="{{.}}" {{if eq . $t}}selected{{end}}>{{thangDep .}}</option>{{end}}
+            </select>
+          </label>
+          <button type="submit" style="flex:0 0 auto">Xem</button>
+        </form>
+      </div>
+      {{if .Khoan}}
+      <div class="cuon">
+        <table class="bang">
+          <thead><tr><th>Ngày</th><th>Nội dung</th><th>Nhóm</th><th class="p">Thu</th><th class="p">Chi</th><th></th></tr></thead>
+          <tbody>
+          {{range .Khoan}}
+            <tr {{if .ChoDuyet}}class="mo"{{end}}>
+              <td class="nho mo">{{ngaydep .Ngay}}</td>
+              <td>
+                {{.DienGiai}}
+                {{if .ChoDuyet}}<span class="chip chip-cho">chờ xác nhận</span>{{end}}
+                <div class="nho mo">
+                  {{if .MaDon}}<a href="/qt/don/{{.MaDon}}" class="so">{{.MaDon}}</a> · {{end}}
+                  {{if .MaPhieu}}<a href="/qt/kho/phieu/{{.MaPhieu}}" class="so">{{.MaPhieu}}</a> · {{end}}
+                  {{if .TenPhuongThuc}}{{.TenPhuongThuc}} · {{end}}{{.Nguoi}}
+                </div>
+              </td>
+              <td class="nho mo">{{.TenNhom}}</td>
+              <td class="p">{{if .LaThu}}{{tien .SoTien}}{{end}}</td>
+              <td class="p">{{if not .LaThu}}{{tien .SoTien}}{{end}}</td>
+              <td>
+                {{if not .MaPhieu}}
+                <form method="post" action="/qt/tien/xoa" onsubmit="return confirm('Xoá khoản này khỏi sổ?')">
+                  <input type="hidden" name="ma" value="{{.Ma}}">
+                  <button type="submit" class="nut-nho phu">Xoá</button>
+                </form>
+                {{end}}
+              </td>
+            </tr>
+          {{end}}
+          </tbody>
+        </table>
+      </div>
+      {{else}}
+      <div class="noi"><p class="nho mo" style="margin:0">Tháng này chưa ghi gì.</p></div>
+      {{end}}
+    </div>
+
+    <div class="the-nhom">
+      <h3>Từng tháng</h3>
+      <div class="cuon">
+        <table class="bang">
+          <thead>
+            <tr><th>Tháng</th><th class="p">Thu</th><th class="p">Chi vận hành</th><th class="p">Lãi</th><th class="p">Đầu tư</th><th class="p">Luỹ kế lãi</th><th class="p">Luỹ kế đầu tư</th></tr>
+          </thead>
+          <tbody>
+            {{range .BaoCao}}
+            <tr>
+              <td><a href="/qt/tien?thang={{.Thang}}">{{thangDep .Thang}}</a></td>
+              <td class="p">{{tien .Thu}}</td>
+              <td class="p">{{tien .ChiVanHanh}}</td>
+              <td class="p {{if .Lo}}chip chip-tuchoi{{end}}">{{tien .Lai}}</td>
+              <td class="p mo">{{if .DauTu}}{{tien .DauTu}}{{else}}—{{end}}</td>
+              <td class="p">{{tien .LuyKeLai}}</td>
+              <td class="p mo">{{tien .LuyKeDauTu}}</td>
+            </tr>
+            {{else}}
+            <tr><td colspan="7" class="mo">Chưa có tháng nào có số.</td></tr>
+            {{end}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="the-nhom">
+      <h3>Ghi một khoản</h3>
+      <div class="noi">
+        <form method="post" action="/qt/tien/them" class="doc">
+          <label>Loại
+            <select name="loai" id="loai">
+              <option value="chi">Chi ra</option>
+              <option value="thu">Thu vào</option>
+            </select>
+          </label>
+          <label>Nhóm
+            <select name="nhom" id="nhom">
+              <optgroup label="Chi" id="g-chi">
+                {{range .NhomChi}}<option value="{{.Ma}}" data-loai="chi">{{.Ten}}</option>{{end}}
+              </optgroup>
+              <optgroup label="Thu" id="g-thu">
+                {{range .NhomThu}}<option value="{{.Ma}}" data-loai="thu">{{.Ten}}</option>{{end}}
+              </optgroup>
+            </select>
+          </label>
+          <label>Nội dung<input name="dien_giai" maxlength="200" required placeholder="máy ép nhiệt, tiền nhà tháng 9…"></label>
+          <label>Số tiền<input name="so_tien" inputmode="numeric" required></label>
+          <label>Ngày<input type="date" name="ngay" value="{{.HomNay}}"></label>
+          <label>Trả bằng
+            <select name="phuong_thuc">
+              <option value="chuyen_khoan">Chuyển khoản</option>
+              <option value="tien_mat">Tiền mặt</option>
+            </select>
+          </label>
+          <label>Gắn với đơn
+            <span class="hd">Để trống nếu không phải tiền của một đơn sửa.</span>
+            <input name="ma_don" maxlength="20" placeholder="TV-2609-001">
+          </label>
+          <button type="submit">Ghi vào sổ</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="the-nhom">
+      <h3>Các nhóm nghĩa là gì</h3>
+      <div class="noi doc">
+        {{range .NhomChi}}{{if .MoTa}}<p class="nho"><b>{{.Ten}}</b> — {{.MoTa}}</p>{{end}}{{end}}
+        {{range .NhomThu}}{{if .MoTa}}<p class="nho"><b>{{.Ten}}</b> — {{.MoTa}}</p>{{end}}{{end}}
+      </div>
+    </div>
+
+    <div class="the-nhom">
+      <h3>Định phí: khai và thật</h3>
+      <div class="noi">
+        <dl class="kv">
+          <dt>Bảng giá khai</dt><dd>{{tien $tq.DinhPhiBang}}/tháng</dd>
+          <dt>Sổ ghi thật</dt><dd>{{if $tq.DinhPhiTB}}{{tien $tq.DinhPhiTB}}/tháng{{else}}<span class="mo">chưa đủ số</span>{{end}}</dd>
+        </dl>
+        <p class="nho mo" style="margin-top:10px">
+          Lệch nhiều thì giá bán đang tính trên một cái nền sai. Sửa con số khai ở
+          <code>bang-gia.yaml</code> rồi chạy lại báo giá — trang này cố tình không
+          tự sửa file đó.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Chọn "Thu vào" mà nhóm vẫn đang là "Định phí" thì khoản ghi vào sổ sai nhóm
+// và không ai nhìn ra. Lọc luôn danh sách nhóm theo loại.
+(function () {
+  var loai = document.getElementById('loai'), nhom = document.getElementById('nhom');
+  function loc() {
+    var l = loai.value, dau = null;
+    Array.prototype.forEach.call(nhom.options, function (o) {
+      var hop = o.dataset.loai === l;
+      o.hidden = !hop;
+      o.disabled = !hop;
+      if (hop && !dau) { dau = o; }
+    });
+    document.getElementById('g-chi').hidden = l !== 'chi';
+    document.getElementById('g-thu').hidden = l !== 'thu';
+    if (nhom.selectedOptions[0] && nhom.selectedOptions[0].disabled && dau) { nhom.value = dau.value; }
+  }
+  loai.addEventListener('change', loc);
+  loc();
+})();
+</script>
+
+{{template "qt-chan" .}}
+{{end}}

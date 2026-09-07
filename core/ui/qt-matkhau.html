@@ -1,0 +1,32 @@
+{{define "qt-matkhau.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang"><h1>Đổi mật khẩu</h1></div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<div style="max-width:440px">
+  <div class="the-nhom">
+    <h3>Tài khoản {{.NguoiDung.Ten}}</h3>
+    <div class="noi">
+      <form method="post" action="/qt/mat-khau" class="doc">
+        <label>Mật khẩu hiện tại<input name="cu" type="password" autocomplete="current-password" required></label>
+        <label>Mật khẩu mới
+          <span class="hd">Ít nhất 8 ký tự.</span>
+          <input name="moi" type="password" minlength="8" autocomplete="new-password" required>
+        </label>
+        <label>Gõ lại mật khẩu mới<input name="moi2" type="password" minlength="8" autocomplete="new-password" required></label>
+        <button type="submit">Đổi mật khẩu</button>
+      </form>
+    </div>
+  </div>
+
+  <p class="nho mo" style="margin-top:16px">
+    Bản demo chưa có HTTPS nên mật khẩu đi qua mạng dạng bản rõ. Đừng dùng lại
+    mật khẩu của email hay ngân hàng ở đây.
+  </p>
+</div>
+
+{{template "qt-chan" .}}
+{{end}}

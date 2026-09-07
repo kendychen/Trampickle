@@ -1,0 +1,148 @@
+{{define "qt-kho-mot-phieu.html"}}
+{{template "qt-dau" .}}
+{{$p := .Phieu}}
+{{$nhap := eq $p.Loai "nhap"}}
+{{$kk := eq $p.Loai "kiem_ke"}}
+
+<div class="qt-dau-trang">
+  <h1>{{if .Moi}}Phiếu {{$p.TenLoai}}{{else}}<span class="so">{{$p.Ma}}</span>{{end}}</h1>
+  {{if not .Moi}}<span class="chip chip-trung">{{$p.TenLoai}}</span>{{end}}
+  <div class="phai"><a class="nut nut-vien" href="/qt/kho">← Tồn kho</a></div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+{{if .Moi}}
+<div class="hang-nut" style="margin:0 0 16px">
+  {{range .LoaiPhieu}}
+  {{if or (ne .Loai "nhap") $.NguoiDung.LaChu}}
+  <a class="nut {{if eq .Loai $p.Loai}}nut-chinh{{else}}nut-vien{{end}}" href="/qt/kho/phieu/moi?loai={{.Loai}}">{{.Ten}}</a>
+  {{end}}
+  {{end}}
+</div>
+{{end}}
+
+<div class="the-nhom">
+  <div class="noi doc" style="padding-bottom:0">
+    {{if $nhap}}
+    <p class="nho mo" style="margin:0">
+      Mua vật tư về thì ghi ở đây. Phiếu này vừa cộng hàng vào kho, vừa sinh một
+      khoản chi trong sổ tiền — không phải gõ lại lần thứ hai bên sổ.
+    </p>
+    {{else if $kk}}
+    <p class="nho mo" style="margin:0">
+      Đếm thật còn bao nhiêu thì điền bấy nhiêu. Số điền vào là <b>đặt lại</b> tồn
+      kho, không phải cộng thêm. Bỏ trống dòng nào là chưa đếm thứ đó, tồn giữ
+      nguyên; điền 0 nghĩa là đã đếm và hết sạch.
+    </p>
+    {{else if eq $p.Loai "hao_hut"}}
+    <p class="nho mo" style="margin:0">
+      Hỏng, rơi vãi, cắt lỗi, hết hạn. Ghi cho đúng thay vì để kiểm kê cuối tháng
+      nuốt mất — biết hao ở đâu mới sửa được.
+    </p>
+    {{else}}
+    <p class="nho mo" style="margin:0">
+      Vật tư lấy ra dùng cho một đơn. Điền mã đơn thì sau này nhìn lại biết vợt nào
+      ăn hết bao nhiêu dây, bao nhiêu keo.
+    </p>
+    {{end}}
+  </div>
+
+  <form method="post" action="/qt/kho/phieu/luu" class="noi">
+    <input type="hidden" name="loai" value="{{$p.Loai}}">
+    <input type="hidden" name="ma" value="{{$p.Ma}}">
+
+    <div class="hang">
+      <label class="co-hep">Ngày<input type="date" name="ngay" value="{{$p.Ngay}}"></label>
+      {{if $nhap}}
+      <label>Nhà cung cấp<input name="nha_cung_cap" maxlength="120" value="{{$p.NhaCungCap}}" placeholder="chỗ mua, để lần sau còn nhớ"></label>
+      {{else}}
+      <label class="co-hep">Cho đơn<input name="ma_don" maxlength="20" value="{{$p.MaDon}}" placeholder="TV-2609-001"></label>
+      {{end}}
+      <label>Ghi chú<input name="ghi_chu" maxlength="300" value="{{$p.GhiChu}}"></label>
+    </div>
+
+    <div class="cuon" style="margin-top:6px">
+      <table class="bang">
+        <thead>
+          <tr>
+            <th style="min-width:220px">Vật tư</th>
+            <th style="width:140px">{{if $kk}}Đếm được{{else}}Số lượng{{end}}</th>
+            {{if $nhap}}<th style="width:150px">Đơn giá</th>{{end}}
+            <th style="width:120px" class="p">Đang còn</th>
+            <th>Ghi chú dòng</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{range $p.Dong}}
+          <tr>
+            <td>
+              <select name="ma_vat_tu" style="width:100%">
+                <option value="">— bỏ dòng này —</option>
+                {{$mv := .MaVatTu}}
+                {{range $.VatTu}}<option value="{{.Ma}}" {{if eq .Ma $mv}}selected{{end}}>{{.Ten}} ({{.DonVi}})</option>{{end}}
+              </select>
+            </td>
+            <td><input name="so_luong" inputmode="decimal" value="{{slo .SoLuong}}" style="width:100%"></td>
+            {{if $nhap}}<td><input name="don_gia" inputmode="numeric" value="{{oso .DonGia}}" style="width:100%"></td>{{end}}
+            <td class="p so nho mo">{{sl (index $.Ton .MaVatTu)}}</td>
+            <td><input name="ghi_chu_dong" maxlength="120" value="{{.GhiChu}}" style="width:100%"></td>
+          </tr>
+          {{end}}
+
+          {{/* Mấy dòng trống để thêm thứ mới mà không phải bấm nút nào. */}}
+          {{range lap 4}}
+          <tr>
+            <td>
+              <select name="ma_vat_tu" style="width:100%">
+                <option value="">— chọn vật tư —</option>
+                {{range $.VatTu}}<option value="{{.Ma}}">{{.Ten}} ({{.DonVi}})</option>{{end}}
+              </select>
+            </td>
+            <td><input name="so_luong" inputmode="decimal" style="width:100%"></td>
+            {{if $nhap}}<td><input name="don_gia" inputmode="numeric" style="width:100%"></td>{{end}}
+            <td></td>
+            <td><input name="ghi_chu_dong" maxlength="120" style="width:100%"></td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+    </div>
+
+    {{if $nhap}}
+    <label style="margin-top:14px;display:flex;align-items:center;gap:8px">
+      <input type="checkbox" name="da_tra" value="1" checked>
+      Đã trả tiền rồi — ghi thẳng vào sổ
+    </label>
+    <p class="nho mo" style="margin:6px 0 0">
+      Bỏ tick nếu còn nợ nhà cung cấp: khoản chi vẫn được dựng nhưng nằm ở mục
+      chờ xác nhận, chưa tính vào lãi lỗ tháng này.
+    </p>
+    {{end}}
+
+    <div class="hang-nut">
+      <button type="submit" {{if not .SuaDuoc}}disabled{{end}}>{{if .Moi}}Ghi phiếu{{else}}Lưu thay đổi{{end}}</button>
+      {{if not .SuaDuoc}}<span class="nho mo">Phiếu nhập do chủ ghi — bạn xem được, không sửa được.</span>{{end}}
+    </div>
+  </form>
+</div>
+
+{{if not .Moi}}
+<div class="the-nhom">
+  <h3>Xoá phiếu</h3>
+  <div class="noi">
+    <p class="nho mo" style="margin-top:0">
+      Xoá là tồn kho tính lại ngay, như thể phiếu này chưa từng có.
+      {{if $nhap}} Khoản chi kèm theo trong sổ tiền cũng mất theo.{{end}}
+    </p>
+    <form method="post" action="/qt/kho/phieu/xoa" onsubmit="return confirm('Xoá phiếu {{$p.Ma}}? Tồn kho sẽ tính lại.')">
+      <input type="hidden" name="ma" value="{{$p.Ma}}">
+      <button type="submit" class="phu">Xoá phiếu {{$p.Ma}}</button>
+    </form>
+  </div>
+</div>
+{{end}}
+
+{{template "qt-chan" .}}
+{{end}}

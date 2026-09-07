@@ -1,0 +1,59 @@
+{{define "gioithieu.html"}}
+{{template "html-dau" .}}
+
+<section class="hero">
+  <div class="khung">
+    <div class="nhan-nho">{{nd "gioithieu.nhan"}}</div>
+    <h1 style="margin-top:16px">{{nd "gioithieu.h1"}}</h1>
+    <p class="dan">{{ndx "gioithieu.dan" "ten" .Brand.Ten}}</p>
+  </div>
+</section>
+
+<section>
+  <div class="khung doi-cot">
+    <div class="doc-lon">
+      <div class="doc">
+        <p>{{ndd "gioithieu.doan-1"}}</p>
+      </div>
+
+      <div>
+        <div class="nhan-nho nhan-vach">{{nd "gioithieu.can.nhan"}}</div>
+        <h2 style="margin-top:16px">{{nd "gioithieu.can.h2"}}</h2>
+        <div class="doc" style="margin-top:14px">
+          <p class="mo">{{ndd "gioithieu.can.chu-1"}}</p>
+          <p>{{ndx "gioithieu.can.chu-2" "nguong" (nd "chung.can.muc")}}</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="nhan-nho nhan-vach">{{nd "gioithieu.tuchoi.nhan"}}</div>
+        <h2 style="margin-top:16px">{{nd "gioithieu.tuchoi.h2"}}</h2>
+        <div class="doc" style="margin-top:14px">
+          <p class="mo">{{ndd "gioithieu.tuchoi.chu-1"}}</p>
+          <p>{{ndd "gioithieu.tuchoi.chu-2"}}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="canh">
+      <div class="phieu">
+        <div class="dinh">{{nd "gioithieu.phieu.dinh"}} <span>{{nd "gioithieu.phieu.dinh-phu"}}</span></div>
+        <div class="d"><span>{{nd "gioithieu.phieu.d"}}</span><b>{{nd "chung.can.muc"}}</b></div>
+        <div class="chot"><span>{{nd "gioithieu.phieu.chot"}}</span><b>{{nd "gioithieu.phieu.chot-so"}}</b></div>
+      </div>
+      <div class="the">
+        <h3>{{nd "gioithieu.giay.h3"}}</h3>
+        <p class="nho mo" style="margin-top:10px">{{ndd "gioithieu.giay.chu-1"}}</p>
+        <p class="nho" style="margin-top:12px">{{ndd "gioithieu.giay.chu-2"}}</p>
+      </div>
+      <div class="the">
+        <h3>{{nd "gioithieu.xem.h3"}}</h3>
+        <p style="margin-top:12px"><a class="nut nut-chinh" href="/dich-vu">{{nd "chung.nut.dich-vu"}}</a></p>
+        <p style="margin-top:10px"><a class="nut nut-vien" href="/quy-trinh">{{nd "chung.nut.quy-trinh"}}</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{{template "html-chan" .}}
+{{end}}

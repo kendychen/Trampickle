@@ -1,0 +1,383 @@
+{{define "qt-don-ct.html"}}
+{{template "qt-dau" .}}
+{{$d := .Don}}
+{{$tt := tt $d.TrangThai}}
+
+<div class="qt-dau-trang">
+  <h1 class="so">{{$d.Ma}}</h1>
+  <span class="chip chip-{{$tt.Mau}}">{{$tt.Ten}}</span>
+  <div class="phai">
+    <a class="nut nut-vien" href="/qt/don">← Danh sách</a>
+  </div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+{{if $d.VuotNguongCan}}
+<div class="bao bao-loi">
+  Vợt nặng thêm {{canDep $d.ChenhCan}} — quá ngưỡng {{canDep .Nguong.TangKhoiLuongToiDaG}}.
+  Báo khách trước khi giao, hoặc gỡ bớt vật liệu.
+</div>
+{{end}}
+
+<div class="ct-2cot">
+
+  <div>
+    <div class="the-nhom">
+      <h3>Đổi trạng thái</h3>
+      <div class="noi">
+        <form method="post" action="/qt/don/{{$d.Ma}}/trang-thai">
+          <div class="hang" style="align-items:flex-end">
+            <label style="margin:0" class="co-hep">Trạng thái
+              <select name="trang_thai">
+                {{range .CacTT}}<option value="{{.Ma}}" {{if eq .Ma $d.TrangThai}}selected{{end}}>{{.Ten}}</option>{{end}}
+              </select>
+            </label>
+            <label style="margin:0">Ghi chú mốc này<input name="ghi_chu" maxlength="300" placeholder="thay lõi tổ ong, dán lại mép"></label>
+            <button type="submit" style="flex:0 0 auto">Ghi mốc</button>
+          </div>
+        </form>
+        <p class="nho mo" style="margin-top:10px">{{$tt.TenKhach}} — đây là câu khách đọc được khi tra cứu.</p>
+      </div>
+    </div>
+
+    <form method="post" action="/qt/don/{{$d.Ma}}/luu" class="doc" style="gap:18px">
+
+      <div class="the-nhom">
+        <h3>Khách và vợt</h3>
+        <div class="noi">
+          <div class="hang">
+            <label>Tên khách<input name="khach_ten" maxlength="100" value="{{$d.KhachTen}}"></label>
+            <label>Điện thoại / Zalo<input name="khach_lien_he" maxlength="60" value="{{$d.KhachLienHe}}" required></label>
+          </div>
+          <div class="hang">
+            <label>Hãng / đời vợt<input name="vot_hang" maxlength="100" value="{{$d.VotHang}}"></label>
+            <label class="co-hep">Giá trị vợt<input name="vot_gia_tri" inputmode="numeric" value="{{oso $d.VotGiaTri}}"></label>
+            <label class="co-hep">Nhận qua
+              <select name="kenh_nhan">
+                <option value="truc_tiep" {{if eq $d.KenhNhan "truc_tiep"}}selected{{end}}>Trực tiếp</option>
+                <option value="ship" {{if eq $d.KenhNhan "ship"}}selected{{end}}>Gửi từ xa</option>
+                <option value="web" {{if eq $d.KenhNhan "web"}}selected{{end}}>Từ web</option>
+              </select>
+            </label>
+          </div>
+          <div class="hang">
+            <label class="co-hep">Cân trước (g)<input name="can_truoc" inputmode="decimal" value="{{oso $d.CanTruocG}}"></label>
+            <label class="co-hep">Cân sau (g)
+              <span class="hd">Cân lại trước khi giao.</span>
+              <input name="can_sau" inputmode="decimal" value="{{oso $d.CanSauG}}">
+            </label>
+            {{if .NguoiDung.LaChu}}
+            <label>Thợ phụ trách
+              <select name="tho">
+                {{range .Tho}}<option value="{{.Ten}}" {{if eq .Ten $d.ThoPhuTrach}}selected{{end}}>{{.TenHienThi}}</option>{{end}}
+              </select>
+            </label>
+            {{end}}
+          </div>
+          <label>Khách mô tả<textarea name="tinh_trang" maxlength="3000">{{$d.TinhTrang}}</textarea></label>
+          <label>Thợ chẩn đoán<textarea name="chan_doan" maxlength="3000">{{$d.ChanDoan}}</textarea></label>
+        </div>
+      </div>
+
+      <div class="the-nhom">
+        <h3>Việc và tiền</h3>
+        <div class="noi">
+          <div class="luoi" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">
+            {{range .DichVu}}
+            <label class="the" style="margin:0;display:flex;align-items:flex-start;gap:10px;padding:12px 14px">
+              <input type="checkbox" name="dv" value="{{.Ma}}" class="tick-dv" data-tien="{{giaso .}}" style="margin-top:4px" {{if index $.DaChonDV .Ma}}checked{{end}}>
+              <span style="flex:1"><b>{{.Ten}}</b><span class="nho mo" style="display:block">{{gia .}}</span></span>
+            </label>
+            {{end}}
+          </div>
+
+          <div class="nhan-nho" style="margin:22px 0 10px">Dòng gõ tay</div>
+          {{range .DongThem}}
+          <div class="hang">
+            <label style="margin:0">Nội dung<input name="dong_ten" maxlength="120" value="{{.Ten}}"></label>
+            <label style="margin:0" class="co-hep">Tiền<input name="dong_tien" inputmode="numeric" value="{{oso .SoTien}}" class="tay"></label>
+          </div>
+          {{end}}
+          <div class="hang">
+            <label style="margin:0">Nội dung<input name="dong_ten" maxlength="120"></label>
+            <label style="margin:0" class="co-hep">Tiền<input name="dong_tien" inputmode="numeric" class="tay"></label>
+          </div>
+          <div class="hang">
+            <label style="margin:0">Nội dung<input name="dong_ten" maxlength="120"></label>
+            <label style="margin:0" class="co-hep">Tiền<input name="dong_tien" inputmode="numeric" class="tay"></label>
+          </div>
+          <p class="nho mo" style="margin-top:8px">Xoá nội dung một dòng là dòng đó biến mất khi lưu.</p>
+
+
+          <div class="nhan-nho" style="margin:22px 0 10px">Giảm giá</div>
+          <div class="hang">
+            <label style="margin:0" class="co-hep">Bớt cho khách<input name="giam_gia" inputmode="numeric" class="giam" value="{{oso $d.GiamGia}}" placeholder="0"></label>
+            <label style="margin:0">Vì sao<input name="giam_ly_do" maxlength="80" value="{{$d.LyDoGiam}}" placeholder="khách quen, làm lại lần 2, sai hẹn…"></label>
+          </div>
+          <p class="nho mo" style="margin-top:8px">Gõ số dương. Để trống là bỏ giảm giá.</p>
+
+          <div class="hang" style="margin-top:18px;border-top:1px solid var(--vien);padding-top:16px">
+            <div><div class="nhan-nho">Tổng tạm tính</div><div class="so" id="tong" style="font-size:22px;font-weight:700">{{tien $d.TongTien}}</div></div>
+            <div class="nho mo" style="align-self:flex-end">
+              Khách đưa tiền thì ghi ở ô <b>Thu tiền</b> bên phải — mỗi lần đưa một
+              dòng, để sau còn biết đã thu mấy lần và thu bằng gì.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="the-nhom">
+        <h3>Hẹn và ghi chú</h3>
+        <div class="noi">
+          <div class="hang">
+            <label>Hẹn trả ngày<input type="date" name="hen_tra" value="{{$d.HenTraNgay}}"></label>
+            <label>Bảo hành đến<input type="date" name="bao_hanh_den" value="{{$d.BaoHanhDen}}"></label>
+          </div>
+          <label>Ghi chú nội bộ<textarea name="ghi_chu" maxlength="3000">{{$d.GhiChu}}</textarea></label>
+        </div>
+      </div>
+
+      <div class="hang-nut"><button type="submit">Lưu đơn</button></div>
+    </form>
+
+    <div class="the-nhom">
+      <h3>Ảnh trước / sau</h3>
+      <div class="noi">
+        <form method="post" action="/qt/don/{{$d.Ma}}/anh" enctype="multipart/form-data">
+          <div class="hang" style="align-items:flex-end">
+            <label style="margin:0" class="co-hep">Nhãn
+              <select name="nhan"><option value="truoc">Trước khi sửa</option><option value="sau">Sau khi sửa</option></select>
+            </label>
+            <label style="margin:0">Chọn ảnh<input type="file" name="anh" accept="image/jpeg,image/png,image/webp" multiple></label>
+            <button type="submit" style="flex:0 0 auto">Tải lên</button>
+          </div>
+        </form>
+        <p class="nho mo" style="margin:10px 0 0">Tối đa 16 ảnh mỗi đơn, mỗi ảnh dưới 8MB. Chỉ nhận JPG, PNG, WebP.</p>
+
+        {{if $d.Anh}}
+        <div class="anh-luoi" style="margin-top:16px">
+          {{range $d.Anh}}
+          <div class="anh-o">
+            <a href="/qt/anh/{{$d.Ma}}/{{.}}" target="_blank" rel="noopener"><img src="/qt/anh/{{$d.Ma}}/{{.}}" alt="ảnh đơn {{$d.Ma}}" loading="lazy"></a>
+            <div class="duoi">
+              <span>{{if batdau . "sau"}}sau{{else}}trước{{end}}</span>
+              <form method="post" action="/qt/don/{{$d.Ma}}/xoa-anh" onsubmit="return confirm('Xoá ảnh này?')">
+                <input type="hidden" name="ten" value="{{.}}">
+                <button type="submit">Xoá</button>
+              </form>
+            </div>
+          </div>
+          {{end}}
+        </div>
+        {{end}}
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="the-nhom">
+      <h3>Tiền của đơn này</h3>
+      <div class="noi">
+        {{if $d.DongTien}}
+        <table class="bang" style="font-size:14px">
+          <tbody>
+          {{range $d.DongTien}}<tr><td>{{.Ten}}</td><td class="p">{{tien .SoTien}}</td></tr>{{end}}
+          <tr><td><b>Tổng</b></td><td class="p">{{tien $d.TongTien}}</td></tr>
+          <tr><td class="mo">Đã thu</td><td class="p mo">{{tien $d.DaThu}}</td></tr>
+          <tr><td><b>Còn lại</b></td><td class="p">{{tien $d.ConNo}}</td></tr>
+          </tbody>
+        </table>
+        {{else}}
+        <p class="nho mo">Chưa chốt việc nào. Tick dịch vụ bên trái rồi lưu.</p>
+        {{end}}
+      </div>
+    </div>
+
+    <div class="the-nhom">
+      <h3>Thu tiền</h3>
+      <div class="noi">
+        <form method="post" action="/qt/don/{{$d.Ma}}/thu" class="doc" style="gap:12px">
+          <div class="hang" style="margin:0">
+            <label style="margin:0" class="co-hep">Khách đưa<input name="so_tien" inputmode="numeric" required placeholder="{{oso $d.ConNo}}"></label>
+            <label style="margin:0" class="co-hep">Bằng
+              <select name="phuong_thuc">
+                <option value="tien_mat">Tiền mặt</option>
+                <option value="chuyen_khoan">Chuyển khoản</option>
+              </select>
+            </label>
+          </div>
+          <label style="margin:0">Ghi chú<input name="ghi_chu" maxlength="120" placeholder="đặt cọc, trả nốt…"></label>
+          <button type="submit">Ghi nhận đã thu</button>
+        </form>
+
+        {{if .LanThu}}
+        <table class="bang" style="font-size:14px;margin-top:16px">
+          <tbody>
+          {{range .LanThu}}
+          <tr>
+            <td class="nho mo">{{ngaydep .Ngay}}<div>{{.TenPhuongThuc}}</div></td>
+            <td class="p">{{tien .SoTien}}</td>
+            <td style="width:52px">
+              <form method="post" action="/qt/don/{{$d.Ma}}/thu-xoa" onsubmit="return confirm('Xoá lần thu này?')">
+                <input type="hidden" name="ma" value="{{.Ma}}">
+                <button type="submit" class="nut-nho phu">Xoá</button>
+              </form>
+            </td>
+          </tr>
+          {{end}}
+          </tbody>
+        </table>
+        {{else}}
+        <p class="nho mo" style="margin:14px 0 0">Chưa thu đồng nào của đơn này.</p>
+        {{end}}
+      </div>
+    </div>
+
+    {{/* Hoàn tiền chỉ hiện khi đơn đã thu được đồng nào — chưa thu mà bày ra
+         nút hoàn thì chỉ tổ bấm nhầm. */}}
+    {{if $d.DaThu}}
+    <div class="the-nhom">
+      <h3>Hoàn tiền cho khách</h3>
+      <div class="noi">
+        <form method="post" action="/qt/don/{{$d.Ma}}/hoan" class="doc" style="gap:12px"
+              onsubmit="return confirm('Ghi một khoản chi trả lại tiền cho khách?')">
+          <div class="hang" style="margin:0">
+            <label style="margin:0" class="co-hep">Trả lại<input name="so_tien" inputmode="numeric" required placeholder="{{oso $d.DaThu}}"></label>
+            <label style="margin:0" class="co-hep">Bằng
+              <select name="phuong_thuc">
+                <option value="tien_mat">Tiền mặt</option>
+                <option value="chuyen_khoan">Chuyển khoản</option>
+              </select>
+            </label>
+          </div>
+          <label style="margin:0">Vì sao<input name="ghi_chu" maxlength="120" placeholder="khách huỷ sau khi nhận, trạm làm lại…"></label>
+          <button type="submit" class="phu">Ghi hoàn tiền</button>
+        </form>
+        <p class="nho mo" style="margin:10px 0 0">Ghi thành một khoản chi trong sổ và trừ thẳng vào số đã thu của đơn. Khoản thu cũ giữ nguyên để còn đối chiếu sao kê.</p>
+
+        {{if .LanHoan}}
+        <table class="bang" style="font-size:14px;margin-top:16px">
+          <tbody>
+          {{range .LanHoan}}
+          <tr>
+            <td class="nho mo">{{ngaydep .Ngay}}<div>{{.TenPhuongThuc}}</div></td>
+            <td class="p">{{tien .SoTien}}</td>
+          </tr>
+          {{end}}
+          </tbody>
+        </table>
+        {{end}}
+      </div>
+    </div>
+    {{end}}
+
+    <div class="the-nhom">
+      <h3>Vật tư đã dùng</h3>
+      <div class="noi">
+        {{if .CoPhieu}}
+        <p style="margin:0">
+          Đã xuất kho — phiếu <a href="/qt/kho/phieu/{{.PhieuXuat.Ma}}" class="so">{{.PhieuXuat.Ma}}</a>
+        </p>
+        <table class="bang" style="font-size:14px;margin-top:12px">
+          <tbody>
+          {{range .PhieuXuat.Dong}}<tr><td>{{tenvt .MaVatTu}}</td><td class="p so">{{sl .SoLuong}}</td></tr>{{end}}
+          </tbody>
+        </table>
+        <p class="nho mo" style="margin:12px 0 0">Sai thì sửa ngay trong phiếu, tồn kho tính lại theo.</p>
+        {{else if .DeXuatVT}}
+        <p class="nho mo" style="margin:0 0 12px">Theo định mức, đơn này ăn hết:</p>
+        <table class="bang" style="font-size:14px">
+          <tbody>
+          {{range .DeXuatVT}}<tr><td>{{tenvt .MaVatTu}}</td><td class="p so">{{sl .SoLuong}}</td></tr>{{end}}
+          </tbody>
+        </table>
+        <div class="hang-nut">
+          <form method="post" action="/qt/don/{{$d.Ma}}/xuat-kho">
+            <input type="hidden" name="nhanh" value="1">
+            <button type="submit" class="nut-nho">Đúng vậy, trừ kho</button>
+          </form>
+          <form method="post" action="/qt/don/{{$d.Ma}}/xuat-kho">
+            <button type="submit" class="nut-nho phu">Sửa lại rồi trừ</button>
+          </form>
+        </div>
+        <p class="nho mo" style="margin:12px 0 0">
+          Kho chỉ trừ khi có người bấm. Máy không tự trừ theo định mức — vợt nào
+          cũng ăn khác nhau.
+        </p>
+        {{else}}
+        <p class="nho mo" style="margin:0">
+          Chưa khai định mức cho dịch vụ nào trong đơn, nên không dựng sẵn được.
+          <a href="/qt/kho/phieu/moi?loai=xuat&don={{$d.Ma}}">Ghi phiếu xuất tay</a>.
+        </p>
+        {{end}}
+      </div>
+    </div>
+
+    <div class="the-nhom">
+      <h3>Khách tra cứu thế nào</h3>
+      <div class="noi">
+        <dl class="kv">
+          <dt>Mã đơn</dt><dd class="so">{{$d.Ma}}</dd>
+          <dt>Cần thêm</dt><dd>4 số cuối của {{if $d.KhachLienHe}}<span class="so">{{$d.KhachLienHe}}</span>{{else}}số điện thoại{{end}}</dd>
+          <dt>Trang</dt><dd><a href="/tra-cuu">/tra-cuu</a></dd>
+        </dl>
+        <p class="nho mo" style="margin-top:10px">Ghi hai thứ này lên phiếu đưa khách.</p>
+      </div>
+    </div>
+
+    <div class="the-nhom">
+      <h3>Thông tin đơn</h3>
+      <div class="noi">
+        <dl class="kv">
+          <dt>Nhận ngày</dt><dd>{{ngaydep $d.Ngay}}</dd>
+          <dt>Sửa lần cuối</dt><dd>{{$d.CapNhat}}</dd>
+          <dt>Thợ</dt><dd>{{if $d.ThoPhuTrach}}{{$d.ThoPhuTrach}}{{else}}chưa ai nhận{{end}}</dd>
+          <dt>Hẹn trả</dt><dd {{if $d.QuaHan}}class="chip chip-tuchoi"{{end}}>{{ngaydep $d.HenTraNgay}}</dd>
+          <dt>Cân</dt><dd class="so">{{canDep $d.CanTruocG}} → {{canDep $d.CanSauG}}{{if $d.ChenhCan}} ({{canDep $d.ChenhCan}}){{end}}</dd>
+        </dl>
+      </div>
+    </div>
+
+    {{if $d.LichSu}}
+    <div class="the-nhom">
+      <h3>Diễn biến</h3>
+      <div class="noi">
+        <div class="moc">
+          {{range $d.LichSu}}
+          <div>
+            <div class="khi">{{.Luc}} · {{.Nguoi}}</div>
+            <b>{{(tt .TrangThai).Ten}}</b>
+            {{if .GhiChu}}<div class="nho mo">{{.GhiChu}}</div>{{end}}
+          </div>
+          {{end}}
+        </div>
+      </div>
+    </div>
+    {{end}}
+  </div>
+</div>
+
+<script>
+function dinhDang(n){ return n.toLocaleString('vi-VN') + 'đ'; }
+function tinhTong(){
+  var t = 0;
+  document.querySelectorAll('.tick-dv:checked').forEach(function(e){ t += parseInt(e.dataset.tien || '0', 10) || 0; });
+  document.querySelectorAll('.tay').forEach(function(e){
+    var s = (e.value || '').replace(/[^0-9]/g, '');
+    if (s) { t += parseInt(s, 10); }
+  });
+  var g = 0;
+  document.querySelectorAll('.giam').forEach(function(e){
+    var s = (e.value || '').replace(/[^0-9]/g, '');
+    if (s) { g += parseInt(s, 10); }
+  });
+  if (g > t) { g = t; }
+  document.getElementById('tong').textContent = dinhDang(t - g);
+}
+document.addEventListener('input', tinhTong);
+document.addEventListener('change', tinhTong);
+</script>
+
+{{template "qt-chan" .}}
+{{end}}

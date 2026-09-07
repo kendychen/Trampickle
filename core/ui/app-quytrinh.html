@@ -1,0 +1,96 @@
+{{define "app-quytrinh.html"}}<!doctype html>
+{{/* Quy trình, bản app. Bản web trải năm bước ra một lưới bốn cột để người
+     ngồi máy tính đọc một lượt; trên điện thoại cái lưới ấy thành năm khối
+     chữ chồng nhau dài hai màn hình rưỡi, và khách chỉ muốn biết "giờ đến
+     bước nào rồi". Nên gấp lại thành năm nếp bấm mở: nhìn hết dàn bước trong
+     một màn, cần đọc kỹ bước nào thì mở bước ấy. */}}
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{nd "app.nut.quy-trinh"}} — {{.Brand.Ten}}</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="{{iconURL}}" type="{{iconMIME}}">
+{{template "pwa-dau" .}}
+{{template "css" .}}
+</head>
+<body class="{{.LopThan}} la-app">
+
+<header class="app-dau app-dau-2">
+  <a class="app-lui" href="/app" aria-label="Quay lại">{{template "bt-lui"}}</a>
+  <b class="app-tieu">{{nd "app.nut.quy-trinh"}}</b>
+</header>
+
+<main class="app-than">
+  <p class="app-dan">{{ndd "quytrinh.dan"}}</p>
+
+  <div class="app-xep">
+    <details open>
+      <summary><span class="n">{{nd "quytrinh.b1.n"}}</span><b>{{nd "quytrinh.b1.h4"}}</b></summary>
+      <p>{{ndd "quytrinh.b1.chu"}}</p>
+    </details>
+    <details>
+      <summary><span class="n">{{nd "quytrinh.b2.n"}}</span><b>{{nd "quytrinh.b2.h4"}}</b></summary>
+      <p>{{ndd "quytrinh.b2.chu"}}</p>
+    </details>
+    <details>
+      <summary><span class="n">{{nd "quytrinh.b3.n"}}</span><b>{{nd "quytrinh.b3.h4"}}</b></summary>
+      <p>{{ndd "quytrinh.b3.chu"}}</p>
+    </details>
+    <details>
+      <summary><span class="n">{{nd "quytrinh.b4.n"}}</span><b>{{nd "quytrinh.b4.h4"}}</b></summary>
+      <p>{{ndd "quytrinh.b4.chu"}}</p>
+    </details>
+    {{/* Bước cân giữ nguyên ở đây chứ không cắt cho gọn: đây là bước duy nhất
+         khách kiểm tra lại được bằng cái cân nhà bếp. */}}
+    <details>
+      <summary><span class="n">{{nd "quytrinh.b5.n"}}</span><b>{{nd "quytrinh.b5.h4"}}</b></summary>
+      <p>{{ndx "quytrinh.b5.chu" "nguong" (nd "chung.can.muc")}}</p>
+    </details>
+  </div>
+
+  <section class="app-muc">
+    <h2 class="app-h2">{{nd "quytrinh.duong.h2"}}</h2>
+    <div class="app-doi">
+      <div>
+        <h3>{{nd "quytrinh.duong.den-h3"}}</h3>
+        <p class="nho mo">{{ndd "quytrinh.duong.den-chu"}}</p>
+      </div>
+      <div>
+        <h3>{{nd "quytrinh.duong.gui-h3"}}</h3>
+        <p class="nho mo">{{ndd "quytrinh.duong.gui-chu"}}</p>
+      </div>
+    </div>
+  </section>
+
+  {{/* Phí ship nói rõ chứ không giấu: khách gửi từ xa hỏi câu này trước cả
+       câu hỏi giá sửa. */}}
+  <section class="app-muc">
+    <h2 class="app-h2">{{nd "quytrinh.ship.h3"}}</h2>
+    <p class="nho mo">{{ndx "quytrinh.ship.chu-1" "nguong" (tien .Nguong.FreeShipVeTuDong)}}</p>
+    <p class="nho mo" style="margin-top:8px">{{ndd "quytrinh.ship.chu-2"}}</p>
+  </section>
+
+  <section class="app-muc">
+    <h2 class="app-h2">{{nd "quytrinh.theo.h3"}}</h2>
+    <p class="nho mo">{{ndd "quytrinh.theo.chu"}}</p>
+    <div class="app-nut-hang">
+      <a class="nut nut-chinh" href="/app/tra-cuu">{{nd "chung.nut.tra-cuu"}}</a>
+    </div>
+  </section>
+
+  <section class="app-muc">
+    <h2 class="app-h2">{{nd "quytrinh.chua.h3"}}</h2>
+    <p class="nho mo">{{ndd "quytrinh.chua.chu"}}</p>
+    <div class="app-nut-hang">
+      <a class="nut nut-vien" href="/app/gui-anh">{{nd "chung.nut.gui-anh"}}</a>
+    </div>
+  </section>
+</main>
+
+{{template "thanh-app" .}}
+
+{{template "pwa-chan" .}}
+</body>
+</html>
+{{end}}

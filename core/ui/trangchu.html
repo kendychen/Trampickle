@@ -1,0 +1,356 @@
+{{define "trangchu.html"}}
+{{template "html-dau" .}}
+
+<section class="hero hero-lon">
+  <div class="khung hero-canh">
+    {{/* Hai cột. Trái: chữ ở trên, ảnh ngay dưới. Phải: danh sách việc, bắt
+         đầu ngang hàng với dòng nhãn trên cùng.
+
+         Danh sách việc phải nằm ở ĐỈNH cột phải, không phải dưới hàng nút:
+         nó là câu trả lời cho "chỗ này làm được gì cho tôi", mà câu đó khách
+         hỏi ngay giây đầu. Xếp nó dưới nút thì phải kéo mới thấy.
+
+         Ảnh nằm dưới chữ ở cột trái nên rộng gần hết bề ngang — to hơn hẳn
+         thời còn chen với danh sách việc trong một cột hẹp. Chiều cao ảnh là
+         phần CÒN DƯ của một màn hình sau khi trừ chữ, nên tấm hero không bao
+         giờ dài quá màn (luật ở css.html, khối hero cao một màn).
+
+         Không có giá ở đây: bảng giá không lên trang công khai, giá chỉ ra
+         sau khi khám. */}}
+    <div class="hero-trai">
+      <div class="hero-chu">
+        <div class="nhan-nho">{{nd "trangchu.hero.nhan"}}</div>
+        <h1 style="margin-top:18px">{{nd "trangchu.hero.h1"}}</h1>
+        <p class="dan">{{ndd "trangchu.hero.dan"}}</p>
+        <div class="hero-nut">
+          <a class="nut nut-chinh" href="#gui-yeu-cau">{{nd "trangchu.hero.nut1"}}</a>
+          <a class="nut nut-vien" href="/dich-vu">{{nd "trangchu.hero.nut2"}}</a>
+        </div>
+        {{/* Cụm liên hệ ngay dưới nút, không nhét vào dòng nhãn trên cùng:
+             dòng nhãn là câu chào "trạm làm gì", còn đây là câu trả lời cho
+             "gửi vợt tới đâu, gọi ai" — khách chỉ hỏi câu sau khi đã tin câu
+             trước. Để ở đây thì khách khỏi phải bấm sang trang Liên hệ.
+             Ô nào chưa điền ở /qt/lien-he thì mất hẳn ô đó. */}}
+        {{with .LienHe}}
+        {{if or .DiaChi .DienThoai .Zalo}}
+        <p class="hero-lien-he">
+          {{if .DiaChi}}
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/>
+              <circle cx="12" cy="10" r="2.6"/>
+            </svg>{{.DiaChi}}
+          </span>
+          {{end}}
+          {{if .DienThoai}}
+          <a href="tel:{{soGoi .DienThoai}}">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M6.5 3.5h3l1.5 4-2 1.5a12 12 0 0 0 6 6l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.7 2 2 0 0 1 6.5 3.5z"/>
+            </svg>{{.DienThoai}}
+          </a>
+          {{end}}
+          {{if .Zalo}}
+          <a href="https://zalo.me/{{.Zalo}}">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M4 5.5h16v10H9.5L4 19.5z"/>
+            </svg>Zalo {{.Zalo}}
+          </a>
+          {{end}}
+        </p>
+        {{end}}
+        {{end}}
+      </div>
+
+      {{/* Có ảnh thật thì ảnh thắng bản vẽ — ảnh chụp việc đã làm nói được thứ
+           bản vẽ không nói: trạm có thật, tay nghề ra sao. Chưa up ảnh nào thì
+           bản vẽ giữ chỗ, chứ không để nửa hero trống. Đổi ảnh ở /qt/anh-trang-chu. */}}
+      {{if .Anh}}
+      <div class="bang-anh">
+        <div class="bang-anh-khung">
+          {{range $i, $a := .Anh}}
+          <figure class="ba-o{{if eq $i 0}} hien{{end}}">
+            <img src="/anh-trang-chu/{{$a.Ten}}" alt="{{$a.ChuThich}}"
+                 {{if eq $i 0}}fetchpriority="high"{{else}}loading="lazy"{{end}}>
+            {{if $a.ChuThich}}<figcaption>{{$a.ChuThich}}</figcaption>{{end}}
+          </figure>
+          {{end}}
+        </div>
+        {{if gt (len .Anh) 1}}
+        <div class="ba-cham">
+          {{range $i, $a := .Anh}}
+          <button type="button" class="{{if eq $i 0}}day{{end}}" aria-label="Ảnh {{cong $i 1}}"></button>
+          {{end}}
+        </div>
+        {{end}}
+      </div>
+      {{else}}
+      <div class="sv-ve">{{template "hinh-vot-hero"}}</div>
+      {{end}}
+    </div>
+
+    {{if .DichVu}}
+    <nav class="hero-dv" aria-label="{{nd "trangchu.herodv.nhan"}}">
+      <div class="hero-dv-dinh">{{nd "trangchu.herodv.nhan"}}</div>
+      {{range .DichVu}}
+      <a href="/dich-vu/{{.Ma}}"><span>{{.Ten}}</span></a>
+      {{end}}
+      <a class="hero-dv-het" href="/dich-vu"><span>{{nd "trangchu.herodv.tatca"}}</span></a>
+    </nav>
+    {{end}}
+  </div>
+</section>
+
+{{if gt (len .Anh) 1}}
+<script>
+// Băng ảnh hero. Chuyển ảnh bằng cách đổi một class, không đụng tới style —
+// hiệu ứng mờ nằm hết trong CSS nên máy khách bật "giảm chuyển động" là tự
+// hết mờ, không cần biết ở đây.
+(function () {
+  var b = document.querySelector('.bang-anh');
+  if (!b) return;
+  var os = b.querySelectorAll('.ba-o');
+  var chams = b.querySelectorAll('.ba-cham button');
+  if (os.length < 2) return;
+  var i = 0, hen = null;
+  var yen = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function di(n) {
+    os[i].classList.remove('hien');
+    if (chams[i]) chams[i].classList.remove('day');
+    i = (n + os.length) % os.length;
+    os[i].classList.add('hien');
+    if (chams[i]) chams[i].classList.add('day');
+  }
+  function chay() { if (!hen && !yen) hen = setInterval(function () { di(i + 1); }, 5200); }
+  function dung() { if (hen) { clearInterval(hen); hen = null; } }
+  Array.prototype.forEach.call(chams, function (c, n) {
+    c.addEventListener('click', function () { dung(); di(n); chay(); });
+  });
+  // Rê chuột vào là dừng: khách đang nhìn kỹ một tấm thì đừng giật đi mất.
+  b.addEventListener('mouseenter', dung);
+  b.addEventListener('mouseleave', chay);
+  // Tab ẩn thì thôi đếm giờ, khỏi tốn pin điện thoại nằm trong túi.
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { dung(); } else { chay(); }
+  });
+  chay();
+})();
+</script>
+{{end}}
+
+<section class="bang-so">
+  <div class="khung">
+    <div class="bang-so-luoi">
+      <div>
+        <span class="n">{{nd "trangchu.so.1-nhan"}}</span>
+        <span class="v">{{len .DichVu}}</span>
+        <span class="t">{{nd "trangchu.so.1-chu"}}</span>
+      </div>
+      <div>
+        <span class="n">{{nd "trangchu.so.2-nhan"}}</span>
+        <span class="v">{{nd "trangchu.so.2-so"}}<i>{{nd "trangchu.so.2-dv"}}</i></span>
+        <span class="t">{{nd "trangchu.so.2-chu"}}</span>
+      </div>
+      <div>
+        <span class="n">{{nd "trangchu.so.3-nhan"}}</span>
+        <span class="v">{{nd "trangchu.so.3-so"}}<i>{{nd "trangchu.so.3-dv"}}</i></span>
+        <span class="t">{{nd "trangchu.so.3-chu"}}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+{{/* Thẻ kiểu phiếu ở mục riêng thay vì nằm cạnh tiêu đề: chỗ này nói được kỹ
+     về cái phiếu khám, thứ khách hỏi nhiều nhất trước khi mang vợt tới.
+     Phiếu cố tình KHÔNG có tiền — giá chỉ ra sau khi khám, để một con số ví dụ
+     ở đây là hứa hộ thợ một cái giá chưa ai nhìn thấy cây vợt. */}}
+<section class="nen2">
+  <div class="khung doi-hinh lat">
+    <div>
+      <div class="phieu">
+        <div class="dinh">{{nd "trangchu.phieu.dinh"}} <span>{{nd "trangchu.phieu.dinh-phu"}}</span></div>
+        <div class="d"><span>{{nd "trangchu.phieu.d1"}}</span><b>{{nd "trangchu.phieu.d1-ket"}}</b></div>
+        <div class="d"><span>{{nd "trangchu.phieu.d2"}}</span><b>{{nd "trangchu.phieu.d2-ket"}}</b></div>
+        <div class="d"><span>{{nd "trangchu.phieu.d3"}}</span><b>{{nd "trangchu.phieu.d3-ket"}}</b></div>
+        <div class="chot"><span>{{nd "trangchu.phieu.chot"}}</span><b>{{nd "trangchu.phieu.chot-ket"}}</b></div>
+      </div>
+      <p class="phieu-ghi">{{ndd "trangchu.phieu.ghi"}}</p>
+    </div>
+    <div>
+      <div class="nhan-nho nhan-vach">{{nd "trangchu.baogia.nhan"}}</div>
+      <h2 style="margin-top:16px">{{nd "trangchu.baogia.h2"}}</h2>
+      <p class="dan-lon" style="margin-top:12px">{{ndd "trangchu.baogia.dan"}}</p>
+      <ul class="gach">
+        <li>{{ndd "trangchu.baogia.y1"}}</li>
+        <li>{{ndd "trangchu.baogia.y2"}}</li>
+        <li>{{ndd "trangchu.baogia.y3"}}</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="khung doi-hinh">
+    <figure class="hinh-o">
+      {{template "hinh-vot-bo"}}
+      <figcaption>{{ndd "trangchu.kham.chu-thich"}}</figcaption>
+    </figure>
+    <div>
+      <div class="nhan-nho nhan-vach">{{nd "trangchu.kham.nhan"}}</div>
+      <h2 style="margin-top:16px">{{nd "trangchu.kham.h2"}}</h2>
+      <p class="dan-lon" style="margin-top:12px">{{ndd "trangchu.kham.dan"}}</p>
+      <ul class="gach">
+        <li>{{ndd "trangchu.kham.y1"}}</li>
+        <li>{{ndd "trangchu.kham.y2"}}</li>
+        <li>{{ndd "trangchu.kham.y3"}}</li>
+      </ul>
+      <p style="margin-top:24px">
+        <a class="nut nut-vien" href="/bai-viet/sua-vot-pickleball-ha-noi">{{nd "trangchu.kham.nut"}}</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="nen2">
+  <div class="khung doc-lon">
+    <div>
+      <div class="nhan-nho nhan-vach">{{nd "trangchu.dv.nhan"}}</div>
+      <h2 style="margin-top:16px">{{nd "trangchu.dv.h2"}}</h2>
+      <p class="dan-lon" style="margin-top:10px">{{ndd "trangchu.dv.dan"}}</p>
+    </div>
+    <div class="luoi-vach">
+      {{range .DichVu}}
+      <a class="dv-the" href="/dich-vu/{{.Ma}}">
+        <div class="bt-o">{{template "bt-dich-vu" .Ma}}</div>
+        <div class="dau-the">
+          <h3>{{.Ten}}</h3>
+        </div>
+        <span class="chip chip-trung">{{nhom .Nhom}}</span>
+        {{if .DieuKien}}<div class="mota">{{.DieuKien}}</div>{{end}}
+        <div class="chan">
+          {{if .LeadTimeNgay}}<span>{{.LeadTimeNgay}} ngày</span>{{end}}
+          {{if .BaoHanhThang}}<span>BH {{.BaoHanhThang}} tháng</span>{{end}}
+        </div>
+      </a>
+      {{end}}
+
+      {{/* Ô cuối cùng không phải dịch vụ mà là lối vào cho ca không khớp mục
+           nào. Đặt trong lưới chứ không tách ra dưới: người đã quét hết lưới mà
+           không thấy việc của mình thì đang ở đúng chỗ này. */}}
+      <a class="dv-the" href="#gui-yeu-cau">
+        <div class="bt-o">{{template "bt-hoi"}}</div>
+        <div class="dau-the"><h3>{{nd "trangchu.dv.khac-h3"}}</h3></div>
+        <span class="chip chip-trung">{{nd "trangchu.dv.khac-chip"}}</span>
+        <div class="mota">{{ndd "trangchu.dv.khac-chu"}}</div>
+        <div class="chan"><span>{{nd "trangchu.dv.khac-chan"}}</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="khung doi-hinh lat">
+    <figure class="hinh-o">
+      {{template "hinh-de-giay"}}
+      <figcaption>{{ndd "trangchu.giay.chu-thich"}}</figcaption>
+    </figure>
+    <div>
+      <div class="nhan-nho nhan-vach">{{nd "trangchu.giay.nhan"}}</div>
+      <h2 style="margin-top:16px">{{nd "trangchu.giay.h2"}}</h2>
+      <p class="dan-lon" style="margin-top:12px">{{ndd "trangchu.giay.dan"}}</p>
+      <ul class="gach">
+        <li>{{ndd "trangchu.giay.y1"}}</li>
+        <li>{{ndd "trangchu.giay.y2"}}</li>
+        <li>{{ndd "trangchu.giay.y3"}}</li>
+      </ul>
+      <p style="margin-top:24px">
+        <a class="nut nut-vien" href="#gui-yeu-cau">{{nd "trangchu.giay.nut"}}</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="nen2">
+  <div class="khung doc-lon">
+    <div>
+      <div class="nhan-nho nhan-vach">{{nd "trangchu.qt.nhan"}}</div>
+      <h2 style="margin-top:16px">{{nd "trangchu.qt.h2"}}</h2>
+    </div>
+    <div class="buoc">
+      <div><span class="n">{{nd "trangchu.qt.b1-so"}}</span><h4>{{nd "trangchu.qt.b1-ten"}}</h4><p>{{ndd "trangchu.qt.b1-chu"}}</p></div>
+      <div><span class="n">{{nd "trangchu.qt.b2-so"}}</span><h4>{{nd "trangchu.qt.b2-ten"}}</h4><p>{{ndd "trangchu.qt.b2-chu"}}</p></div>
+      <div><span class="n">{{nd "trangchu.qt.b3-so"}}</span><h4>{{nd "trangchu.qt.b3-ten"}}</h4><p>{{ndd "trangchu.qt.b3-chu"}}</p></div>
+      <div><span class="n">{{nd "trangchu.qt.b4-so"}}</span><h4>{{nd "trangchu.qt.b4-ten"}}</h4><p>{{ndd "trangchu.qt.b4-chu"}}</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="khung doc-lon">
+    <div>
+      <div class="nhan-nho nhan-vach">{{nd "trangchu.ck.nhan"}}</div>
+      <h2 style="margin-top:16px">{{nd "trangchu.ck.h2"}}</h2>
+    </div>
+    <div class="cam-ket">
+      <div class="the" data-so="01">
+        <strong>{{nd "trangchu.ck.1-ten"}}</strong>
+        <p class="nho mo">{{ndd "trangchu.ck.1-chu"}}</p>
+      </div>
+      <div class="the" data-so="02">
+        <strong>{{nd "trangchu.ck.2-ten"}}</strong>
+        <p class="nho mo">{{ndd "trangchu.ck.2-chu"}}</p>
+      </div>
+      <div class="the" data-so="03">
+        <strong>{{nd "trangchu.ck.3-ten"}}</strong>
+        <p class="nho mo">{{ndd "trangchu.ck.3-chu"}}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="nen2" id="gui-yeu-cau">
+  <div class="khung doi-cot">
+    <div>
+      {{if .DaGui}}
+        {{/* Mã phải hiện ngay ở đây. Khách gửi ảnh xong mà không cầm được gì
+             trên tay thì chỉ còn cách ngồi đợi, và ô tra cứu ở trang kia vô
+             dụng với họ vì chưa có đơn thì chưa có mã đơn. */}}
+        <div class="bao bao-ok">
+          {{ndd "trangchu.gui.ok"}}
+          {{if .MaYeuCau}}
+            <div class="ma-yc">
+              <span>{{nd "trangchu.gui.ma-nhan"}}</span>
+              <b class="so">{{.MaYeuCau}}</b>
+            </div>
+            <div class="nho" style="margin-top:8px">
+              {{if .MailToi}}{{ndx "trangchu.gui.mail-co" "email" .MailToi}}{{else}}{{ndd "trangchu.gui.mail-khong"}}{{end}}
+              {{ndd "trangchu.gui.tra-cuu"}}
+            </div>
+          {{end}}
+        </div>
+      {{end}}
+      {{if .Loi}}
+        <div class="bao bao-loi">{{.Loi}}</div>
+      {{end}}
+      <div class="nhan-nho nhan-vach">{{nd "trangchu.gui.nhan"}}</div>
+      <h2 style="margin-top:16px">{{nd "trangchu.gui.h2"}}</h2>
+      <p class="dan-lon" style="margin:10px 0 22px">{{ndd "trangchu.gui.dan"}}</p>
+      {{template "form-yeu-cau" .}}
+    </div>
+
+    <div class="canh">
+      <div class="the">
+        <h3>{{nd "trangchu.canh.1-h3"}}</h3>
+        <p class="nho mo" style="margin-top:8px">{{ndd "trangchu.canh.1-chu"}}</p>
+        <p style="margin-top:14px"><a class="nut nut-vien" href="/tra-cuu">{{nd "trangchu.canh.1-nut"}}</a></p>
+      </div>
+      <div class="the">
+        <h3>{{nd "trangchu.canh.2-h3"}}</h3>
+        <p class="nho mo" style="margin-top:8px">{{ndd "trangchu.canh.2-chu"}}</p>
+        <p style="margin-top:14px"><a class="nut nut-vien" href="/dich-vu">{{nd "trangchu.canh.2-nut"}}</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{{template "html-chan" .}}
+{{end}}

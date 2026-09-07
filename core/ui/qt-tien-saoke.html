@@ -1,0 +1,101 @@
+{{define "qt-tien-saoke.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang">
+  <h1>Dán sao kê</h1>
+  <div class="phai"><a class="nut nut-vien" href="/qt/tien">← Sổ tiền</a></div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<div class="the-nhom">
+  <h3>Dán vào đây</h3>
+  <div class="noi">
+    <form method="post" action="/qt/tien/sao-ke">
+      <label>Chép từ app ngân hàng, mỗi giao dịch một dòng
+        <span class="hd">Kéo chọn cả bảng rồi dán thẳng vào. Cần có ngày, số tiền, và nội dung chuyển khoản.</span>
+        <textarea name="sao_ke" rows="10" style="font-family:'JetBrains Mono',monospace;font-size:13px" placeholder="05/09/2026  +350.000  TV2609001 NGUYEN VAN A chuyen tien">{{.Text}}</textarea>
+      </label>
+      <div class="hang-nut"><button type="submit">Đọc thử</button></div>
+    </form>
+    <p class="nho mo" style="margin:14px 0 0">
+      Đọc xong <b>chưa ghi gì cả</b> — nó chỉ đề xuất. Nhìn lại từng dòng, bỏ tick
+      dòng nào sai rồi mới bấm ghi.
+    </p>
+  </div>
+</div>
+
+{{if .Dong}}
+<div class="the-nhom">
+  <h3>Đọc được {{len .Dong}} dòng — đề xuất ghi {{.SoDe}}</h3>
+  <form method="post" action="/qt/tien/sao-ke/ghi">
+    <div class="cuon">
+      <table class="bang">
+        <thead>
+          <tr>
+            <th style="width:52px">Ghi</th><th style="width:130px">Ngày</th>
+            <th style="width:140px">Số tiền</th><th style="width:150px">Đơn</th>
+            <th>Dòng sao kê</th>
+          </tr>
+        </thead>
+        <tbody>
+        {{range $i, $d := .Dong}}
+          <tr {{if $d.DaGhi}}class="mo"{{end}}>
+            <td>
+              <input type="checkbox" name="chon" value="{{$i}}" {{if $d.Chon}}checked{{end}} {{if $d.DaGhi}}disabled{{end}}>
+            </td>
+            <td><input type="date" name="ngay" value="{{$d.Ngay}}" style="width:100%"></td>
+            <td><input name="so_tien" inputmode="numeric" value="{{oso $d.SoTien}}" style="width:100%"></td>
+            <td>
+              <input name="ma_don" maxlength="20" value="{{$d.MaDon}}" placeholder="TV-…" style="width:100%">
+              {{if $d.TenKhach}}<div class="nho mo">{{$d.TenKhach}}{{if $d.ConNo}} · nợ {{tien $d.ConNo}}{{end}}</div>{{end}}
+            </td>
+            <td class="nho">
+              <div class="so mo" style="font-size:12px">{{$d.NoiDung}}</div>
+              {{if $d.DaGhi}}<span class="chip chip-trung">đã có trong sổ</span>
+              {{else if $d.ChuaRo}}<span class="chip chip-cho">cần xem lại</span>
+              {{else}}<span class="chip chip-nhan">khớp đơn</span>{{end}}
+              {{if $d.LyDo}}<span class="mo"> {{$d.LyDo}}</span>{{end}}
+            </td>
+          </tr>
+        {{end}}
+        </tbody>
+      </table>
+    </div>
+    <div class="noi">
+      <button type="submit">Ghi những dòng đã tick vào sổ</button>
+      <p class="nho mo" style="margin:12px 0 0">
+        Dòng nào không có mã đơn thì gõ mã vào rồi tick. Bỏ trống mã là dòng đó bị
+        bỏ qua — sổ này chỉ nhận tiền của một đơn cụ thể; thu linh tinh thì ghi
+        tay bên trang sổ tiền.
+      </p>
+    </div>
+  </form>
+</div>
+{{end}}
+
+<div class="the-nhom">
+  <h3>Nó nhận ra được gì</h3>
+  <div class="noi doc">
+    <p class="nho">
+      <b>Mã đơn</b> trong nội dung chuyển khoản: TV2609001, TV-2609-001, tv 2609 001
+      — viết kiểu nào cũng đọc ra.
+    </p>
+    <p class="nho">
+      <b>Số tiền</b> ưu tiên số có dấu cộng. Dòng có nhiều số (số dư, phí) thì nó
+      nói thẳng là "dòng có nhiều số tiền" và bắt bạn nhìn lại, chứ không đoán bừa.
+    </p>
+    <p class="nho">
+      <b>Không có mã đơn</b> mà số tiền khớp đúng phần còn nợ của đúng một đơn đang
+      chạy thì nó gợi ý đơn đó — vẫn để bạn duyệt.
+    </p>
+    <p class="nho">
+      <b>Đã có trong sổ</b>: cùng đơn, cùng số tiền, trong vòng ngày rưỡi. Dán lại
+      lần nữa cũng không ghi thành hai lần.
+    </p>
+  </div>
+</div>
+
+{{template "qt-chan" .}}
+{{end}}

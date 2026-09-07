@@ -1,0 +1,95 @@
+{{define "dichvu-mot.html"}}
+{{template "html-dau" .}}
+
+<section class="hero">
+  <div class="khung">
+    <a href="/dich-vu" class="nhan-nho" style="text-decoration:none">{{nd "dichvumot.quay-lai"}}</a>
+    <h1 style="margin-top:16px">{{.DV.Ten}}</h1>
+    <div style="display:flex;gap:12px;align-items:center;margin-top:18px;flex-wrap:wrap">
+      <span class="chip chip-trung">{{nhom .DV.Nhom}}</span>
+    </div>
+    {{if .DV.DieuKien}}
+    <div class="bao bao-luu" style="margin:22px 0 0;max-width:60ch">{{nd "dichvumot.dieu-kien"}} {{.DV.DieuKien}}</div>
+    {{end}}
+  </div>
+</section>
+
+<section class="bang-so">
+  <div class="khung">
+    <div class="bang-so-luoi">
+      <div>
+        <span class="n">{{nd "dichvumot.so.1-n"}}</span>
+        <span class="v">{{if .DV.LeadTimeNgay}}{{.DV.LeadTimeNgay}}{{else}}—{{end}}</span>
+        <span class="t">{{nd "dichvumot.so.1-t"}}</span>
+      </div>
+      <div>
+        <span class="n">{{nd "dichvumot.so.2-n"}}</span>
+        <span class="v">{{if .DV.BaoHanhThang}}{{.DV.BaoHanhThang}}{{else}}—{{end}}</span>
+        <span class="t">{{nd "dichvumot.so.2-t"}}</span>
+      </div>
+      <div>
+        <span class="n">{{nd "dichvumot.so.3-n"}}</span>
+        <span class="v">{{nd "chung.can.muc"}}</span>
+        <span class="t">{{nd "dichvumot.so.3-t"}}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="khung doi-cot">
+    <div>
+      <div class="nhan-nho nhan-vach">{{nd "dichvumot.qt.nhan"}}</div>
+      <h2 style="margin:16px 0 14px">{{nd "dichvumot.qt.h2"}}</h2>
+      <ol style="margin:0;padding-left:20px;display:grid;gap:11px">
+        <li>{{ndd "dichvumot.qt.b1"}}</li>
+        <li>{{ndd "dichvumot.qt.b2"}}</li>
+        <li>{{ndd "dichvumot.qt.b3"}}</li>
+        <li>{{ndx "dichvumot.qt.b4" "ten" .DV.Ten}}</li>
+        <li>{{ndd "dichvumot.qt.b5"}}</li>
+      </ol>
+    </div>
+
+    <div class="canh">
+      <div class="the">
+        <h3>{{nd "dichvumot.gui.h3"}}</h3>
+        <p class="nho mo" style="margin-top:8px">{{ndd "dichvumot.gui.chu"}}</p>
+        <p style="margin-top:14px"><a class="nut nut-chinh" href="/#gui-yeu-cau">{{nd "chung.nut.gui-anh"}}</a></p>
+        <p style="margin-top:10px"><a class="nut nut-vien" href="/quy-trinh">{{nd "dichvumot.gui.nut-2"}}</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="nen2">
+  <div class="khung doc-lon">
+    <div>
+      <div class="nhan-nho nhan-vach">{{nd "dichvumot.khac.nhan"}}</div>
+    </div>
+    <div class="luoi-vach">
+      {{range .Khac}}{{if ne .Ma $.DV.Ma}}
+      <a class="dv-the" href="/dich-vu/{{.Ma}}">
+        <div class="bt-o">{{template "bt-dich-vu" .Ma}}</div>
+        <div class="dau-the"><h3>{{.Ten}}</h3></div>
+        <span class="chip chip-trung">{{nhom .Nhom}}</span>
+      </a>
+      {{end}}{{end}}
+
+      {{/* Hai ô cuối không phải dịch vụ. Lưới xếp ba cột, mà bỏ dịch vụ đang
+           xem ra thì còn bốn ô — thêm hai ô này cho đủ hai hàng. */}}
+      <a class="dv-the" href="/#gui-yeu-cau">
+        <div class="bt-o">{{template "bt-hoi"}}</div>
+        <div class="dau-the"><h3>{{nd "dichvu.hoi.h3"}}</h3></div>
+        <span class="chip chip-trung">{{nd "dichvu.hoi.chip"}}</span>
+      </a>
+      <a class="dv-the" href="/dich-vu">
+        <div class="bt-o">{{template "bt-lop"}}</div>
+        <div class="dau-the"><h3>{{nd "dichvumot.tatca.h3"}}</h3></div>
+        <span class="chip chip-trung">{{nd "dichvumot.tatca.chip"}}</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+{{template "html-chan" .}}
+{{end}}

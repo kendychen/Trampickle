@@ -1,0 +1,121 @@
+{{define "qt-dich-vu.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang"><h1>Bảng dịch vụ</h1></div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<p class="mo" style="max-width:66ch">
+  Danh sách việc trạm nhận. Ghi thẳng vào <code>{{.Tep}}</code> — cùng file mà
+  phần báo giá đọc, nên sửa ở đây là web và báo giá đổi cùng lúc. Comment giải
+  thích trong file giữ nguyên.
+  Trạm đang ở <b>giai đoạn {{.GiaiDoan}}</b>; {{.SoHien}}/{{len .DichVu}} việc
+  đang hiện với khách.
+</p>
+<p class="nho mo" style="max-width:66ch">
+  <b>Thứ tự:</b> số nhỏ đứng trước, áp cho cả trang chủ, trang dịch vụ lẫn bảng
+  tích việc lúc tạo phiếu. Bỏ trống nghĩa là chưa xếp — việc ấy xuống sau những
+  việc đã đánh số, giữ nguyên thứ tự vốn có. Nên chỉ cần đánh số cho vài việc
+  muốn đẩy lên đầu, phần còn lại kệ nó.
+</p>
+<p class="nho mo" style="max-width:66ch">
+  Không sửa được ở đây: tiền vật tư, giờ công, nhóm việc, và thêm việc mới —
+  mấy thứ đó đổi là đổi cách tính lãi, phải mở file mà sửa cho biết mình đang
+  làm gì.
+</p>
+
+<form method="post" action="/qt/dich-vu" style="max-width:860px;margin-top:24px">
+  {{range .DichVu}}
+  <input type="hidden" name="co.{{.Ma}}" value="1">
+  <div class="o-nguong" style="border-left:3px solid {{if .DangHien}}var(--nhan,#d6f32f){{else}}var(--vien,#3a3a3a){{end}};padding:14px 0 14px 16px;margin:20px 0">
+
+    <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap">
+      <code>{{.Ma}}</code>
+      <span class="nho mo">nhóm {{.Nhom}}</span>
+      <span class="nho mo">· {{.ViSao}}</span>
+    </div>
+
+    <div style="margin:10px 0">
+      <label for="ten.{{.Ma}}" class="nho mo">Tên việc</label>
+      <input id="ten.{{.Ma}}" name="ten.{{.Ma}}" value="{{.Ten}}" style="width:100%;max-width:520px" autocomplete="off">
+    </div>
+
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin:10px 0">
+      {{$ma := .Ma}}
+      {{range $i, $g := .Gia}}
+      <div>
+        <label for="g{{cong $i 1}}.{{$ma}}" class="nho mo">Giá giai đoạn {{cong $i 1}}</label><br>
+        <input id="g{{cong $i 1}}.{{$ma}}" name="gia{{cong $i 1}}.{{$ma}}" value="{{$g}}"
+               inputmode="numeric" placeholder="chưa mở" style="max-width:150px" autocomplete="off">
+      </div>
+      {{end}}
+    </div>
+    <p class="nho mo" style="margin:0 0 10px">
+      Đang dùng: {{index .GiaDep 0}} / {{index .GiaDep 1}} / {{index .GiaDep 2}}.
+      Bỏ trống ô nào là giai đoạn đó chưa bán. Gõ <code>0</code> là tặng kèm.
+    </p>
+
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;margin:10px 0">
+      <div>
+        <label for="tgd.{{.Ma}}" class="nho mo">Mở bán từ</label><br>
+        <select id="tgd.{{.Ma}}" name="tu_giai_doan.{{.Ma}}" style="max-width:150px">
+          <option value="1" {{if eq .TuGiaiDoan 1}}selected{{end}}>Giai đoạn 1</option>
+          <option value="2" {{if eq .TuGiaiDoan 2}}selected{{end}}>Giai đoạn 2</option>
+          <option value="3" {{if eq .TuGiaiDoan 3}}selected{{end}}>Giai đoạn 3</option>
+        </select>
+      </div>
+      <div>
+        <label for="lt.{{.Ma}}" class="nho mo">Số ngày làm</label><br>
+        <input id="lt.{{.Ma}}" name="lead_time_ngay.{{.Ma}}" value="{{.LeadTimeNgay}}"
+               inputmode="numeric" placeholder="—" style="max-width:110px" autocomplete="off">
+      </div>
+      <div>
+        <label for="tt.{{.Ma}}" class="nho mo">Thứ tự</label><br>
+        <input id="tt.{{.Ma}}" name="thu_tu.{{.Ma}}" value="{{.ThuTu}}"
+               inputmode="numeric" placeholder="—" style="max-width:90px" autocomplete="off">
+      </div>
+      <div>
+        <label for="bh.{{.Ma}}" class="nho mo">Bảo hành (tháng)</label><br>
+        <input id="bh.{{.Ma}}" name="bao_hanh_thang.{{.Ma}}" value="{{.BaoHanhThang}}"
+               inputmode="numeric" placeholder="—" style="max-width:110px" autocomplete="off">
+      </div>
+      <label style="display:flex;gap:8px;align-items:center;padding-bottom:6px">
+        <input type="checkbox" name="bao_gia_rieng.{{.Ma}}" value="1" {{if .BaoGiaRieng}}checked{{end}}>
+        <span class="nho">Nhận việc nhưng chưa niêm yết giá</span>
+      </label>
+    </div>
+
+    <div style="margin:10px 0 0">
+      <label for="dk.{{.Ma}}" class="nho mo">Điều kiện nhận — khách đọc được câu này</label>
+      <textarea id="dk.{{.Ma}}" name="dieu_kien.{{.Ma}}" rows="3"
+                style="width:100%;max-width:660px">{{.DieuKien}}</textarea>
+    </div>
+  </div>
+  {{end}}
+
+  <div style="display:flex;gap:12px;align-items:center;margin-top:24px;flex-wrap:wrap">
+    <button type="submit">Lưu bảng dịch vụ</button>
+    <span class="nho mo">Gõ tiền kiểu nào cũng được: 250000, 250.000, 250.000đ.</span>
+  </div>
+</form>
+
+{{if .CongKhai}}
+<div class="bao" style="margin-top:26px;max-width:860px">
+  <b>Sửa ở đây là sửa trên máy chủ.</b>
+  <p class="nho" style="margin:6px 0 0">
+    Máy nhà vẫn giữ bản cũ của <code>{{.Tep}}</code>, mà bên đó mới là nơi chạy
+    báo giá. Chưa kéo về thì hai bên bán hai bảng giá khác nhau. Kéo về bằng
+    lệnh này ở máy nhà:
+  </p>
+  <p style="margin:8px 0 0"><code>scp root@147.93.156.82:/opt/tramvot/{{.Tep}} {{.Tep}}</code></p>
+</div>
+{{else}}
+<p class="nho mo" style="margin-top:26px;max-width:66ch">
+  Đang chạy ở máy nhà. Sửa xong nhớ đẩy <code>{{.Tep}}</code> lên máy chủ,
+  không thì web khách vẫn chạy bảng cũ.
+</p>
+{{end}}
+
+{{template "qt-chan" .}}
+{{end}}
