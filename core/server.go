@@ -26,7 +26,6 @@ import (
 	"html/template"
 	"io"
 	"mime/multipart"
-	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -300,23 +299,8 @@ func (g *gioiHan) choPhep(ip string, soLan int, trong time.Duration) bool {
 	return true
 }
 
-// TinProxy: chỉ tin X-Forwarded-For khi thật sự có reverse proxy đứng trước.
-// Chạy trần ra internet mà vẫn tin header này thì bot chỉ cần đổi
-// X-Forwarded-For mỗi request là rate limit thành vô nghĩa.
-var TinProxy bool
-
-func ipCua(r *http.Request) string {
-	if TinProxy {
-		if h := r.Header.Get("X-Forwarded-For"); h != "" {
-			return strings.TrimSpace(strings.Split(h, ",")[0])
-		}
-	}
-	host, _, err := net.SplitHostPort(r.RemoteAddr)
-	if err != nil {
-		return r.RemoteAddr
-	}
-	return host
-}
+// TinProxy và ipCua chuyển sang core/realip.go — xác định IP thật là nền của
+// mọi giới hạn tần suất nên đáng có file riêng kèm test.
 
 // --- Khung dữ liệu chung cho mọi trang -------------------------------
 

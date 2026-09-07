@@ -63,28 +63,28 @@
        thì thành hai đoạn văn chồng nhau, mà lưới việc thì bị đẩy khuất. */}}
   <div class="app-nhan-nhom">{{nd "app.luoi.h2"}}</div>
 
-  {{/* Lưới cỡ nhỏ: ba cột, chỉ biểu tượng với tên việc. Số ngày làm bỏ xuống
-       trang từng dịch vụ — ở màn đầu nó ăn mất một dòng của mỗi ô, mà đổi lại
-       cả lưới không lọt vào màn hình cùng mấy khối dưới. */}}
+  {{/* Lưới toàn biểu tượng, không một chữ nào trong ô — bốn cột, tám ô
+       vuông, đúng dáng lưới app trên điện thoại. Tên việc vẫn còn trong
+       aria-label và title: người đọc màn hình nghe được, máy tính rê chuột
+       lên thấy được, chỉ mắt người cầm điện thoại là không thấy.
+
+       Cái giá phải trả nằm ở hai cặp hình gần nhau — dán viền / thay viền và
+       vá mặt / tách lớp. Bỏ chữ thì hình phải gánh hết, nên bốn hình ấy đã vẽ
+       lại trong hinh.html: cùng một dáng vợt, khác nhau ở chỗ hỏng được đánh
+       dấu. Nhãn nhóm ngay trên lưới thì giữ — bỏ nốt là tám hình vẽ không còn
+       gì nói cho khách biết đây là bảng dịch vụ. */}}
   <div class="app-luoi app-luoi-nho">
     {{range .DichVu}}
-    <a class="app-o" href="/app/dich-vu/{{.Ma}}">
+    <a class="app-o" href="/app/dich-vu/{{.Ma}}" title="{{.Ten}}" aria-label="{{.Ten}}">
       <span class="app-bt">{{template "bt-dich-vu" .Ma}}</span>
-      <span class="app-ten">{{.Ten}}</span>
-      {{if .LeadTimeNgay}}<span class="app-phu">{{.LeadTimeNgay}} ngày</span>{{end}}
     </a>
-    {{/* Ô ngang: biểu tượng trong khung tròn bên trái, tên việc bên phải.
-         Hai cột thay vì ba — tên dịch vụ dài như "Thay viền toàn bộ" ở ba
-         cột phải gãy làm ba dòng chữ mười hai chấm, còn hai cột thì đọc
-         thẳng một hơi. */}}
     {{end}}
 
     {{/* Ô cuối, không phải dịch vụ: khách quét hết lưới mà không thấy việc
          của mình thì đang đứng đúng chỗ cần hỏi. */}}
-    <a class="app-o app-o-hoi" href="/app/gui-anh">
+    <a class="app-o app-o-hoi" href="/app/gui-anh"
+       title="{{nd "app.o-khac"}}" aria-label="{{nd "app.o-khac"}} — {{nd "app.o-khac-phu"}}">
       <span class="app-bt">{{template "bt-hoi"}}</span>
-      <span class="app-ten">{{nd "app.o-khac"}}</span>
-      <span class="app-phu">{{nd "app.o-khac-phu"}}</span>
     </a>
   </div>
 
