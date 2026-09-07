@@ -1,0 +1,26 @@
+[Unit]
+Description=TramVot — web tiem sua vot
+After=network.target
+
+[Service]
+Type=simple
+User=tramvot
+Group=tramvot
+WorkingDirectory=/opt/tramvot
+ExecStart=/opt/tramvot/tramvot -public -https -tin-proxy -port 8442
+Restart=on-failure
+RestartSec=5
+
+# Siết quyền: tiến trình web không cần ghi ở đâu ngoài data/.
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/opt/tramvot/data
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+
+[Install]
+WantedBy=multi-user.target
