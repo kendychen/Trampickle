@@ -1,0 +1,51 @@
+{{define "qt-nhatky.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang">
+  <h1>Nhật ký</h1>
+  <form method="get" action="/qt/nhat-ky" style="display:flex;gap:8px;align-items:center">
+    <select name="thang" onchange="this.form.submit()">
+      {{range $.CacThang}}<option value="{{.}}"{{if eq . $.Thang}} selected{{end}}>{{.}}</option>{{end}}
+    </select>
+    <noscript><button type="submit">Xem</button></noscript>
+  </form>
+</div>
+
+<p class="nho mo" style="margin-top:-6px">
+  Mọi thao tác ghi của người đã đăng nhập đều vào đây: sửa đơn, sửa sổ tiền,
+  đổi nội dung web, đăng nhập và đăng xuất. Xem trang thì không ghi.
+  Tệp nằm ở <code>data/nhat-ky/{{$.Thang}}.jsonl</code>, không sửa được từ web.
+</p>
+
+{{if not $.Muc}}
+  <div class="the-nhom"><div class="noi">
+    <p>Tháng {{$.Thang}} chưa có dòng nào.</p>
+  </div></div>
+{{else}}
+  {{if $.BiCat}}
+  <div class="bao bao-loi">Nhiều hơn 500 dòng — trang này chỉ hiện 500 dòng mới nhất.</div>
+  {{end}}
+  <div class="cuon">
+    <table class="bang">
+      <thead>
+        <tr><th>Lúc</th><th>Ai</th><th>IP</th><th>Việc</th><th>Đường</th><th>Kết quả</th><th>Chi tiết</th></tr>
+      </thead>
+      <tbody>
+        {{range $.Muc}}
+        <tr>
+          <td class="nho" style="white-space:nowrap">{{.Luc}}</td>
+          <td>{{.Ai}}</td>
+          <td class="nho mo">{{.IP}}</td>
+          <td>{{.Viec}}</td>
+          <td class="nho"><code>{{.Duong}}</code></td>
+          <td>{{if eq .KetQua "ok"}}<span class="chip chip-nhan">ok</span>{{else}}<span class="chip chip-tuchoi">{{.KetQua}}</span>{{end}}</td>
+          <td class="nho mo">{{.DoiTuong}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+{{end}}
+
+{{template "qt-chan" .}}
+{{end}}

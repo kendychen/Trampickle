@@ -329,6 +329,8 @@ var tieuDeTrang = map[string]string{
 	"chu":           "Sửa vợt Pickleball",
 	"vot":           "Danh mục vợt",
 	"cai-dat":       "Khóa API & model",
+	"nhat-ky":       "Nhật ký",
+	"2fa":           "Xác thực hai bước",
 	"gioi-thieu":    "Giới thiệu",
 	"ve-chung-toi":  "Về chúng tôi",
 	"app":           "App",

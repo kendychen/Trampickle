@@ -45,6 +45,9 @@ func dangKyQuanTri(mux *http.ServeMux) {
 	mux.HandleFunc("POST /qt/mat-khau", canDangNhap(hQtMatKhau))
 
 	mux.HandleFunc("GET /qt/thong-ke", canLaChu(hQtThongKe))
+	mux.HandleFunc("GET /qt/nhat-ky", canLaChu(hQtNhatKy))
+	mux.HandleFunc("GET /qt/2fa", canDangNhap(hQt2FA))
+	mux.HandleFunc("POST /qt/2fa", canDangNhap(hQt2FA))
 	mux.HandleFunc("GET /qt/nguoi-dung", canLaChu(hQtNguoiDung))
 	mux.HandleFunc("POST /qt/nguoi-dung", canLaChu(hQtNguoiDungLuu))
 

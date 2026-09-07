@@ -1,0 +1,87 @@
+{{define "qt-2fa.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang"><h1>Xác thực hai bước</h1></div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<div style="max-width:560px">
+
+{{if .MaDuPhong}}
+  <div class="the-nhom">
+    <h3>Mã dự phòng — chép lại ngay</h3>
+    <div class="noi">
+      <p>Mất điện thoại thì đây là đường vào duy nhất. Mỗi mã dùng được
+      <b>một lần</b>. Trang này đóng lại là không xem lại được nữa.</p>
+      <p style="font-family:'JetBrains Mono',monospace;font-size:17px;line-height:2.1;letter-spacing:.06em">
+        {{range .MaDuPhong}}{{.}}<br>{{end}}
+      </p>
+      <p class="nho mo">Chụp màn hình hoặc chép ra giấy, cất chỗ khác với điện thoại.</p>
+    </div>
+  </div>
+{{end}}
+
+{{if .DangBat}}
+  <div class="the-nhom">
+    <h3>Đang bật</h3>
+    <div class="noi">
+      <p>Mỗi lần đăng nhập sẽ phải gõ thêm mã 6 số.
+      Còn <b>{{.SoMaCon}}</b> mã dự phòng chưa dùng.</p>
+      {{if lt .SoMaCon 3}}
+      <p class="bao bao-loi">Sắp hết mã dự phòng. Tắt rồi bật lại để lấy bộ mới.</p>
+      {{end}}
+      <form method="post" action="/qt/2fa" class="doc" style="margin-top:16px">
+        <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+        <input type="hidden" name="viec" value="tat">
+        <label>Gõ mã hiện tại để tắt
+          <span class="hd">6 số trong ứng dụng, hoặc một mã dự phòng.</span>
+          <input name="ma" inputmode="numeric" autocomplete="one-time-code" required>
+        </label>
+        <button type="submit">Tắt xác thực hai bước</button>
+      </form>
+    </div>
+  </div>
+{{else if .BiMat}}
+  <div class="the-nhom">
+    <h3>Bước 2 — quét rồi gõ mã</h3>
+    <div class="noi">
+      <p>Mở Google Authenticator (hoặc app tương đương), chọn
+      <b>thêm bằng mã thiết lập</b>, rồi dán chuỗi này:</p>
+      <p style="font-family:'JetBrains Mono',monospace;font-size:16px;word-break:break-all;letter-spacing:.05em">{{.BiMat}}</p>
+      <p class="nho mo">Ai muốn tự dựng QR thì dùng liên kết:<br>
+        <code style="word-break:break-all">{{.URI}}</code></p>
+
+      <form method="post" action="/qt/2fa" class="doc" style="margin-top:16px">
+        <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+        <input type="hidden" name="viec" value="bat">
+        <input type="hidden" name="bi_mat" value="{{.BiMat}}">
+        <label>Mã 6 số app đang hiện
+          <input name="ma" inputmode="numeric" autocomplete="one-time-code" autofocus required>
+        </label>
+        <button type="submit">Bật xác thực hai bước</button>
+      </form>
+    </div>
+  </div>
+{{else}}
+  <div class="the-nhom">
+    <h3>Chưa bật</h3>
+    <div class="noi">
+      <p>Mật khẩu lộ là chuyện có thể xảy ra — dùng lại ở chỗ khác, gõ nhầm
+      vào máy lạ, hay bị nhìn trộm. Bật xác thực hai bước thì chỉ mật khẩu
+      thôi không đủ để vào.</p>
+      <p class="nho mo">Cần một ứng dụng xác thực trên điện thoại:
+      Google Authenticator, Microsoft Authenticator, hay Aegis.</p>
+      <form method="post" action="/qt/2fa" style="margin-top:16px">
+        <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+        <input type="hidden" name="viec" value="bat-dau">
+        <button type="submit">Bắt đầu</button>
+      </form>
+    </div>
+  </div>
+{{end}}
+
+</div>
+
+{{template "qt-chan" .}}
+{{end}}

@@ -1,22 +1,22 @@
 package core
 
-// Mã dự phòng cho xác thực hai bước.
-//
-// VÁ ĐỂ BIÊN DỊCH LẠI: core/auth.go trỏ tới file này và core/server.go gọi
-// DungMaDuPhong, nhưng file chưa kịp ra đời — cả app đứng ở lỗi "undefined:
-// DungMaDuPhong", không build được bản nào. Ở đây chỉ có đúng phần luồng
-// đăng nhập cần. Việc bật/tắt 2FA, sinh mã dự phòng và trang quản trị vẫn
-// còn để trống cho người đang làm dở phần đó viết tiếp.
+// Bật/tắt xác thực hai bước, và mã dự phòng.
 //
 // Vì sao 2FA phải có mã dự phòng: TOTP nằm trong điện thoại. Mất máy, đổi
 // máy, xoá nhầm app — không còn đường nào vào lại, mà đây là tài khoản chủ
 // trạm. Mỗi mã dùng đúng một lần rồi xoá hẳn khỏi danh sách.
+//
+// Lưu bcrypt hash chứ không phải bản rõ: mã dự phòng có sức mạnh ngang mật
+// khẩu, để bản rõ trong tai-khoan.yaml là biến một file thành hai bí mật.
 
 import (
+	"fmt"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 )
+
+const soMaDuPhong = 8
 
 // DungMaDuPhong so mã người dùng gõ với từng hash còn lại của tài khoản.
 // Khớp thì xoá hash ấy đi rồi lưu file, trả về true.
@@ -75,7 +75,11 @@ func DungMaDuPhong(ten, ma string) bool {
 	}
 	nguoiDungMu.Unlock()
 
-	luuNguoiDung()
+	if err := luuNguoiDung(); err != nil {
+		// Mã đã bị xoá khỏi RAM nên lần này vẫn tính là dùng rồi. Lưu hụt
+		// nghĩa là sau khi khởi động lại nó sống dậy — phải thấy được.
+		fmt.Printf("[2fa] không lưu được sau khi dùng mã dự phòng: %v\n", err)
+	}
 	return true
 }
 
@@ -87,4 +91,72 @@ func chuanMaDuPhong(s string) string {
 	s = strings.ReplaceAll(s, "-", "")
 	s = strings.ReplaceAll(s, " ", "")
 	return s
+}
+
+// sinhMaDuPhong trả (bản rõ để hiện một lần, hash để lưu). Bản rõ có gạch
+// nối cho dễ chép tay; hash băm bản ĐÃ chuẩn hoá, để lúc gõ lại có gạch hay
+// không đều khớp.
+func sinhMaDuPhong() (ro []string, hash []string, err error) {
+	for i := 0; i < soMaDuPhong; i++ {
+		// 5 byte = 10 ký tự hex.
+		m := maNgauNhien(5)
+		h, e := bcrypt.GenerateFromPassword([]byte(chuanMaDuPhong(m)), 12)
+		if e != nil {
+			return nil, nil, e
+		}
+		ro = append(ro, m[:5]+"-"+m[5:])
+		hash = append(hash, string(h))
+	}
+	return ro, hash, nil
+}
+
+// DatTOTP bật 2FA sau khi người dùng đã chứng minh quét đúng mã. Trả về danh
+// sách mã dự phòng bản rõ — hiện đúng một lần rồi không lấy lại được.
+func DatTOTP(ten, biMat string) ([]string, error) {
+	// Sinh mã TRƯỚC khi giữ khoá: tám lần bcrypt cost 12 mất khoảng hai
+	// giây, giữ khoá ghi suốt quãng đó là chặn mọi request khác của trạm.
+	ro, hash, err := sinhMaDuPhong()
+	if err != nil {
+		return nil, err
+	}
+
+	ten = strings.ToLower(strings.TrimSpace(ten))
+	nguoiDungMu.Lock()
+	thay := false
+	for i := range nguoiDung {
+		if strings.ToLower(nguoiDung[i].Ten) == ten {
+			nguoiDung[i].TotpBiMat = biMat
+			nguoiDung[i].TotpBat = true
+			nguoiDung[i].MaDuPhong = hash
+			thay = true
+		}
+	}
+	nguoiDungMu.Unlock()
+	if !thay {
+		return nil, fmt.Errorf("không có tài khoản tên %q", ten)
+	}
+	// luuNguoiDung tự lấy RLock nên phải gọi sau khi đã nhả Lock.
+	if err := luuNguoiDung(); err != nil {
+		return nil, err
+	}
+	return ro, nil
+}
+
+func TatTOTP(ten string) error {
+	ten = strings.ToLower(strings.TrimSpace(ten))
+	nguoiDungMu.Lock()
+	thay := false
+	for i := range nguoiDung {
+		if strings.ToLower(nguoiDung[i].Ten) == ten {
+			nguoiDung[i].TotpBiMat = ""
+			nguoiDung[i].TotpBat = false
+			nguoiDung[i].MaDuPhong = nil
+			thay = true
+		}
+	}
+	nguoiDungMu.Unlock()
+	if !thay {
+		return fmt.Errorf("không có tài khoản tên %q", ten)
+	}
+	return luuNguoiDung()
 }

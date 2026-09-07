@@ -239,11 +239,15 @@
     <a href="/qt/yeu-cau" {{if eq .Trang "yeu-cau"}}class="day"{{end}}>Yêu cầu từ web</a>
     <a href="/qt/kho" {{if batdau .Trang "kho"}}class="day"{{end}}>Kho vật tư</a>
     <a href="/qt/vot" {{if eq .Trang "vot"}}class="day"{{end}}>Danh mục vợt</a>
+    <div class="nhan-nho nhom">Tài khoản</div>
+    <a href="/qt/mat-khau" {{if eq .Trang "mat-khau"}}class="day"{{end}}>Đổi mật khẩu</a>
+    <a href="/qt/2fa" {{if eq .Trang "2fa"}}class="day"{{end}}>Xác thực hai bước</a>
     {{if .NguoiDung.LaChu}}
       <div class="nhan-nho nhom">Chủ trạm</div>
       <a href="/qt/tien" {{if batdau .Trang "tien"}}class="day"{{end}}>Sổ tiền</a>
       <a href="/qt/thong-ke" {{if eq .Trang "thong-ke"}}class="day"{{end}}>Thống kê</a>
       <a href="/qt/nguoi-dung" {{if eq .Trang "nguoi-dung"}}class="day"{{end}}>Tài khoản</a>
+      <a href="/qt/nhat-ky" {{if eq .Trang "nhat-ky"}}class="day"{{end}}>Nhật ký</a>
       <a href="/qt/giao-dien" {{if eq .Trang "giao-dien"}}class="day"{{end}}>Giao diện</a>
       <a href="/qt/anh-trang-chu" {{if eq .Trang "anh-trang-chu"}}class="day"{{end}}>Ảnh trang chủ</a>
       <a href="/qt/bai-viet" {{if eq .Trang "bai-viet-qt"}}class="day"{{end}}>Bài viết</a>
