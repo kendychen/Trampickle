@@ -26,7 +26,7 @@
   {{/* Biểu tượng to đặt cạnh tên: khách bấm từ lưới ngoài trang chủ vào đây,
        thấy lại đúng hình vừa bấm thì biết mình không vào nhầm ô. */}}
   <div class="app-dv-dau">
-    <span class="app-dv-bt">{{template "bt-dich-vu" .DV.Ma}}</span>
+    <span class="app-dv-bt">{{template "bt-dv-mau" .DV.Ma}}</span>
     <div>
       <h1 class="app-dv-ten">{{.DV.Ten}}</h1>
       <span class="chip chip-trung">{{nhom .DV.Nhom}}</span>
@@ -79,13 +79,13 @@
     <div class="app-luoi">
       {{range .Khac}}{{if ne .Ma $.DV.Ma}}
       <a class="app-o" href="/app/dich-vu/{{.Ma}}">
-        <span class="app-bt">{{template "bt-dich-vu" .Ma}}</span>
+        <span class="app-bt">{{template "bt-dv-mau" .Ma}}</span>
         <span class="app-ten">{{.Ten}}</span>
         {{if .LeadTimeNgay}}<span class="app-phu">{{.LeadTimeNgay}} ngày</span>{{end}}
       </a>
       {{end}}{{end}}
       <a class="app-o app-o-hoi" href="/app/gui-anh">
-        <span class="app-bt">{{template "bt-hoi"}}</span>
+        <span class="app-bt">{{template "btm-hoi"}}</span>
         <span class="app-ten">{{nd "app.o-khac"}}</span>
         <span class="app-phu">{{nd "app.o-khac-phu"}}</span>
       </a>

@@ -450,3 +450,101 @@
 {{define "bt-thu-vien"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><rect x="7.4" y="3.6" width="13" height="13" rx="2.6"/><path d="M8.4 14.2 L11.6 10.6 L14 12.8 L16.6 9.6 L19.4 13.2"/><path d="M16.6 19.2 a2.6 2.6 0 0 1 -2.6 1.2 H6.2 A2.6 2.6 0 0 1 3.6 17.8 V8.6"/></svg>{{end}}
 
 {{define "bt-xong"}}<svg class="bt" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/><path d="M7.8 12.3 L10.8 15.2 L16.2 9.2"/></svg>{{end}}
+
+{{/* ---------------------------------------------------------------------------
+     BIỂU TƯỢNG MÀU — chỉ dùng trong vỏ app, không dùng ngoài web
+     ---------------------------------------------------------------------------
+     Bộ nét mảnh ở trên vẫn là bộ chính: nó ăn currentColor nên đổi theo sáu
+     bộ giao diện, hợp với trang web. Nhưng ở lưới trang chủ app, hình chỉ có
+     28px và phải gánh cả phần tên việc — mà bốn việc đông khách nhất đều là
+     bốn cái hỏng của CÙNG một cây vợt. Vẽ nét mảnh thì bốn ô cạnh nhau đều là
+     một khung vuông bo góc có cái cán, khác nhau đúng vài nét 1.6px; khách
+     nhìn không ra, phải bấm thử từng ô.
+
+     Bộ này chữa đúng chỗ đó bằng ba tầng màu:
+       - NỀN pastel riêng cho từng việc — tám ô không còn lẫn nhau dù chưa đọc
+         chữ, mắt nhớ ô theo màu như nhớ icon trên màn hình chính điện thoại;
+       - THÂN vật tô đặc #334155 — khối đặc đọc được ở cỡ nhỏ, nét viền thì
+         không;
+       - CHỖ HỎNG tô cam #F97316 — mắt bắt vào đó trước, và nó chính là thứ
+         phân biệt việc này với việc kia.
+     Ngoại lệ có chủ đích: thay viền dùng xanh lá thay vì cam, vì viền mới thì
+     không phải chỗ hỏng; vá mặt dùng đỏ cho vết nứt và vàng cho miếng vá, vì
+     ở đây phải phân biệt cái hỏng với cái đắp lên.
+
+     Màu đặt cứng trong hình, không theo giao diện. Đổi màu theo sáu theme thì
+     nền pastel có lúc trùng nền thẻ và ô mất đường ranh — mà cái ta mua bằng
+     màu chính là sự khác biệt giữa các ô. Đây là chỗ duy nhất trong dự án cố
+     ý đứng ngoài hệ màu.
+
+     Class là "btm" chứ không phải "bt": luật .bt đặt fill:none, hình tô đặc
+     rơi vào đó là mất sạch ruột.
+     --------------------------------------------------------------------- */}}
+
+{{/* Dán viền: dải viền cam ôm mép vợt nhưng HỞ một đoạn ở góc trên phải, và
+     mảnh viền tuột hẳn ra ngoài nằm cạnh đó. Cây vợt bên trong phải thu nhỏ
+     lại để viền chạy NGOÀI biên: vẽ viền trùng đúng đường biên thì nó nuốt
+     mất cái vợt, còn lại một khối cam không ra hình gì. */}}
+{{define "btm-vien"}}<svg class="btm" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="7" fill="#E4EEFC"/><rect x="7.2" y="4.6" width="9.6" height="10.6" rx="3.2" fill="#334155"/><rect x="10.8" y="15" width="2.4" height="5.4" rx="1.2" fill="#334155"/><path d="M12.6 2.6 H9.8 A4.6 4.6 0 0 0 5.2 7.2 V12.6 A4.6 4.6 0 0 0 9.8 17.2 H14.2 A4.6 4.6 0 0 0 18.8 12.6 V9.6" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"/><path d="M14.4 1.7 C17.3 2.4 19.6 4.5 20.5 7.2" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"/></svg>{{end}}
+
+{{/* Thay viền: vòng viền mới KÍN cả chu vi, bọc ngoài cây vợt, màu xanh lá.
+     Đứng cạnh ô dán viền thì khác nhau ở hai chỗ cùng lúc — kín/hở và
+     xanh/cam — nên không cần đọc chữ cũng tách được hai ô. */}}
+{{define "btm-vien-moi"}}<svg class="btm" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="7" fill="#E1F4E9"/><rect x="7" y="4.8" width="10" height="10.8" rx="3.4" fill="#334155"/><rect x="10.8" y="15" width="2.4" height="5.4" rx="1.2" fill="#334155"/><rect x="4.4" y="2.4" width="15.2" height="15.4" rx="5.4" fill="none" stroke="#0EA36B" stroke-width="2.2"/></svg>{{end}}
+
+{{/* Quấn grip: cán vợt to hết khung, ba dải băng cam quấn chéo. Không vẽ mặt
+     vợt — cắt cụt ở cổ cán chính là thứ nói "việc này chỉ ở cái cán". */}}
+{{define "btm-grip"}}<svg class="btm" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="7" fill="#FFEDD9"/><rect x="10.2" y="2.8" width="3.6" height="4.6" fill="#334155"/><rect x="8" y="6.4" width="8" height="14.4" rx="3" fill="#334155"/><path d="M8.2 10.7 L15.8 8.5 M8.2 14.3 L15.8 12.1 M8.2 17.9 L15.8 15.7" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"/></svg>{{end}}
+
+{{/* Vá mặt: vết nứt đỏ gãy khúc chạy dọc mặt vợt, miếng vá vàng đặt nghiêng
+     đè lên. Hai màu chứ không một — cái hỏng và cái chữa phải nhìn ra là hai
+     thứ, cùng một màu thì thành một vệt loang không nghĩa gì. */}}
+{{define "btm-mat"}}<svg class="btm" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="7" fill="#FFE5E3"/><rect x="6.2" y="3.4" width="11.6" height="12.8" rx="3.9" fill="#334155"/><rect x="10.6" y="15.4" width="2.8" height="5.2" rx="1.3" fill="#334155"/><path d="M11.8 4.4 L9.2 7.6 L11.8 9.4 L9.4 13.2" fill="none" stroke="#FF6B4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="11.2" y="8.4" width="6.4" height="5.2" rx="1.7" fill="#FBBF24" transform="rotate(-12 14.4 11)"/></svg>{{end}}
+
+{{/* Hàn cán: cán đứt hẳn làm đôi, khối cam là mối hàn bắc qua chỗ đứt. Mặt
+     vợt phía trên phải giữ — bỏ đi thì còn mỗi cái que, không ai đoán ra hình
+     này đang nói về cây vợt. */}}
+{{define "btm-can"}}<svg class="btm" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="7" fill="#FFF3D6"/><rect x="7.4" y="2.8" width="9.2" height="8" rx="3" fill="#334155"/><rect x="10.6" y="10.4" width="2.8" height="2.4" fill="#334155"/><rect x="10.6" y="15.6" width="2.8" height="5" rx="1.3" fill="#334155"/><rect x="8.4" y="12.6" width="7.2" height="3.4" rx="1.5" fill="#F97316"/></svg>{{end}}
+
+{{/* Tách lớp: lớp mặt trên bong hẳn ra, nhấc lệch lên và nghiêng đi. Bản đầu
+     vẽ một khe hở mảnh chạy ngang kèm mũi tên — ở 42px thì khe biến mất và
+     mũi tên thành cái chấm. Nhấc hẳn tấm lớp ra ngoài thì không đọc nhầm. */}}
+{{define "btm-lop"}}<svg class="btm" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="7" fill="#EBE6FD"/><rect x="6.2" y="6.6" width="11.6" height="9.6" rx="3.4" fill="#334155"/><rect x="10.6" y="15.4" width="2.8" height="5.2" rx="1.3" fill="#334155"/><rect x="7.6" y="2.4" width="11.6" height="5.6" rx="2.4" fill="#F97316" transform="rotate(-9 13.4 5.2)"/></svg>{{end}}
+
+{{/* Lead tape: hai dải chì dán dọc hai mép mặt vợt, đúng chỗ thợ dán thật.
+     Bản đầu vẽ cuộn băng rời kèm dấu cộng, nhìn ra cục pin. */}}
+{{define "btm-nang"}}<svg class="btm" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="7" fill="#E6EDF7"/><rect x="6.2" y="3.4" width="11.6" height="12.8" rx="3.9" fill="#334155"/><rect x="10.6" y="15.4" width="2.8" height="5.2" rx="1.3" fill="#334155"/><rect x="6.9" y="5.4" width="2.3" height="9" rx="1.15" fill="#F97316"/><rect x="14.8" y="5.4" width="2.3" height="9" rx="1.15" fill="#F97316"/></svg>{{end}}
+
+{{/* Thay đế giày: thân giày tối, ĐẾ tô cam nằm dưới — chỗ được thay chính là
+     dải cam ấy. */}}
+{{define "btm-giay"}}<svg class="btm" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="7" fill="#DEF1F6"/><path d="M2.6 15.2 L2.6 9.8 C2.6 8.5 3.4 7.9 4.7 7.8 L7 7.6 C7.9 7.5 8.5 7.9 8.9 8.6 L10.4 11.1 C11 12 11.9 12.4 13.1 12.7 L18.1 14 C19.8 14.4 21.4 14.8 21.4 15.2 Z" fill="#334155"/><rect x="2.6" y="15.4" width="18.8" height="3.4" rx="1.7" fill="#F97316"/><path d="M5.2 9.4 L7.4 10.9 M5 11.7 L7.2 13.2" fill="none" stroke="#94A3B8" stroke-width="1.4" stroke-linecap="round"/></svg>{{end}}
+
+{{/* Vệ sinh: vệt lau trắng quét ngang mặt vợt, hai tia lấp lánh ngoài rìa. */}}
+{{define "btm-sach"}}<svg class="btm" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="7" fill="#DEF0FB"/><rect x="6.2" y="3.4" width="11.6" height="12.8" rx="3.9" fill="#334155"/><rect x="10.6" y="15.4" width="2.8" height="5.2" rx="1.3" fill="#334155"/><path d="M8.6 13.4 C10.1 10.7 12.3 9 15.1 8.2" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/><path d="M20 3 V5.8 M18.6 4.4 H21.4" fill="none" stroke="#F97316" stroke-width="1.7" stroke-linecap="round"/><path d="M4.2 18.2 V20 M3.3 19.1 H5.1" fill="none" stroke="#F97316" stroke-width="1.5" stroke-linecap="round"/></svg>{{end}}
+
+{{/* Phủ nhám: mặt vợt rắc chấm cam — lớp nhám mới phủ lên. */}}
+{{define "btm-nham"}}<svg class="btm" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="7" fill="#F3E9DA"/><rect x="6.2" y="3.4" width="11.6" height="12.8" rx="3.9" fill="#334155"/><rect x="10.6" y="15.4" width="2.8" height="5.2" rx="1.3" fill="#334155"/><g fill="#F97316"><circle cx="8.9" cy="6.6" r=".85"/><circle cx="12.1" cy="5.9" r=".85"/><circle cx="15.2" cy="7.3" r=".85"/><circle cx="8.2" cy="9.8" r=".85"/><circle cx="11.5" cy="9.3" r=".85"/><circle cx="14.8" cy="10.7" r=".85"/><circle cx="9.6" cy="13" r=".85"/><circle cx="13.2" cy="13.4" r=".85"/></g></svg>{{end}}
+
+{{/* Cây vợt trơn: mặc định cho mã dịch vụ chưa có hình riêng. Không dấu hỏng
+     nào, không hứa gì sai. */}}
+{{define "btm-vot"}}<svg class="btm" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="7" fill="#E8EDF4"/><rect x="6.2" y="3.4" width="11.6" height="12.8" rx="3.9" fill="#334155"/><rect x="10.6" y="15.4" width="2.8" height="5.2" rx="1.3" fill="#334155"/></svg>{{end}}
+
+{{/* Việc khác: khung ảnh với dấu hỏi cam — gửi ảnh lên hỏi. */}}
+{{define "btm-hoi"}}<svg class="btm" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="7" fill="#EFE7FC"/><rect x="3.6" y="5" width="16.8" height="14" rx="3.2" fill="#334155"/><path d="M9.3 10.2 C9.3 8.4 10.5 7.4 12.1 7.4 C13.7 7.4 14.9 8.4 14.9 9.8 C14.9 11.6 12.7 11.7 12.7 13.5" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"/><circle cx="12.7" cy="16" r="1.15" fill="#F97316"/></svg>{{end}}
+
+{{/* Chọn hình màu theo mã dịch vụ. Cùng danh sách mã với bt-dich-vu ở trên;
+     thêm dịch vụ mới ở /qt thì sửa cả hai chỗ, quên một chỗ là ô ấy đeo cây
+     vợt trơn — thà trơn còn hơn đeo nhầm tên việc của người khác. */}}
+{{define "bt-dv-mau"}}
+{{- if eq . "DAN_VIEN"}}{{template "btm-vien"}}
+{{- else if eq . "THAY_VIEN"}}{{template "btm-vien-moi"}}
+{{- else if eq . "QUAN_GRIP"}}{{template "btm-grip"}}
+{{- else if eq . "VA_MAT"}}{{template "btm-mat"}}
+{{- else if eq . "HAN_CAN"}}{{template "btm-can"}}
+{{- else if eq . "TACH_LOP"}}{{template "btm-lop"}}
+{{- else if eq . "LEAD_TAPE"}}{{template "btm-nang"}}
+{{- else if eq . "THAY_DE_GIAY"}}{{template "btm-giay"}}
+{{- else if eq . "VE_SINH"}}{{template "btm-sach"}}
+{{- else if eq . "PHU_NHAM"}}{{template "btm-nham"}}
+{{- else}}{{template "btm-vot"}}{{end}}
+{{- end}}
