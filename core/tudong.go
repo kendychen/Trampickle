@@ -275,7 +275,7 @@ func ThanBaoCaoThang(thang string) (tieuDe, thanHTML, thanChu string) {
 		"",
 		cauVeVon(vv),
 		"",
-		fmt.Sprintf("Khách còn nợ:   %s", dinhDangTien(LayThongKeDon().ConNoTong)),
+		fmt.Sprintf("Khách còn nợ:   %s", dinhDangTien(LayThongKeDon("").ConNoTong)),
 		fmt.Sprintf("Giá trị tồn kho: %s", dinhDangTien(GiaTriTonKho())),
 	}
 	if n := SoKhoanChoDuyet(); n > 0 {
@@ -295,7 +295,7 @@ func ThanBaoCaoThang(thang string) (tieuDe, thanHTML, thanChu string) {
 	hangMail(&b, "Chi vận hành", dinhDangTien(t.ChiVanHanh), false)
 	hangMail(&b, "Lãi", dinhDangTien(t.Lai), true)
 	hangMail(&b, "Đầu tư trong tháng", dinhDangTien(t.DauTu), false)
-	hangMail(&b, "Khách còn nợ", dinhDangTien(LayThongKeDon().ConNoTong), false)
+	hangMail(&b, "Khách còn nợ", dinhDangTien(LayThongKeDon("").ConNoTong), false)
 	hangMail(&b, "Giá trị tồn kho", dinhDangTien(GiaTriTonKho()), false)
 	b.WriteString(`</table>`)
 	fmt.Fprintf(&b, `<p style="margin:16px 0 0">%s</p>`, html.EscapeString(cauVeVon(vv)))
@@ -360,6 +360,9 @@ func cauVeVon(vv KetQuaVeVon) string {
 type nhatKyTuDong struct {
 	DaGuiBaoCao  []string `json:"da_gui_bao_cao"`
 	DaSinhDinhKy []string `json:"da_sinh_dinh_ky"`
+	// DaNhacHen ghi theo NGÀY (hai cái trên ghi theo tháng): nhắc hẹn là việc
+	// mỗi ngày một lần. Chỉ giữ lại một quãng gần đây, xem ghiNhatKy.
+	DaNhacHen []string `json:"da_nhac_hen"`
 }
 
 var nhatKyMu sync.Mutex
@@ -375,6 +378,12 @@ func docNhatKy() nhatKyTuDong {
 func ghiNhatKy(n nhatKyTuDong) error {
 	sort.Strings(n.DaGuiBaoCao)
 	sort.Strings(n.DaSinhDinhKy)
+	// Một dòng mỗi ngày thì một năm là 365 dòng. Chỉ cần đủ để khởi động lại
+	// máy chủ không nhắc lần thứ hai, nên giữ 60 ngày gần nhất là thừa sức.
+	sort.Strings(n.DaNhacHen)
+	if len(n.DaNhacHen) > 60 {
+		n.DaNhacHen = n.DaNhacHen[len(n.DaNhacHen)-60:]
+	}
 	b, err := json.MarshalIndent(n, "", "  ")
 	if err != nil {
 		return err
@@ -432,15 +441,28 @@ func ChayViecNenMotLuot(bayGio time.Time) []string {
 		}
 	}
 
+	// Nhắc đơn tới hẹn — mỗi ngày một tin, gộp cả đơn quá hẹn. Ghi ngày vào
+	// nhật ký TRƯỚC cả khi biết có đơn nào hay không: nếu hôm nay không có đơn
+	// nào tới hẹn thì cũng coi như đã xong việc của hôm nay.
+	homNay := bayGio.Format("2006-01-02")
+	if !coTrong(nk.DaNhacHen, homNay) {
+		nk.DaNhacHen = append(nk.DaNhacHen, homNay)
+		if n := BaoDonToiHen(bayGio); n > 0 {
+			lam = append(lam, fmt.Sprintf("nhắc %d đơn tới hẹn", n))
+		}
+	}
+
 	if err := ghiNhatKy(nk); err != nil {
 		lam = append(lam, "lỗi ghi nhật ký tự động: "+err.Error())
 	}
 	return lam
 }
 
-// ChayViecNen chạy nền suốt đời tiến trình. Sáu tiếng một lượt: việc ở đây
-// tính theo tháng, chậm nửa ngày không ai chết, mà lỡ có lỗi thì cũng không
-// spam log mỗi phút một dòng.
+// ChayViecNen chạy nền suốt đời tiến trình. Một tiếng một lượt — trước kia là
+// sáu, nhưng từ khi có tin nhắc đơn tới hẹn thì nhịp sáu tiếng làm tin của hôm
+// nay có thể tới lúc hai giờ chiều, muộn hơn cả lúc khách gọi hỏi. Một tiếng
+// thì tin luôn tới trước tám giờ sáng. Việc bên trong đã tự chống chạy trùng
+// bằng nhật ký, nên chạy dày hơn không sinh thêm tin nào.
 func ChayViecNen(dung <-chan struct{}) {
 	chay := func() {
 		for _, s := range ChayViecNenMotLuot(time.Now()) {
@@ -448,7 +470,7 @@ func ChayViecNen(dung <-chan struct{}) {
 		}
 	}
 	chay()
-	tick := time.NewTicker(6 * time.Hour)
+	tick := time.NewTicker(1 * time.Hour)
 	defer tick.Stop()
 	for {
 		select {

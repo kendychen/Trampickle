@@ -1,0 +1,112 @@
+{{define "qt-cauhoi.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang">
+  <h1>Câu hỏi thường gặp</h1>
+  <div class="phai"><a class="nut nut-vien" href="/cau-hoi" target="_blank" rel="noopener">Xem trang khách</a></div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<div class="ct-2cot">
+  <div>
+    <div class="the-nhom">
+      <h3>Các câu đang có</h3>
+      <div class="noi">
+        {{range .CauHoi}}
+        <form method="post" action="/qt/cau-hoi/luu" class="doc"
+              style="gap:10px;padding-bottom:16px;border-bottom:1px solid var(--vien);margin-bottom:16px">
+          <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+          <input type="hidden" name="ma" value="{{.Ma}}">
+          <label style="margin:0">Câu hỏi
+            <input name="hoi" maxlength="200" value="{{.Hoi}}" required>
+          </label>
+          <label style="margin:0">Câu trả lời
+            <textarea name="dap" rows="4" maxlength="2000" required>{{.Dap}}</textarea>
+          </label>
+          <div class="hang" style="margin:0">
+            <label style="margin:0" class="co-hep">Thứ tự
+              <input name="thu_tu" type="number" min="0" max="9999" value="{{.ThuTu}}">
+            </label>
+            <label style="margin:0" class="co-hep">Hiện hay ẩn
+              <select name="an">
+                <option value="0" {{if not .An}}selected{{end}}>Đang hiện</option>
+                <option value="1" {{if .An}}selected{{end}}>Đang ẩn</option>
+              </select>
+            </label>
+            <div class="hang-nut" style="margin:0;align-self:flex-end">
+              <button type="submit" class="nut-nho">Lưu</button>
+            </div>
+          </div>
+          <div class="nho mo so">/cau-hoi#{{.Ma}}</div>
+        </form>
+        {{else}}
+        <p class="nho mo" style="margin:0">Chưa có câu nào. Thêm ở ô bên phải.</p>
+        {{end}}
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="the-nhom">
+      <h3>Thêm câu mới</h3>
+      <div class="noi">
+        <form method="post" action="/qt/cau-hoi/luu" class="doc" style="gap:12px">
+          <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+          <label style="margin:0">Câu hỏi
+            <span class="hd">Viết đúng như khách hay hỏi, kể cả khi nghe cụt. Google so câu này với câu người ta gõ đi tìm.</span>
+            <input name="hoi" maxlength="200" required placeholder="Sửa vợt mất bao lâu?">
+          </label>
+          <label style="margin:0">Câu trả lời
+            <span class="hd">Trả lời thẳng ngay câu đầu, đừng mở bài. Dùng được **đậm**, xuống dòng, và [chữ dẫn](/dich-vu) để trỏ sang trang khác.</span>
+            <textarea name="dap" rows="5" maxlength="2000" required
+                      placeholder="Phần lớn việc xong trong 1–3 ngày. Vá mặt và hàn cán lâu hơn vì phải chờ keo khô — xem [bảng dịch vụ](/dich-vu) để biết từng việc mấy ngày."></textarea>
+          </label>
+          <label style="margin:0" class="co-hep">Thứ tự
+            <span class="hd">Số nhỏ đứng trên. Để trống thì câu mới xuống cuối.</span>
+            <input name="thu_tu" type="number" min="0" max="9999" placeholder="0">
+          </label>
+          <button type="submit">Thêm câu</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="the-nhom">
+      <h3>Nên viết thế nào</h3>
+      <div class="noi">
+        <p class="nho mo" style="margin:0">
+          Mỗi câu trả lời phải đứng một mình đọc được — Google hay lôi đúng một câu
+          ra hiện, không kèm mấy câu quanh nó. Đừng viết "như đã nói ở trên".
+        </p>
+        <p class="nho mo" style="margin:10px 0 0">
+          Đừng nhét từ khoá cho kêu. Câu trả lời không khớp câu hỏi thì Google bỏ
+          cả trang khỏi ô "Mọi người cũng hỏi", chứ không bỏ riêng câu đó.
+        </p>
+        <p class="nho mo" style="margin:10px 0 0">
+          Tạm không trả lời được nữa thì chuyển sang "Đang ẩn" — chữ vẫn còn, chỉ
+          biến khỏi trang khách.
+        </p>
+      </div>
+    </div>
+
+    {{if .CauHoi}}
+    <div class="the-nhom">
+      <h3>Xoá hẳn một câu</h3>
+      <div class="noi">
+        <form method="post" action="/qt/cau-hoi/xoa" class="hang" style="align-items:flex-end"
+              onsubmit="return confirm('Xoá hẳn câu này? Muốn giữ chữ thì chọn Đang ẩn.')">
+          <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+          <label style="margin:0">Câu
+            <select name="ma">{{range .CauHoi}}<option value="{{.Ma}}">{{cat .Hoi 60}}</option>{{end}}</select>
+          </label>
+          <button type="submit" class="phu" style="flex:0 0 auto">Xoá</button>
+        </form>
+      </div>
+    </div>
+    {{end}}
+  </div>
+</div>
+
+{{template "qt-chan" .}}
+{{end}}

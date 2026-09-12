@@ -34,14 +34,35 @@ import (
 // --- Trạng thái ------------------------------------------------------
 
 const (
+	// TTKhamAnh: yêu cầu từ web vừa được nhận, thợ đang soi ẢNH khách gửi để
+	// báo giá — vợt vẫn còn ở nhà khách.
+	//
+	// Vì sao không dùng chung TTKiemTra: hai việc khác nhau hẳn. TTKiemTra là
+	// cầm cây vợt thật trên tay, gõ nghe tiếng, cân lên; kết luận ở đó là
+	// chốt. Khám qua ảnh chỉ ra được con số ƯỚC, và câu nói với khách phải
+	// kèm "giá có thể đổi khi vợt tới tay". Trộn hai thứ vào một trạng thái
+	// thì nhìn danh sách không biết cái nào đã sờ vào vợt, cái nào chưa.
+	TTKhamAnh = "kham_anh"
+
+	// TTChoHangVe: khách đã đặt trên web, kiện chưa tới tay trạm. Tách khỏi
+	// "mới nhận" vì hai thứ này xử lý khác hẳn — cái này không có gì trên bàn
+	// để làm, chỉ có một cái hẹn. Trộn chung thì danh sách việc đầy đơn không
+	// làm được gì, và cái nào lâu không thấy hàng cũng không lộ ra.
+	TTChoHangVe = "cho_hang_ve"
+
 	TTMoi     = "moi"      // vừa nhận, chưa ai xem
 	TTKiemTra = "kiem_tra" // đang soi vợt, chưa báo giá
 	TTBaoGia  = "bao_gia"  // đã báo giá, chờ khách gật
 	TTDangSua = "dang_sua"
-	TTXong    = "xong"    // sửa xong, chờ giao
-	TTDaGiao  = "da_giao" // hoàn tất
-	TTTuChoi  = "tu_choi" // từ chối theo checklist
-	TTHuy     = "huy"     // khách đổi ý
+	// Hai mốc của hàng gửi ra tiệm ngoài. Tách khỏi "đang sửa" vì nhìn danh
+	// sách phải biết ngay cái nào còn trong tầm tay mình, cái nào đang nằm ở
+	// chỗ người khác — hai thứ đó xử lý khác nhau khi khách gọi hỏi.
+	TTDaGuiDi  = "da_gui_di"
+	TTDaNhanVe = "da_nhan_ve"
+	TTXong     = "xong"    // sửa xong, chờ giao
+	TTDaGiao   = "da_giao" // hoàn tất
+	TTTuChoi   = "tu_choi" // từ chối theo checklist
+	TTHuy      = "huy"     // khách đổi ý
 )
 
 type MoTaTrangThai struct {
@@ -54,10 +75,18 @@ type MoTaTrangThai struct {
 
 // Thứ tự ở đây là thứ tự hiện trên bảng điều khiển.
 var CacTrangThai = []MoTaTrangThai{
+	{TTChoHangVe, "Chờ hàng về", "Đã nhận đơn, đang chờ hàng của anh/chị tới", "cho", true},
+	// Khám qua ảnh đứng ngay sau: cũng là đơn chưa có đồ trong tay, nhưng
+	// chờ hàng về vẫn phải xem trước — xem TestChoHangVeDungDauDanhSach.
+	{TTKhamAnh, "Đang khám qua ảnh", "Thợ đang xem ảnh anh/chị gửi để báo giá", "trung", true},
 	{TTMoi, "Mới nhận", "Đã nhận vợt, đang xếp lịch kiểm tra", "trung", true},
 	{TTKiemTra, "Đang kiểm tra", "Thợ đang kiểm tra để xác định hư hỏng", "trung", true},
 	{TTBaoGia, "Chờ khách duyệt giá", "Đã báo giá, đang chờ anh/chị xác nhận", "cho", true},
 	{TTDangSua, "Đang sửa", "Vợt đang được sửa", "cho", true},
+	// Câu cho khách cố tình trung tính: khách gửi đồ cho trạm, không cần biết
+	// công đoạn nào trạm làm và công đoạn nào trạm thuê ngoài.
+	{TTDaGuiDi, "Đã gửi đi gia công", "Đang được xử lý", "cho", true},
+	{TTDaNhanVe, "Đã nhận về, đang kiểm", "Đang được kiểm tra lần cuối", "cho", true},
 	{TTXong, "Sửa xong, chờ giao", "Đã sửa xong, chuẩn bị bàn giao", "nhan", true},
 	{TTDaGiao, "Đã giao", "Đã bàn giao. Cảm ơn anh/chị", "nhan", false},
 	{TTTuChoi, "Từ chối nhận", "Ca này chúng tôi không nhận sửa", "tuchoi", false},
@@ -84,6 +113,87 @@ func TrangThaiHopLe(ma string) bool {
 
 // --- Kiểu dữ liệu ----------------------------------------------------
 
+// --- Loại đơn --------------------------------------------------------
+//
+// Vợt và giày quản lý ở hai trang riêng, mã đơn riêng, form riêng. Nhưng vẫn
+// một kho, một struct: Don đang bị bốn chỗ ngoài trang quản trị dùng chung —
+// tra cứu khách (server.go), đối chiếu sao kê (saoke.go), tổng quan tiền
+// (sotien.go), mail hằng ngày (tudong.go). Tách đôi kho thì mỗi chỗ ấy phải
+// hỏi hai nơi rồi gộp, và ngày ai đó quên một chỗ thì khách gõ mã TG- vào ô
+// tra cứu sẽ nhận "không có đơn này".
+const (
+	LoaiVot  = "vot"
+	LoaiGiay = "giay"
+)
+
+// Hai cách khách trả tiền cho đơn gửi từ xa.
+const (
+	TraQR  = "qr"
+	TraCOD = "cod"
+)
+
+// Đơn vào hệ bằng đường nào. Rỗng đọc là tay — mọi đơn có trước cửa hàng.
+const (
+	NguonWeb = "web"
+	NguonTay = "tay"
+)
+
+// LoaiHopLe chuẩn hoá: rỗng đọc là vợt, vì đơn tạo trước ngày có giày không
+// có trường này trong file JSON.
+func LoaiHopLe(l string) string {
+	if l == LoaiGiay {
+		return LoaiGiay
+	}
+	return LoaiVot
+}
+
+func TenLoaiDon(l string) string {
+	if LoaiHopLe(l) == LoaiGiay {
+		return "giày"
+	}
+	return "vợt"
+}
+
+// Hai kiểu giày duy nhất trạm nhận. Xem dieu_kien của THAY_DE_GIAY trong
+// bang-gia.yaml: giày court / cầu lông / pickleball / tennis bị TỪ CHỐI vì
+// đế sai làm tăng hệ số ma sát xoay.
+const (
+	GiayChayBo = "chay_bo"
+	GiayDiLai  = "di_lai"
+)
+
+var CacKieuGiay = []struct{ Ma, Ten string }{
+	{GiayChayBo, "Giày chạy bộ"},
+	{GiayDiLai, "Giày đi lại"},
+}
+
+func TenKieuGiay(ma string) string {
+	for _, k := range CacKieuGiay {
+		if k.Ma == ma {
+			return k.Ten
+		}
+	}
+	return ""
+}
+
+// GuiDi — ca gửi ra tiệm ngoài rồi ăn phần chênh. Dùng cho cả đơn vợt (phủ
+// nhám, sơn lại) lẫn đơn giày (thay đế).
+//
+// TraDoiTac là số GÕ TAY, không phải số máy tính ra. Tiền trả tiệm đổi theo
+// từng đôi — chính bang-gia.yaml đã ghi thế khi để bao_gia_rieng: true cho
+// THAY_DE_GIAY. Gõ một tỷ lệ % rồi để máy suy ra tiền trả tiệm là bịa ra một
+// con số không ai chốt với ai.
+type GuiDi struct {
+	MaDoiTac   string `json:"ma_doi_tac"` // rỗng = tự làm tại trạm
+	NgayGui    string `json:"ngay_gui"`
+	NgayHenVe  string `json:"ngay_hen_ve"`
+	NgayVe     string `json:"ngay_ve"`
+	TraDoiTac  int    `json:"tra_doi_tac"`
+	DaTra      bool   `json:"da_tra"`
+	MaKhoanChi string `json:"ma_khoan_chi"` // khoản chi đã sinh trong sổ tiền
+	GhiChu     string `json:"ghi_chu"`
+}
+
 type DongTien struct {
 	MaDichVu string `json:"ma_dich_vu"`
 	Ten      string `json:"ten"`
@@ -103,25 +213,60 @@ type Don struct {
 	Ngay    string `json:"ngay"`
 	CapNhat string `json:"cap_nhat"`
 
+	// Loai rỗng đọc là vợt — đơn cũ không có trường này. Đừng so sánh thẳng
+	// với LoaiVot ở đâu cả, dùng d.LaGiay().
+	Loai string `json:"loai"`
+
 	TrangThai   string `json:"trang_thai"`
 	ThoPhuTrach string `json:"tho_phu_trach"`
 
+	// MaKhach trỏ sang hồ sơ ở data/khach-hang.yaml. Rỗng với đơn cũ, và
+	// KhachTen/KhachLienHe bên dưới KHÔNG bỏ đi: đơn là chứng từ, nó phải đọc
+	// được đúng những gì đã ghi lúc nhận, kể cả sau này khách đổi tên đổi số.
+	MaKhach string `json:"ma_khach"`
+
+	// MaDonGoc: đơn này là đơn bảo hành của đơn nào. Rỗng với đơn thường.
+	// Việc 3 dựng phần còn lại (nút mở đơn bảo hành, thống kê tỷ lệ); ở đây
+	// nó đã cần rồi vì đơn bảo hành không tính là một lần ghé mới và không
+	// được giảm giá — xem GoiYGiamGia.
+	MaDonGoc    string `json:"ma_don_goc"`
 	KhachTen    string `json:"khach_ten"`
 	KhachLienHe string `json:"khach_lien_he"`
+	// KhachEmail không bắt buộc, y như ô email ngoài biểu mẫu web: nhiều bác
+	// chơi pickleball chỉ dùng Zalo. Có thì gửi được báo giá và hoá đơn về
+	// hộp thư, không có thì thợ nhắn Zalo tay.
+	KhachEmail string `json:"khach_email"`
 
 	VotHang   string `json:"vot_hang"`
 	VotGiaTri int    `json:"vot_gia_tri"` // khách khai, để quyết định có nhận ship không
 	TinhTrang string `json:"tinh_trang"`  // khách mô tả
 	ChanDoan  string `json:"chan_doan"`   // thợ ghi sau khi soi
 
+	GiayHang  string `json:"giay_hang"`
+	GiaySize  string `json:"giay_size"`
+	GiayKieu  string `json:"giay_kieu"`   // chay_bo | di_lai
+	DeHienTai string `json:"de_hien_tai"` // đế đang đi, mức mòn
+
 	CanTruocG float64 `json:"can_truoc_g"`
 	CanSauG   float64 `json:"can_sau_g"`
+
+	GuiDi GuiDi `json:"gui_di"`
 
 	DongTien []DongTien `json:"dong_tien"`
 	TongTien int        `json:"tong_tien"`
 	// Không có trường "đã thu" ở đây — xem DaThu() bên dưới.
 
-	KenhNhan   string `json:"kenh_nhan"` // truc_tiep | ship
+	KenhNhan string `json:"kenh_nhan"` // truc_tiep | ship
+	// Địa chỉ ship trả về. Rỗng với đơn khách tới lấy.
+	KhachDiaChi string `json:"khach_dia_chi"`
+	// qr | cod. Rỗng = khách chưa chọn.
+	HinhThucTra string `json:"hinh_thuc_tra"`
+	// Vận đơn hai chiều, GÕ TAY. Không nối API hãng vận chuyển — xem spec.
+	MaVanDonDen string `json:"ma_van_don_den"`
+	MaVanDonVe  string `json:"ma_van_don_ve"`
+	// web | tay. Rỗng đọc là tay.
+	NguonDon string `json:"nguon_don"`
+
 	HenTraNgay string `json:"hen_tra_ngay"`
 	BaoHanhDen string `json:"bao_hanh_den"`
 
@@ -138,6 +283,101 @@ type Don struct {
 func (d Don) DaThu() int { return ThuCuaDon(d.Ma) }
 
 func (d Don) ConNo() int { return d.TongTien - d.DaThu() }
+
+// NgayGiao — ngày đơn này thành tiền, đọc ngược lịch sử tìm mốc "đã giao"
+// gần nhất. Doanh thu tính theo ngày này chứ không theo ngày nhận đơn: đơn
+// nhận cuối tháng 8, giao giữa tháng 9 thì tiền là của tháng 9.
+//
+// Rỗng nếu đơn chưa giao. Đơn cũ không có mốc nào (lịch sử trống) thì trả
+// ngày nhận — thà tính vào tháng nhận còn hơn biến mất khỏi mọi bảng.
+func (d Don) NgayGiao() string {
+	if d.TrangThai != TTDaGiao {
+		return ""
+	}
+	for i := len(d.LichSu) - 1; i >= 0; i-- {
+		if d.LichSu[i].TrangThai != TTDaGiao {
+			continue
+		}
+		if ng := ngayCuaMoc(d.LichSu[i].Luc); ng != "" {
+			return ng
+		}
+	}
+	return d.Ngay
+}
+
+// ngayCuaMoc cắt phần ngày khỏi dấu thời gian của một mốc. GhiMoc ghi bằng
+// time.Now().Format(...) nên 10 ký tự đầu luôn là YYYY-MM-DD; kiểm lại độ
+// dài cho chắc, file đơn là JSON và có thể bị sửa tay.
+func ngayCuaMoc(luc string) string {
+	if len(luc) < 10 {
+		return ""
+	}
+	ng := luc[:10]
+	if _, err := time.Parse("2006-01-02", ng); err != nil {
+		return ""
+	}
+	return ng
+}
+
+// NguonDonHopLe — rỗng đọc là nhận tay, y như Loai rỗng đọc là vợt.
+func (d Don) NguonDonHopLe() string {
+	if d.NguonDon == NguonWeb {
+		return NguonWeb
+	}
+	return NguonTay
+}
+
+func (d Don) ChoHangVe() bool { return d.TrangThai == TTChoHangVe }
+
+func (d Don) LaGiay() bool    { return LoaiHopLe(d.Loai) == LoaiGiay }
+func (d Don) TenLoai() string { return TenLoaiDon(d.Loai) }
+
+// TenMon — thứ khách gửi tới, một dòng để hiện trong bảng và trong mail.
+func (d Don) TenMon() string {
+	if d.LaGiay() {
+		s := strings.TrimSpace(d.GiayHang)
+		if d.GiaySize != "" {
+			s = strings.TrimSpace(s + " · cỡ " + d.GiaySize)
+		}
+		return s
+	}
+	return d.VotHang
+}
+
+func (d Don) TenKieuGiay() string { return TenKieuGiay(d.GiayKieu) }
+
+// GuiRaNgoai — đơn này có nhờ tiệm ngoài làm hay không.
+func (d Don) GuiRaNgoai() bool { return d.GuiDi.MaDoiTac != "" }
+
+// LaiThat — tổng đơn trừ tiền trả tiệm ngoài. Là phép TRỪ hai con số đã ghi
+// vào sổ, cùng loại việc với ConNo(); không phải định giá.
+func (d Don) LaiThat() int { return d.TongTien - d.GuiDi.TraDoiTac }
+
+// NoDoiTac — đã nhận việc của tiệm mà chưa trả tiền tiệm.
+func (d Don) NoDoiTac() int {
+	if !d.GuiRaNgoai() || d.GuiDi.DaTra {
+		return 0
+	}
+	return d.GuiDi.TraDoiTac
+}
+
+// QuaHenDoiTac — tiệm trễ. Khác QuaHan(): đó là mình trễ với khách.
+func (d Don) QuaHenDoiTac() bool {
+	if d.TrangThai != TTDaGuiDi || d.GuiDi.NgayHenVe == "" {
+		return false
+	}
+	// ParseInLocation chứ không phải Parse: Parse hiểu "2026-09-08" là nửa đêm
+	// theo GIỜ UTC, tức 7 giờ sáng ở Việt Nam. Đơn hẹn hôm qua sẽ không bị
+	// tính là trễ trong suốt buổi đêm tới 7h — đúng lúc Kendy mở máy xem
+	// việc còn tồn.
+	t, err := time.ParseInLocation("2006-01-02", d.GuiDi.NgayHenVe, time.Local)
+	if err != nil {
+		return false
+	}
+	return time.Now().After(t.AddDate(0, 0, 1))
+}
+
+func (d Don) TenDoiTac() string { return TenDoiTac(d.GuiDi.MaDoiTac) }
 
 // AnhTruoc / AnhSau — nhãn nằm ngay trong tên file, do hQtTaiAnh đặt lúc
 // tải lên ("truoc-150405-abc.webp"). Không có trường riêng trong JSON nên
@@ -166,7 +406,12 @@ func (d Don) ChenhCan() float64 {
 }
 
 // VuotNguongCan — quá ngưỡng thì theo cam kết là không tính tiền công.
+// Chỉ áp cho vợt: cam kết không tăng quá 3g là cam kết về vợt, đôi giày nặng
+// thêm bao nhiêu sau khi thay đế không nằm trong lời hứa nào.
 func (d Don) VuotNguongCan() bool {
+	if d.LaGiay() {
+		return false
+	}
 	nguong := NguongHienTai().TangKhoiLuongToiDaG
 	if nguong <= 0 {
 		nguong = 3.0
@@ -181,7 +426,8 @@ func (d Don) QuaHan() bool {
 	if d.HenTraNgay == "" || !TrangThaiCua(d.TrangThai).DangChay {
 		return false
 	}
-	t, err := time.Parse("2006-01-02", d.HenTraNgay)
+	// Giờ địa phương — xem ghi chú ở QuaHenDoiTac.
+	t, err := time.ParseInLocation("2006-01-02", d.HenTraNgay, time.Local)
 	if err != nil {
 		return false
 	}
@@ -274,9 +520,18 @@ func LayDonTheoToken(token string) (*Don, bool) {
 
 // MaDonMoi — TV-2609-001: TV + năm 2 số + tháng 2 số + số thứ tự trong
 // tháng. Đủ ngắn để khách đọc qua điện thoại, đủ dài để không trùng.
-func MaDonMoi() string {
+// Giày dùng tiền tố TG- và đếm riêng: nhìn mã là biết ngay đôi giày hay cây
+// vợt, không phải mở đơn ra xem.
+func TienToDon(loai string) string {
+	if LoaiHopLe(loai) == LoaiGiay {
+		return "TG-"
+	}
+	return "TV-"
+}
+
+func MaDonMoi(loai string) string {
 	now := time.Now()
-	tien := fmt.Sprintf("TV-%s-", now.Format("0601"))
+	tien := fmt.Sprintf("%s%s-", TienToDon(loai), now.Format("0601"))
 	donMu.RLock()
 	max := 0
 	for ma := range donDs {
@@ -292,10 +547,25 @@ func MaDonMoi() string {
 }
 
 type BoLoc struct {
+	Loai        string // rỗng = cả vợt lẫn giày
 	TrangThai   string
 	Tho         string
+	DoiTac      string
 	Tim         string
 	ChiDangChay bool
+	// ChuaThuDu: đơn còn nợ tiền. Tính từ SỔ TIỀN qua ConNo() — cố tình không
+	// có trường "đã trả" trên đơn để đọc. Xem chú thích trên Don.DaThu.
+	ChuaThuDu bool
+	// ChiXongBoQuen: đơn sửa xong mà không ai tới lấy — xem core/boquen.go.
+	ChiXongBoQuen bool
+	// ConBaoHanh: đơn đã giao mà hạn bảo hành chưa qua. Rổ này để trả lời
+	// "cây này còn bảo hành không" lúc khách cầm đồ tới càu nhàu.
+	ConBaoHanh bool
+	// Tu/Den: khoảng ngày NHẬN đơn, hai đầu đều tính. Rỗng cả hai là không
+	// giới hạn. Lọc theo ngày nhận vì bảng này trả lời "kỳ này nhận bao
+	// nhiêu việc"; doanh thu là câu hỏi khác và đi theo NgayGiao().
+	Tu  string
+	Den string
 }
 
 func LocDon(f BoLoc) []*Don {
@@ -303,6 +573,12 @@ func LocDon(f BoLoc) []*Don {
 	donMu.RLock()
 	out := []*Don{}
 	for _, d := range donDs {
+		if f.Loai != "" && LoaiHopLe(d.Loai) != LoaiHopLe(f.Loai) {
+			continue
+		}
+		if f.DoiTac != "" && d.GuiDi.MaDoiTac != f.DoiTac {
+			continue
+		}
 		if f.TrangThai != "" && d.TrangThai != f.TrangThai {
 			continue
 		}
@@ -312,9 +588,22 @@ func LocDon(f BoLoc) []*Don {
 		if f.ChiDangChay && !TrangThaiCua(d.TrangThai).DangChay {
 			continue
 		}
+		if f.ChuaThuDu && d.ConNo() <= 0 {
+			continue
+		}
+		if f.ChiXongBoQuen && !d.XongBoQuen(time.Now(), NguongTramHienTai().XongBoQuenNgay) {
+			continue
+		}
+		if f.ConBaoHanh && !d.ConBaoHanh() {
+			continue
+		}
+		if !trongKhoang(d.Ngay, f.Tu, f.Den) {
+			continue
+		}
 		if tim != "" {
 			gop := strings.ToLower(strings.Join([]string{
-				d.Ma, d.KhachTen, d.KhachLienHe, d.VotHang, d.TinhTrang, d.ChanDoan,
+				d.Ma, d.KhachTen, d.KhachLienHe, d.VotHang,
+				d.GiayHang, d.GiaySize, d.TinhTrang, d.ChanDoan,
 			}, " "))
 			if !strings.Contains(gop, tim) {
 				continue
@@ -423,12 +712,20 @@ type ThongKeDon struct {
 	DoanhThuThang []ThangDoanhThu `json:"doanh_thu_thang"`
 	ConNoTong     int             `json:"con_no_tong"`
 	TyLeTuChoi    int             `json:"ty_le_tu_choi"` // phần trăm
+	// OTiemNgoai: đang nằm ở chỗ người khác, gọi điện mới biết bao giờ xong.
+	OTiemNgoai   int `json:"o_tiem_ngoai"`
+	QuaHenDoiTac int `json:"qua_hen_doi_tac"`
+	NoDoiTacTong int `json:"no_doi_tac_tong"`
 }
 
-func LayThongKeDon() ThongKeDon {
+// LayThongKeDon — loai rỗng là đếm cả vợt lẫn giày.
+func LayThongKeDon(loai string) ThongKeDon {
 	donMu.RLock()
 	ds := make([]*Don, 0, len(donDs))
 	for _, d := range donDs {
+		if loai != "" && LoaiHopLe(d.Loai) != LoaiHopLe(loai) {
+			continue
+		}
 		ds = append(ds, d)
 	}
 	donMu.RUnlock()
@@ -448,6 +745,13 @@ func LayThongKeDon() ThongKeDon {
 		if d.QuaHan() {
 			tk.QuaHan++
 		}
+		if d.TrangThai == TTDaGuiDi {
+			tk.OTiemNgoai++
+		}
+		if d.QuaHenDoiTac() {
+			tk.QuaHenDoiTac++
+		}
+		tk.NoDoiTacTong += d.NoDoiTac()
 		if d.TrangThai == TTTuChoi {
 			tuChoi++
 		}

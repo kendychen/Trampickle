@@ -12,16 +12,20 @@
 <section>
   <div class="khung doc-lon">
     <div class="luoi-vach">
+      {{/* Tô nổi giống hệt lưới trang chủ, kể cả chuyện tô TẠI CHỖ chứ không
+           nhấc lên đầu: hai lưới này là cùng một danh sách, khách bấm "Xem tất
+           cả" từ trang chủ sang đây mà thứ tự đổi thì phải dò lại từ đầu. */}}
       {{range .DichVu}}
-      <a class="dv-the" href="/dich-vu/{{.Ma}}">
-        <div class="bt-o">{{template "bt-dich-vu" .Ma}}</div>
+      <a class="dv-the{{if and $.NoiBat .NoiBat}} dv-noi-bat{{end}}" href="/dich-vu/{{.Ma}}">
+        <div class="bt-o">{{template "bt-dv-mau" .Ma}}</div>
         <div class="dau-the">
           <h3>{{.Ten}}</h3>
         </div>
-        <span class="chip chip-trung">{{nhom .Nhom}}</span>
+        {{if and $.NoiBat .NoiBat}}<span class="chip chip-noi-bat">{{nd "trangchu.dv.noi-bat"}}</span>{{end}}
+        {{with giaKhach .}}<div class="dv-gia">{{.}}</div>{{end}}
         {{if .DieuKien}}<div class="mota">{{.DieuKien}}</div>{{end}}
         <div class="chan">
-          {{if .LeadTimeNgay}}<span>{{.LeadTimeNgay}} ngày</span>{{end}}
+          {{with .LeadChu}}<span>{{.}}</span>{{end}}
           {{if .BaoHanhThang}}<span>BH {{.BaoHanhThang}} tháng</span>{{end}}
         </div>
       </a>
@@ -31,7 +35,7 @@
            lưới; đưa vào trong để hàng cuối không hụt ô, và vì người quét hết
            lưới mà không thấy việc của mình thì đang đọc đúng chỗ này. */}}
       <a class="dv-the" href="/#gui-yeu-cau">
-        <div class="bt-o">{{template "bt-hoi"}}</div>
+        <div class="bt-o">{{template "btm-hoi"}}</div>
         <div class="dau-the"><h3>{{nd "dichvu.hoi.h3"}}</h3></div>
         <span class="chip chip-trung">{{nd "dichvu.hoi.chip"}}</span>
         <div class="mota">{{ndd "dichvu.hoi.chu"}}</div>
@@ -39,12 +43,44 @@
       </a>
     </div>
 
+    {{/* Câu này đi liền dưới lưới chứ không nhét vào từng ô: nó nói về cách
+         trạm báo giá, không phải về một việc cụ thể. Chỉ hiện khi trong lưới
+         thật sự có việc chưa chốt giá cứng. */}}
+    {{if giaTuyThe .DichVu}}<p class="dv-luoi-chu">{{ndd "app.gia.tuy-the"}}</p>{{end}}
+
     <div class="hero-nut">
       <a class="nut nut-chinh" href="/#gui-yeu-cau">{{nd "chung.nut.gui-anh"}}</a>
       <a class="nut nut-vien" href="/quy-trinh">{{nd "chung.nut.quy-trinh"}}</a>
     </div>
   </div>
 </section>
+
+{{/* Khối "không nhận" đứng dưới lưới việc chứ không trộn vào lưới: trộn vào
+     thì khách quét lưới tưởng đây cũng là việc bán. Dữ liệu lấy từ khối
+     khong_ban trong bang-gia.yaml, sửa lý do ở đó. Ca nào đã có bài thì thành
+     link sang trang riêng; chưa có bài thì chỉ là một dòng chữ. */}}
+{{if .KhongBan}}
+<section class="nen2">
+  <div class="khung doc-lon">
+    <div>
+      <div class="nhan-nho nhan-vach">{{nd "dichvu.tuchoi.nhan"}}</div>
+      <h2 style="margin:16px 0 12px">{{nd "dichvu.tuchoi.h2"}}</h2>
+      <p class="mo" style="max-width:60ch">{{ndd "dichvu.tuchoi.chu"}}</p>
+    </div>
+    <div style="display:grid;gap:18px">
+      {{range .KhongBan}}
+      <div class="bao bao-luu" style="margin:0">
+        <b>{{.Ten}}</b>
+        <p class="nho" style="margin:6px 0 0">{{.LyDo}}</p>
+        {{if coBaiDV .Ma}}
+        <p style="margin:10px 0 0"><a href="/dich-vu/{{.Ma}}">{{nd "dichvu.tuchoi.link"}}</a></p>
+        {{end}}
+      </div>
+      {{end}}
+    </div>
+  </div>
+</section>
+{{end}}
 
 {{template "html-chan" .}}
 {{end}}

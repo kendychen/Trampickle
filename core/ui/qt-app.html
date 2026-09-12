@@ -1,0 +1,255 @@
+{{define "qt-app.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang">
+  <h1>App trên điện thoại</h1>
+  <div class="phai"><a class="nut nut-vien" href="/app" target="_blank">Xem màn app ↗</a></div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<p class="mo" style="max-width:70ch">{{.Hien.MoTa}}</p>
+<p class="nho mo" style="max-width:70ch">
+  Mọi thứ của app nằm cả ở trang này — ảnh, chữ, khuyến mãi, icon. Chữ ghi vào
+  <code>data/noi-dung.yaml</code>, phần còn lại vào <code>data/app.yaml</code>;
+  cả hai đều trong <code>data/</code> nên đẩy bản mới lên máy chủ không đụng
+  tới. Màn app <b>không cuộn được</b>: mọi thứ phải lọt trong đúng một màn
+  hình, nên trang này không cho thêm khối mới.
+</p>
+
+{{/* Ảnh banner đứng riêng ngoài form lưu: tải tệp là multipart, mà nhét
+     multipart vào chung với form chữ thì mỗi lần sửa một dấu phẩy cũng phải
+     gửi lại cả tấm ảnh. */}}
+<div class="the-nhom" style="margin-top:24px">
+  <h3>Ảnh banner</h3>
+  <div class="noi">
+    <p class="nho mo" style="max-width:64ch;margin-top:0">
+      Khe banner rất thấp (60–240px tuỳ máy) và <b>nằm ngang</b>. Ảnh dọc hoặc
+      ảnh nhiều chi tiết cắt vào đây còn một vệt màu — chọn ảnh ngang, chủ thể
+      nằm bên phải, vì chữ đè lên nửa trái. Không có ảnh thì banner dùng bản vẽ
+      cây vợt, vẫn sắc ở mọi cỡ màn và nhẹ hơn nhiều.
+    </p>
+
+    {{if .CH.BannerURL}}
+    <div style="margin:14px 0">
+      <img src="{{.CH.BannerURL}}" alt="Ảnh banner đang dùng"
+           style="width:100%;max-width:420px;aspect-ratio:16/6;object-fit:cover;border-radius:12px;display:block">
+      {{/* flex:0 0 auto vì .hang kéo mọi con ra 180px+. Hai nút này là hành
+           động phụ, mà một cái còn là xoá hẳn — để nó phình to bằng nút chính
+           thì bấm nhầm chỉ là chuyện sớm muộn. */}}
+      <div class="hang nho mo" style="gap:12px;align-items:center;margin-top:8px;flex-wrap:wrap">
+        <code style="flex:0 0 auto">{{.CH.BannerAnh}}</code>
+        <button class="phu nho" style="flex:0 0 auto" type="submit" form="f-anh-bo" name="viec" value="bo">thôi dùng, về bản vẽ</button>
+        <button class="phu nho" style="flex:0 0 auto" type="submit" form="f-anh-bo" name="viec" value="xoa">xoá hẳn khỏi kho</button>
+      </div>
+    </div>
+    {{else}}
+    <p class="nho" style="margin:14px 0"><b>Đang dùng bản vẽ cây vợt.</b> Tải một tấm ảnh lên là banner đổi sang ảnh.</p>
+    {{end}}
+
+    <form method="post" action="/qt/app/anh" enctype="multipart/form-data" class="hang"
+          style="gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px">
+      <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+      <input type="file" name="anh" accept="image/jpeg,image/png,image/webp" required>
+      <button class="nut" type="submit">Tải lên và dùng làm banner</button>
+    </form>
+
+    {{if .AnhApp}}
+    <div style="margin-top:18px">
+      <div class="nhan-nho">Ảnh đã tải cho app — bấm để dùng lại</div>
+      <div class="hang" style="gap:10px;flex-wrap:wrap;margin-top:8px">
+        {{range .AnhApp}}
+        <button class="phu" type="submit" form="f-app" name="banner_anh" value="{{.Ten}}"
+                style="flex:0 0 auto;padding:0;border-radius:10px;overflow:hidden;line-height:0;border:{{if eq .Ten $.CH.BannerAnh}}3px solid var(--sang){{else}}1px solid var(--vien,#ccc){{end}}">
+          <img src="/anh-trang-chu/{{.Ten}}" alt="{{.Ten}}"
+               style="width:132px;height:50px;object-fit:cover;display:block">
+        </button>
+        {{end}}
+      </div>
+      <div class="nho mo" style="margin-top:6px">
+        Ảnh cho các chỗ khác nằm ở <a href="/qt/anh-trang-chu">Ảnh trang chủ</a>;
+        chuyển chỗ treo một tấm sang “app” ở bên ấy thì nó hiện ra đây.
+      </div>
+    </div>
+    {{end}}
+  </div>
+</div>
+
+{{/* Video để riêng khỏi kho ảnh: kho ảnh chặn 8MB, có nắp 14 tấm và còn chảy
+     sang hai chỗ khác dùng thẻ <img> — nhét mp4 vào đấy là hỏng cả ba. */}}
+<div class="the-nhom" style="margin-top:24px">
+  <h3>Video banner</h3>
+  <div class="noi">
+    <p class="nho mo" style="max-width:64ch;margin-top:0">
+      Có video thì video đè lên ảnh: nó <b>tự chạy, lặp, câm tiếng</b>, khách
+      không bấm gì cả. Chỉ nhận <b>.mp4</b> (H.264) — iPhone không mở được webm.
+      Nặng tối đa 10MB, nhưng nên giữ <b>dưới 3MB</b> và dài 5–10 giây: khách
+      mở app bằng 4G, tệp to thì banner đứng im mất mấy giây đầu.
+      Ảnh banner ở trên vẫn nên có — nó làm khung đứng đầu trong lúc video chưa về.
+    </p>
+
+    {{if .CH.BannerVideoURL}}
+    <div style="margin:14px 0">
+      <video src="{{.CH.BannerVideoURL}}" autoplay muted loop playsinline
+             style="width:100%;max-width:420px;aspect-ratio:16/6;object-fit:cover;border-radius:12px;display:block;background:#231F47"></video>
+      <div class="hang nho mo" style="gap:12px;align-items:center;margin-top:8px;flex-wrap:wrap">
+        <code style="flex:0 0 auto">{{.CH.BannerVideo}}</code>
+        <button class="phu nho" style="flex:0 0 auto" type="submit" form="f-video-bo">xoá video, về lại ảnh</button>
+      </div>
+    </div>
+    {{else}}
+    <p class="nho" style="margin:14px 0"><b>Chưa có video.</b> Banner đang dùng ảnh hoặc bản vẽ.</p>
+    {{end}}
+
+    <form method="post" action="/qt/app/video" enctype="multipart/form-data" class="hang"
+          style="gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px">
+      <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+      <input type="file" name="video" accept="video/mp4" required>
+      <button class="nut" type="submit">Tải lên và dùng làm banner</button>
+    </form>
+  </div>
+</div>
+
+<form method="post" action="/qt/app/video-xoa" id="f-video-bo" hidden>
+  <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+</form>
+
+<form method="post" action="/qt/app/anh-xoa" id="f-anh-bo" hidden>
+  <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+  <input type="hidden" name="ten" value="{{.CH.BannerAnh}}">
+</form>
+
+<form method="post" action="/qt/app" id="f-app">
+  <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+
+  {{/* Ô ẩn giữ tên ảnh đang dùng. Mấy nút ảnh nhỏ bên trên cũng gửi
+       banner_anh — trình duyệt lấy giá trị của nút đã bấm, đè lên ô này. */}}
+  <input type="hidden" name="banner_anh" value="{{.CH.BannerAnh}}">
+
+  <div class="the-nhom">
+    <h3>Banner — cách hiện</h3>
+    <div class="noi doc">
+      <label class="hang" style="gap:8px;align-items:center;margin:0 0 16px">
+        <input type="checkbox" name="an_banner" value="1" {{if .CH.AnBanner}}checked{{end}}
+               style="flex:0 0 auto;width:auto;margin:0">
+        <span style="flex:0 1 auto">Ẩn hẳn banner — chỗ trống chia đều cho lưới việc</span>
+      </label>
+
+      {{/* Ảnh sáng thì chữ trắng biến mất. Lớp phủ là cách rẻ nhất để chữ luôn
+           đọc được mà không phải sửa ảnh trước khi up. */}}
+      <label style="margin:0">Lớp phủ tối trên ảnh
+        <select name="banner_toi">
+          <option value="0" {{if eq .CH.BannerToi 0}}selected{{end}}>Không phủ — chỉ hợp ảnh vốn đã rất tối</option>
+          <option value="25" {{if eq .CH.BannerToi 25}}selected{{end}}>Nhẹ 25%</option>
+          <option value="45" {{if eq .CH.BannerToi 45}}selected{{end}}>Vừa 45% — nên dùng</option>
+          <option value="65" {{if eq .CH.BannerToi 65}}selected{{end}}>Đậm 65%</option>
+          <option value="80" {{if eq .CH.BannerToi 80}}selected{{end}}>Rất đậm 80% — ảnh chỉ còn là nền</option>
+        </select>
+      </label>
+      <div class="nho mo" style="margin-top:6px">Chỉ có tác dụng khi banner đang dùng ảnh hoặc video.</div>
+    </div>
+  </div>
+
+  <div class="the-nhom">
+    <h3>Khuyến mãi — đợt chạy</h3>
+    <div class="noi doc">
+      <p class="nho mo" style="max-width:64ch;margin-top:0">
+        Khối khuyến mãi hiện khi <b>đã gõ tên chương trình</b> (ô dưới, nhóm
+        “Khuyến mãi”) <b>và</b> hôm nay nằm trong đợt. Bỏ trống hai ngày là
+        chạy tới khi nào Kendy tự tắt. Có ngày kết thúc thì hết đợt khối tự
+        biến mất, không phải nhớ vào tắt tay.
+        {{if .KMDangChay}}<b> Đang chạy.</b>{{else}}<b> Đang tắt.</b>{{end}}
+        Hôm nay là {{.HomNay}}.
+      </p>
+      <div class="hang" style="gap:16px;flex-wrap:wrap">
+        <label style="margin:0">Bắt đầu
+          <input type="date" name="km_tu" value="{{.CH.KMTu}}">
+        </label>
+        <label style="margin:0">Kết thúc
+          <input type="date" name="km_den" value="{{.CH.KMDen}}">
+        </label>
+      </div>
+      <label style="margin:16px 0 0">Bấm vào khối thì đi đâu
+        <input name="km_link" value="{{.CH.KMLink}}" maxlength="120" placeholder="/app/gui-anh">
+      </label>
+      <div class="nho mo" style="margin-top:6px">
+        Đường dẫn trong site, bắt đầu bằng <code>/</code>. Ví dụ
+        <code>/app/gui-anh</code> hoặc <code>/app/dich-vu/DAN_VIEN</code>.
+      </div>
+    </div>
+  </div>
+
+  <div class="the-nhom">
+    <h3>Icon trong lưới việc</h3>
+    <div class="noi doc">
+      <p class="nho mo" style="max-width:64ch;margin-top:0">
+        Mỗi nhịp <b>một</b> icon nhúc nhích một cái, không phải cả tám cùng
+        nhảy — tám thứ cùng động thì mắt không biết nhìn đâu, mà nhìn lâu thì
+        mỏi. Máy nào bật “giảm chuyển động” trong cài đặt hệ thống thì tự đứng
+        yên, không cần tắt ở đây.
+      </p>
+      <label style="margin:0">Thứ tự
+        <select name="icon_dong">
+          <option value="lan-luot" {{if eq .CH.IconDong "lan-luot"}}selected{{end}}>Lần lượt — chạy vòng từ ô đầu tới ô cuối</option>
+          <option value="ngau-nhien" {{if eq .CH.IconDong "ngau-nhien"}}selected{{end}}>Ngẫu nhiên — không lặp lại ô vừa động</option>
+          <option value="tat" {{if eq .CH.IconDong "tat"}}selected{{end}}>Tắt — icon chỉ động khi chạm vào</option>
+        </select>
+      </label>
+      <label style="margin:16px 0 0">Nhịp
+        <select name="icon_nhip">
+          <option value="2" {{if eq .CH.IconNhip 2}}selected{{end}}>2 giây một icon</option>
+          <option value="3" {{if eq .CH.IconNhip 3}}selected{{end}}>3 giây một icon — nên dùng</option>
+          <option value="5" {{if eq .CH.IconNhip 5}}selected{{end}}>5 giây một icon</option>
+          <option value="8" {{if eq .CH.IconNhip 8}}selected{{end}}>8 giây một icon</option>
+          <option value="15" {{if eq .CH.IconNhip 15}}selected{{end}}>15 giây một icon</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  {{/* Chữ: dựng thẳng từ nhánh "app" của cây nội dung, không gõ tay ô nào.
+       Thêm một khoá vào CayND là ô nhập tự hiện ra đúng nhóm, đúng nhãn. */}}
+  {{range .Nhom}}
+  <div class="the-nhom">
+    <h3>{{.Ten}}</h3>
+    <div class="noi doc">
+      {{range .Muc}}
+      <div style="margin-bottom:20px">
+        <label style="margin:0">{{.Nhan}}
+          {{if .Dai}}
+          <textarea name="k.{{.Khoa}}" rows="3" maxlength="4000">{{.GiaTri}}</textarea>
+          {{else}}
+          <input name="k.{{.Khoa}}" value="{{.GiaTri}}" maxlength="400">
+          {{end}}
+        </label>
+        <div class="hang nho mo" style="gap:10px;align-items:center;margin-top:6px">
+          <code>{{.Khoa}}</code>
+          {{if .DaSua}}
+          <span>· đã đổi</span>
+          <button class="phu nho" type="submit" form="f-app-kp" name="khoa" value="{{.Khoa}}">
+            trả về mặc định
+          </button>
+          {{end}}
+        </div>
+        {{if .DaSua}}
+        <div class="nho mo" style="margin-top:4px">Mặc định: “{{.Mac}}”</div>
+        {{end}}
+      </div>
+      {{end}}
+    </div>
+  </div>
+  {{end}}
+
+  <div class="hang" style="gap:10px;margin:18px 0 30px">
+    <button type="submit" style="flex:0 0 auto">Lưu tất cả</button>
+    <span class="nho mo">Lưu cả chữ lẫn cài đặt trong một lần bấm.</span>
+  </div>
+</form>
+
+<form method="post" action="/qt/app/khoi-phuc" id="f-app-kp" hidden>
+  <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+</form>
+
+{{template "qt-chan" .}}
+{{end}}

@@ -69,12 +69,32 @@
               {{if .ChanDoan}}<dt>{{nd "tracuu.don.k-chan"}}</dt><dd>{{.ChanDoan}}</dd>{{end}}
               {{if .HenTraNgay}}<dt>{{nd "tracuu.don.k-hen"}}</dt><dd>{{ngaydep .HenTraNgay}}</dd>{{end}}
               {{if .BaoHanhDen}}<dt>{{nd "tracuu.don.k-bh"}}</dt><dd>{{ngaydep .BaoHanhDen}}</dd>{{end}}
+              {{if .MaVanDonVe}}<dt>{{nd "cuahang.vandon.ve"}}</dt><dd class="so">{{.MaVanDonVe}}</dd>{{end}}
             </dl>
             {{if $.YeuCau}}
             <p class="nho mo">{{nd "tracuu.don.tu-yc-1"}} <span class="so">{{$.YeuCau.Ma}}</span> {{nd "tracuu.don.tu-yc-2"}} {{ngaydep $.YeuCau.Ngay}}.</p>
             {{end}}
           </div>
         </div>
+
+        {{/* Ô khách tự báo mã vận đơn. Chỉ mở khi đơn còn chờ hàng về —
+             kiện tới tay trạm rồi thì mã ấy hết việc, mà vẫn là một ô cho
+             người cầm link ghi đè. Xem hKhachBaoVanDon. */}}
+        {{if .ChoHangVe}}
+        <div class="the-nhom bao-van-don">
+          <h3>{{nd "cuahang.vandon.tieu-de"}}</h3>
+          <div class="noi">
+            {{ndm "cuahang.vandon.dan"}}
+            <form method="post" action="/tra-cuu/{{.Token}}/van-don" style="margin-top:12px">
+              <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+              <div class="hang" style="align-items:flex-end">
+                <label style="margin:0">Mã vận đơn<input name="ma_van_don" maxlength="60" value="{{.MaVanDonDen}}" placeholder="VD: GHTK123456"></label>
+                <button type="submit" style="flex:0 0 auto">{{nd "cuahang.vandon.nut"}}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        {{end}}
 
         {{if .LichSu}}
         <div class="the-nhom">
@@ -107,6 +127,51 @@
               </tbody>
             </table>
           </div>
+        </div>
+        {{end}}
+
+        {{/* Khối trả tiền. Chỉ dựng khi đơn đã xong mà sổ tiền chưa đủ —
+             xem dungKhoiTra ở core/cuahang.go. Không vẽ được ảnh mã QR
+             (binary không có bộ mã hoá QR), nên in đủ ba thứ để khách tự
+             nhập: số tài khoản, số tiền, nội dung. */}}
+        {{if $.CanTra}}
+        <div class="the-nhom tra-tien">
+          <h3>{{nd "cuahang.tra.tieu-de"}}</h3>
+          <p class="tra-so">{{tien $.SoTienTra}}</p>
+          {{if $.FreeShip}}{{ndm "cuahang.tra.free-ship"}}{{end}}
+
+          {{if $.CoQR}}
+          <h4>{{nd "cuahang.tra.qr"}}</h4>
+          <div class="cuon">
+            <table class="bang">
+              <tbody>
+              <tr><td>Ngân hàng</td><td class="p">{{$.NganHang.Ma}}</td></tr>
+              <tr><td>Số tài khoản</td><td class="p">{{$.NganHang.SoTK}}</td></tr>
+              <tr><td>Chủ tài khoản</td><td class="p">{{$.NganHang.ChuTK}}</td></tr>
+              <tr><td>Số tiền</td><td class="p">{{tien $.SoTienTra}}</td></tr>
+              <tr><td>Nội dung</td><td class="p"><b>{{$.NoiDungCK}}</b></td></tr>
+              </tbody>
+            </table>
+          </div>
+          {{ndm "cuahang.tra.qr-nhac"}}
+          <form method="post" action="/tra-cuu/{{.Token}}/hinh-thuc-tra" style="margin-top:12px">
+            <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+            <input type="hidden" name="cach" value="qr">
+            <button class="nut" type="submit">Tôi sẽ chuyển khoản</button>
+          </form>
+          {{end}}
+
+          <h4>{{nd "cuahang.tra.cod"}}</h4>
+          {{ndm "cuahang.tra.cod-nhac"}}
+          <form method="post" action="/tra-cuu/{{.Token}}/hinh-thuc-tra" style="margin-top:12px">
+            <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+            <input type="hidden" name="cach" value="cod">
+            <button class="nut nut-vien" type="submit">Tôi trả khi nhận hàng</button>
+          </form>
+
+          {{if .HinhThucTra}}
+          <p class="nho mo" style="margin-top:12px">Anh/chị đã chọn: {{if eq .HinhThucTra "qr"}}chuyển khoản{{else}}trả khi nhận hàng{{end}}.</p>
+          {{end}}
         </div>
         {{end}}
 

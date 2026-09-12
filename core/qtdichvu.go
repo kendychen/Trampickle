@@ -68,11 +68,15 @@ type ODichVu struct {
 	Nhom         string
 	DieuKien     string
 	Gia          [3]string // rỗng = chưa mở bán ở giai đoạn đó
+	GiaDen       [3]string // rỗng = giá một con số, không phải một khoảng
 	GiaDep       [3]string // cùng giá trị, dạng người đọc
 	BaoGiaRieng  bool
+	NoiBat       bool
+	An           bool
 	TuGiaiDoan   int
 	BaoHanhThang string
 	LeadTimeNgay string
+	LeadTimeDen  string // rỗng = hẹn một con số, không phải một khoảng
 	ThuTu        string
 
 	// DangHien và ViSao là kết quả tính ra, không phải ô nhập. Có nó thì Kendy
@@ -86,6 +90,8 @@ func oTuDichVu(d DichVu) ODichVu {
 		Ma: d.Ma, Ten: d.Ten, Nhom: d.Nhom,
 		DieuKien:    strings.TrimSpace(d.DieuKien),
 		BaoGiaRieng: d.BaoGiaRieng,
+		NoiBat:      d.NoiBat,
+		An:          d.An,
 		TuGiaiDoan:  d.TuGiaiDoan,
 	}
 	if o.TuGiaiDoan == 0 {
@@ -96,6 +102,9 @@ func oTuDichVu(d DichVu) ODichVu {
 	}
 	if d.LeadTimeNgay > 0 {
 		o.LeadTimeNgay = strconv.Itoa(d.LeadTimeNgay)
+	}
+	if d.LeadTimeDen > 0 {
+		o.LeadTimeDen = strconv.Itoa(d.LeadTimeDen)
 	}
 	if d.ThuTu > 0 {
 		o.ThuTu = strconv.Itoa(d.ThuTu)
@@ -111,11 +120,19 @@ func oTuDichVu(d DichVu) ODichVu {
 		} else {
 			o.GiaDep[i] = dinhDangTien(*d.Gia[i])
 		}
+		if den := d.GiaDenTheoGiaiDoan(i + 1); den != nil {
+			o.GiaDen[i] = strconv.Itoa(*den)
+			o.GiaDep[i] += " – " + dinhDangTien(*den)
+		}
 	}
-	o.DangHien = d.DaMo(GiaiDoan)
+	o.DangHien = !d.An && d.DaMo(GiaiDoan)
 	switch {
 	case o.DangHien:
 		o.ViSao = "Đang hiện trên web."
+	case d.An:
+		// Nói rõ "thợ vẫn tích được": không có câu này thì tắt xong Kendy
+		// tưởng việc biến mất khỏi cả trang lên phiếu, rồi bật lại cho chắc.
+		o.ViSao = "Đang tắt: tạm ngừng nhận. Thợ vẫn tích được khi lên phiếu."
 	case o.TuGiaiDoan > GiaiDoan:
 		o.ViSao = fmt.Sprintf("Đang ẩn: mở từ giai đoạn %d, trạm đang ở giai đoạn %d.", o.TuGiaiDoan, GiaiDoan)
 	default:
@@ -140,6 +157,9 @@ func phanSuaDuoc(o ODichVu) ODichVu {
 	}
 	if o.LeadTimeNgay == "0" {
 		o.LeadTimeNgay = ""
+	}
+	if o.LeadTimeDen == "0" {
+		o.LeadTimeDen = ""
 	}
 	if o.ThuTu == "0" {
 		o.ThuTu = ""
@@ -185,23 +205,51 @@ func docODichVu(cu ODichVu, f func(string) string) (ODichVu, error) {
 		return moi, loi("điều kiện dài quá %d ký tự", dieuKienToiDa)
 	}
 
-	for i := 0; i < 3; i++ {
-		chu := strings.TrimSpace(f(fmt.Sprintf("gia%d", i+1)))
+	// Hai ô một giai đoạn: "từ" và "đến". Ô "đến" để trống là giá một con số,
+	// y như trước khi có khoá gia_den — đó là trạng thái của mọi việc đang có.
+	docGia := func(o, nhan string, i int) (string, error) {
+		chu := strings.TrimSpace(f(fmt.Sprintf("%s%d", o, i+1)))
 		if chu == "" {
-			moi.Gia[i] = ""
-			continue
+			return "", nil
 		}
 		if !coChuSo(chu) {
-			return moi, loi("giá giai đoạn %d: %q không có chữ số nào", i+1, chu)
+			return "", loi("%s giai đoạn %d: %q không có chữ số nào", nhan, i+1, chu)
 		}
 		v := soTien(chu)
 		if v < 0 || v > tienToiDa {
-			return moi, loi("giá giai đoạn %d phải trong khoảng 0 – %s", i+1, dinhDangTien(tienToiDa))
+			return "", loi("%s giai đoạn %d phải trong khoảng 0 – %s", nhan, i+1, dinhDangTien(tienToiDa))
 		}
-		moi.Gia[i] = strconv.Itoa(v)
+		return strconv.Itoa(v), nil
+	}
+	for i := 0; i < 3; i++ {
+		var err error
+		if moi.Gia[i], err = docGia("gia", "giá", i); err != nil {
+			return moi, err
+		}
+		if moi.GiaDen[i], err = docGia("giaden", "giá đến", i); err != nil {
+			return moi, err
+		}
+		// Khoảng giá phải là khoảng thật, cùng luật với khoảng ngày làm:
+		// "150.000 đến 150.000" in ra vẫn là một con số, "150.000 đến 100.000"
+		// thì trang khách in ngược. Và đầu trên một mình thì không có nghĩa —
+		// báo giá Python đọc khoá `gia`, không đọc khoá này.
+		if moi.GiaDen[i] == "" {
+			continue
+		}
+		if moi.Gia[i] == "" {
+			return moi, loi("giai đoạn %d: điền ô giá \"đến\" thì phải điền cả ô giá \"từ\"", i+1)
+		}
+		tu, _ := strconv.Atoi(moi.Gia[i])
+		den, _ := strconv.Atoi(moi.GiaDen[i])
+		if den <= tu {
+			return moi, loi("giá giai đoạn %d: số sau (%s) phải lớn hơn số trước (%s)",
+				i+1, dinhDangTien(den), dinhDangTien(tu))
+		}
 	}
 
 	moi.BaoGiaRieng = f("bao_gia_rieng") != ""
+	moi.NoiBat = f("noi_bat") != ""
+	moi.An = f("an") != ""
 
 	tgd, err := strconv.Atoi(strings.TrimSpace(f("tu_giai_doan")))
 	if err != nil || tgd < 1 || tgd > 3 {
@@ -214,6 +262,23 @@ func docODichVu(cu ODichVu, f func(string) string) (ODichVu, error) {
 	}
 	if moi.LeadTimeNgay, err = docSoNho(f("lead_time_ngay"), 365); err != nil {
 		return moi, loi("số ngày làm: %v", err)
+	}
+	if moi.LeadTimeDen, err = docSoNho(f("lead_time_ngay_den"), 365); err != nil {
+		return moi, loi("số ngày làm (đến): %v", err)
+	}
+	// Khoảng ngày phải là một khoảng thật. "3 đến 3" in ra vẫn là "3 ngày",
+	// giữ lại chỉ tổ để file có một khoá không làm gì; "5 đến 2" thì trang
+	// khách in ngược. Điền ô sau mà bỏ trống ô trước cũng vô nghĩa: báo giá
+	// Python đọc lead_time_ngay, không đọc khoá này.
+	if moi.LeadTimeDen != "" {
+		if moi.LeadTimeNgay == "" {
+			return moi, loi("điền ô ngày làm \"đến\" thì phải điền cả ô ngày làm \"từ\"")
+		}
+		tu, _ := strconv.Atoi(moi.LeadTimeNgay)
+		den, _ := strconv.Atoi(moi.LeadTimeDen)
+		if den <= tu {
+			return moi, loi("ngày làm: số sau (%d) phải lớn hơn số trước (%d)", den, tu)
+		}
 	}
 	if moi.ThuTu, err = docSoNho(f("thu_tu"), 999); err != nil {
 		return moi, loi("thứ tự: %v", err)
@@ -357,7 +422,7 @@ func nhayKep(s string) string {
 	return `"` + strings.NewReplacer(`\`, `\\`, `"`, `\"`).Replace(s) + `"`
 }
 
-func dongGia(g [3]string) string {
+func dongGia(khoa string, g [3]string) string {
 	p := make([]string, 3)
 	for i, v := range g {
 		if v == "" {
@@ -366,7 +431,19 @@ func dongGia(g [3]string) string {
 		}
 		p[i] = v
 	}
-	return "    gia: [" + strings.Join(p, ", ") + "]"
+	return "    " + khoa + ": [" + strings.Join(p, ", ") + "]"
+}
+
+// coSo: mảng ba ô có ít nhất một ô điền. Mảng rỗng hoàn toàn thì không ghi
+// `gia_den: [null, null, null]` xuống file — một dòng nói "không có gì" là
+// một dòng thừa, và người sau đọc file sẽ tưởng khoá ấy có ý nghĩa gì đó.
+func coSo(g [3]string) bool {
+	for _, v := range g {
+		if v != "" {
+			return true
+		}
+	}
+	return false
 }
 
 // suaMotMuc trả về các dòng mới cho vùng [ds,de) của một mục.
@@ -397,13 +474,28 @@ func suaMotMuc(dong []string, ds, de int, cu, moi ODichVu) []string {
 		dat("ten", []string{"    ten: " + nhayKep(moi.Ten)}, true)
 	}
 	if moi.Gia != cu.Gia {
-		dat("gia", []string{dongGia(moi.Gia)}, true)
+		dat("gia", []string{dongGia("gia", moi.Gia)}, true)
+	}
+	// gia_den đứng ngay sau gia trong file: hai khoá này đọc rời nhau thì vô
+	// nghĩa. dat() thêm khoá mới vào CUỐI mục nên lần đầu điền trần giá nó sẽ
+	// nằm cuối; lần lưu sau vungKhoa tìm thấy nên nó ở yên đó. Chấp nhận —
+	// đổi chỗ khoá là phải dời cả khối chú thích viết tay quanh nó.
+	if moi.GiaDen != cu.GiaDen {
+		dat("gia_den", []string{dongGia("gia_den", moi.GiaDen)}, coSo(moi.GiaDen))
 	}
 	if moi.DieuKien != cu.DieuKien {
 		dat("dieu_kien", dongFolded("dieu_kien", moi.DieuKien), moi.DieuKien != "")
 	}
 	if moi.BaoGiaRieng != cu.BaoGiaRieng {
 		dat("bao_gia_rieng", []string{"    bao_gia_rieng: true"}, moi.BaoGiaRieng)
+	}
+	if moi.NoiBat != cu.NoiBat {
+		dat("noi_bat", []string{"    noi_bat: true"}, moi.NoiBat)
+	}
+	// Bật lại thì XOÁ hẳn khoá chứ không ghi "an: false" — mặc định của cờ đã
+	// là hiện, để lại một dòng nói đúng cái mặc định chỉ tổ làm file dài ra.
+	if moi.An != cu.An {
+		dat("an", []string{"    an: true"}, moi.An)
 	}
 	if moi.TuGiaiDoan != cu.TuGiaiDoan {
 		// Giai đoạn 1 là mặc định của DaMo, ghi ra chỉ thêm dòng thừa.
@@ -414,6 +506,9 @@ func suaMotMuc(dong []string, ds, de int, cu, moi ODichVu) []string {
 	}
 	if moi.LeadTimeNgay != cu.LeadTimeNgay {
 		dat("lead_time_ngay", []string{"    lead_time_ngay: " + moi.LeadTimeNgay}, moi.LeadTimeNgay != "")
+	}
+	if moi.LeadTimeDen != cu.LeadTimeDen {
+		dat("lead_time_ngay_den", []string{"    lead_time_ngay_den: " + moi.LeadTimeDen}, moi.LeadTimeDen != "")
 	}
 	if moi.ThuTu != cu.ThuTu {
 		dat("thu_tu", []string{"    thu_tu: " + moi.ThuTu}, moi.ThuTu != "")
@@ -515,10 +610,19 @@ type dlQtDichVu struct {
 	Tep      string
 	GiaiDoan int
 	SoHien   int
+
+	// NoiBatTat: công tắc tổng ở /qt/giao-dien đang tắt. Không chặn tích ô,
+	// chỉ nói ra — tích xong ra trang chủ không thấy gì là chỗ khó đoán nhất.
+	NoiBatTat bool
+
+	// KhongBan: hai ca trạm từ chối. Không sửa được gì ở biểu mẫu này (giá,
+	// ngày làm đều không có), chỉ để mở đường sang trang soạn bài của chúng —
+	// không có chỗ này thì hai bài ấy không có lối vào từ admin.
+	KhongBan []KhongBan
 }
 
 func hQtDichVu(w http.ResponseWriter, r *http.Request) {
-	d := dlQtDichVu{dlQt: dlQt{Chung: chung(r, "dich-vu-qt")}}
+	d := dlQtDichVu{dlQt: dlQt{Chung: chung(r, "dich-vu-qt")}, KhongBan: GIA.KhongBan}
 	if r.Method == http.MethodPost {
 		r.Body = http.MaxBytesReader(w, r.Body, 256*1024)
 		if err := r.ParseForm(); err != nil {
@@ -564,5 +668,50 @@ func hQtDichVu(w http.ResponseWriter, r *http.Request) {
 	}
 	d.Tep = CFG.DuongDan.BangGia
 	d.GiaiDoan = GiaiDoan
+	d.NoiBatTat = !DvNoiBatBat()
 	render(w, "qt-dich-vu.html", d)
+}
+
+// --- Bài của từng việc -------------------------------------------------
+
+// dlQtDVBai nuôi trang soạn bài cho một việc. Cố tình KHÔNG dùng lại trang
+// sửa bài viết: bài viết có đường dẫn, tiêu đề SEO, ngày đăng, ảnh bìa — bài
+// dịch vụ không có cái nào trong số đó, mã việc đã là địa chỉ rồi.
+type dlQtDVBai struct {
+	dlQt
+	DV   DichVu
+	Than string
+	Hinh map[string]string
+}
+
+func hQtDichVuBai(w http.ResponseWriter, r *http.Request) {
+	ma := strings.ToUpper(r.PathValue("ma"))
+	dv, ok := TimDichVu(ma)
+	if !ok {
+		http.NotFound(w, r)
+		return
+	}
+	d := dlQtDVBai{dlQt: dlQt{Chung: chung(r, "dich-vu-qt")}}
+	d.DV = dv
+	d.Hinh = hinhChoPhep
+	if r.Method == http.MethodPost {
+		r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
+		switch err := r.ParseForm(); {
+		case err != nil:
+			d.Loi = "Bài quá dài"
+		default:
+			than := r.FormValue("than")
+			if err := LuuBaiDichVu(ma, than); err != nil {
+				// Giữ nguyên chữ vừa gõ trong ô: lưu hỏng mà ô trở về bản cũ
+				// thì mất trắng công soạn.
+				d.Loi = err.Error()
+				d.Than = than
+				render(w, "qt-dichvu-bai.html", d)
+				return
+			}
+			d.OK = "Đã lưu. Có hiệu lực ngay."
+		}
+	}
+	d.Than = BaiDichVu(ma)
+	render(w, "qt-dichvu-bai.html", d)
 }

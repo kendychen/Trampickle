@@ -22,7 +22,7 @@
   <form method="post" action="/qt/tien/dinh-ky">
     <input type="hidden" name="_csrf" value="{{$.CSRF}}">
     <div class="cuon">
-      <table class="bang">
+      <table class="bang bang-the">
         <thead>
           <tr>
             <th style="min-width:190px">Việc</th><th style="width:150px">Nhóm</th>
@@ -34,26 +34,26 @@
         <tbody>
           {{range .DinhKy}}
           <tr>
-            <td>
+            <td data-n="Việc">
               <input type="hidden" name="ma" value="{{.Ma}}">
               <input name="ten" maxlength="120" value="{{.Ten}}" style="width:100%">
             </td>
-            <td>
+            <td data-n="Nhóm">
               <select name="nhom" style="width:100%">
                 {{$n := .Nhom}}
                 {{range $.NhomChi}}<option value="{{.Ma}}" {{if eq .Ma $n}}selected{{end}}>{{.Ten}}</option>{{end}}
               </select>
             </td>
-            <td><input name="so_tien" inputmode="numeric" value="{{oso .SoTien}}" style="width:100%"></td>
-            <td><input name="ngay_trong_thang" inputmode="numeric" value="{{.NgayTrongThang}}" style="width:100%"></td>
-            <td>
+            <td data-n="Số tiền"><input name="so_tien" inputmode="numeric" value="{{oso .SoTien}}" style="width:100%"></td>
+            <td data-n="Ngày trả"><input name="ngay_trong_thang" inputmode="numeric" value="{{.NgayTrongThang}}" style="width:100%"></td>
+            <td data-n="Trả bằng">
               <select name="phuong_thuc" style="width:100%">
                 <option value="chuyen_khoan" {{if eq .PhuongThuc "chuyen_khoan"}}selected{{end}}>Chuyển khoản</option>
                 <option value="tien_mat" {{if eq .PhuongThuc "tien_mat"}}selected{{end}}>Tiền mặt</option>
               </select>
             </td>
-            <td><input name="ghi_chu" maxlength="200" value="{{.GhiChu}}" style="width:100%"></td>
-            <td>
+            <td data-n="Ghi chú"><input name="ghi_chu" maxlength="200" value="{{.GhiChu}}" style="width:100%"></td>
+            <td data-n="Còn dùng?">
               <select name="bat" style="width:100%">
                 <option value="1" {{if .Bat}}selected{{end}}>Còn</option>
                 <option value="0" {{if not .Bat}}selected{{end}}>Nghỉ</option>
@@ -63,22 +63,22 @@
           {{end}}
           {{range lap 3}}
           <tr>
-            <td><input type="hidden" name="ma" value=""><input name="ten" maxlength="120" placeholder="thêm khoản mới" style="width:100%"></td>
-            <td>
+            <td data-n="Việc"><input type="hidden" name="ma" value=""><input name="ten" maxlength="120" placeholder="thêm khoản mới" style="width:100%"></td>
+            <td data-n="Nhóm">
               <select name="nhom" style="width:100%">
                 {{range $.NhomChi}}<option value="{{.Ma}}" {{if eq .Ma "dinh_phi"}}selected{{end}}>{{.Ten}}</option>{{end}}
               </select>
             </td>
-            <td><input name="so_tien" inputmode="numeric" style="width:100%"></td>
-            <td><input name="ngay_trong_thang" inputmode="numeric" value="1" style="width:100%"></td>
-            <td>
+            <td data-n="Số tiền"><input name="so_tien" inputmode="numeric" style="width:100%"></td>
+            <td data-n="Ngày trả"><input name="ngay_trong_thang" inputmode="numeric" value="1" style="width:100%"></td>
+            <td data-n="Trả bằng">
               <select name="phuong_thuc" style="width:100%">
                 <option value="chuyen_khoan">Chuyển khoản</option>
                 <option value="tien_mat">Tiền mặt</option>
               </select>
             </td>
-            <td><input name="ghi_chu" maxlength="200" style="width:100%"></td>
-            <td>
+            <td data-n="Ghi chú"><input name="ghi_chu" maxlength="200" style="width:100%"></td>
+            <td data-n="Còn dùng?">
               <select name="bat" style="width:100%">
                 <option value="1" selected>Còn</option>
                 <option value="0">Nghỉ</option>

@@ -35,7 +35,13 @@ func TestKhoaNDCoDu(t *testing.T) {
 	if dung == 0 {
 		t.Fatal("không thấy lời gọi {{nd}} nào — regex hỏng hoặc template chưa chuyển")
 	}
-	t.Logf("%d lời gọi, %d khoá khai trong cây", dung, len(ndMac))
+	goc := 0
+	for k := range ndMac {
+		if !strings.HasSuffix(k, hauToOnline) {
+			goc++
+		}
+	}
+	t.Logf("%d lời gọi, %d khoá gốc, %d khoá có bản Online", dung, goc, len(ndMac)-goc)
 }
 
 // Khoá khai ra mà không template nào gọi thì ô nhập trong admin sửa xong
@@ -165,5 +171,140 @@ func TestNDGhiRoiNapLai(t *testing.T) {
 	}
 	if !strings.Contains(string(b), "trang.moi.chua-co") {
 		t.Errorf("khoá lạ bị nuốt mất khi ghi lại file")
+	}
+}
+
+func TestKhoaTheoCheDoGiuNguyenKhiTaiXuong(t *testing.T) {
+	gocTam(t)
+	if err := DatCheDo(CheDoTaiXuong); err != nil {
+		t.Fatal(err)
+	}
+	if got := KhoaTheoCheDo("trangchu.hero.h1"); got != "trangchu.hero.h1" {
+		t.Fatalf("tại xưởng phải giữ nguyên khoá, nhận %q", got)
+	}
+}
+
+// Khoá không khai MacOn thì hai chế độ dùng chung một chữ, và không rỗng.
+func TestKhoaKhongCoMacOnDungChung(t *testing.T) {
+	gocTam(t)
+	// Lấy khoá thật đầu tiên chưa khai MacOn. Ghim tên một khoá cụ thể thì
+	// đến ngày khoá ấy có bản Online, test tự bỏ chạy và nhánh dùng chung
+	// không còn ai canh.
+	khoa := ""
+	for _, tr := range CayND {
+		for _, nh := range tr.Nhom {
+			for _, m := range nh.Muc {
+				if m.MacOn == "" && khoa == "" {
+					khoa = m.Khoa
+				}
+			}
+		}
+	}
+	if khoa == "" {
+		t.Fatal("mọi khoá đều đã khai MacOn — nhánh dùng chung thành code chết")
+	}
+	if err := DatCheDo(CheDoOnline); err != nil {
+		t.Fatal(err)
+	}
+	if got := KhoaTheoCheDo(khoa); got != khoa {
+		t.Fatalf("khoá không có MacOn phải giữ nguyên, nhận %q", got)
+	}
+	if ND(khoa) == "" {
+		t.Fatalf("%s rỗng ở chế độ online", khoa)
+	}
+}
+
+// Sửa bản Online không được đụng bản Tại xưởng. Đây là toàn bộ lý do có hậu
+// tố @online.
+func TestSuaBanOnlineKhongDeBanTaiXuong(t *testing.T) {
+	gocTam(t)
+	const khoa = "trangchu.hero.h1"
+	goc := NDMac(khoa)
+
+	if err := DatCheDo(CheDoOnline); err != nil {
+		t.Fatal(err)
+	}
+	if err := DatND(map[string]string{KhoaTheoCheDo(khoa): "Gửi vợt tới trạm"}); err != nil {
+		t.Fatal(err)
+	}
+	if got := ND(khoa); got != "Gửi vợt tới trạm" {
+		t.Fatalf("online phải ra chữ vừa sửa, nhận %q", got)
+	}
+	if err := DatCheDo(CheDoTaiXuong); err != nil {
+		t.Fatal(err)
+	}
+	if CoBanOnline(khoa) {
+		if got := ND(khoa); got != goc {
+			t.Fatalf("sửa bản online không được đụng bản tại xưởng: nhận %q, chờ %q", got, goc)
+		}
+	} else {
+		t.Log("khoá chưa khai MacOn — hai chế độ dùng chung, đúng thiết kế")
+	}
+	_ = KhoiPhucND(KhoaTheoCheDo(khoa))
+}
+
+// Khoá khai MacOn thì cả hai bản phải có chữ. Một bản rỗng nghĩa là trang
+// trống ở đúng chế độ ít người xem — và không ai phát hiện ra.
+func TestMacOnKhongRong(t *testing.T) {
+	for _, tr := range CayND {
+		for _, nh := range tr.Nhom {
+			for _, m := range nh.Muc {
+				if m.MacOn == "" {
+					continue
+				}
+				if strings.TrimSpace(m.Mac) == "" {
+					t.Errorf("%s: có MacOn nhưng Mac rỗng", m.Khoa)
+				}
+				if strings.TrimSpace(m.MacOn) == "" {
+					t.Errorf("%s: MacOn chỉ có khoảng trắng", m.Khoa)
+				}
+				if m.Mac == m.MacOn {
+					t.Errorf("%s: MacOn giống hệt Mac — bỏ MacOn đi", m.Khoa)
+				}
+			}
+		}
+	}
+}
+
+// Đổi chế độ không được làm mất chữ. So tương đối, không so với rỗng: vài
+// khoá cố tình để trống ở cả hai bản (app.km.ten trống là khối khuyến mãi
+// biến mất). Cái phải chặn là khoá CÓ chữ ở bản này mà mất chữ ở bản kia.
+func TestChuyenCheDoKhongMatChu(t *testing.T) {
+	gocTam(t)
+	if err := DatCheDo(CheDoTaiXuong); err != nil {
+		t.Fatal(err)
+	}
+	xuong := map[string]string{}
+	for _, tr := range CayND {
+		for _, nh := range tr.Nhom {
+			for _, m := range nh.Muc {
+				xuong[m.Khoa] = ND(m.Khoa)
+			}
+		}
+	}
+	if err := DatCheDo(CheDoOnline); err != nil {
+		t.Fatal(err)
+	}
+	for khoa, cu := range xuong {
+		if strings.TrimSpace(cu) == "" {
+			continue
+		}
+		if strings.TrimSpace(ND(khoa)) == "" {
+			t.Errorf("khoá %s có chữ ở tại xưởng nhưng rỗng ở online", khoa)
+		}
+	}
+}
+
+// Khoá tự chứa "@" sẽ đẻ ra "a@online@online". init() đã panic, test này nói
+// rõ lý do trước khi ai đó phải đi đọc stack.
+func TestKhoaKhongChuaKyTuAt(t *testing.T) {
+	for _, tr := range CayND {
+		for _, nh := range tr.Nhom {
+			for _, m := range nh.Muc {
+				if strings.Contains(m.Khoa, "@") {
+					t.Errorf("khoá %s chứa @ — hậu tố %s sẽ chồng lên nhau", m.Khoa, hauToOnline)
+				}
+			}
+		}
 	}
 }

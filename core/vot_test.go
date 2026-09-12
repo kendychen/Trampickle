@@ -295,3 +295,107 @@ func TestKhoangCanSaiThiBaoLoi(t *testing.T) {
 		t.Errorf("null phải ra nil, không phải lỗi (err=%v)", err)
 	}
 }
+
+// Sơ đồ cấu tạo vẽ theo ĐỜI chế tạo, nên panel chỉ chạy được khi ba mảnh khớp
+// nhau: hàng mang data-ct, kho hình có khối cùng mã, và map DOI có mô tả. Thiếu
+// một mảnh thì trang vẫn 200, chỉ có chỗ sơ đồ im lặng biến mất — không ai biết.
+func TestTrangVotCoSoDoCauTao(t *testing.T) {
+	mux, ck := dungTrangThu(t, VaiTroTho)
+	votThu(t)
+
+	s := moTrang(t, mux, ck, "/qt/vot")
+	if !strings.Contains(s, `id="kho-so-do"`) {
+		t.Fatal("thiếu kho sơ đồ trong trang")
+	}
+	for _, ma := range []string{
+		"EP_NGUOI", "EP_NONG", "EP_NONG_FOAM", "TUONG_DAC",
+		"FOAM_TOAN_PHAN", "LIEN_KHOI", "KHONG_RO",
+	} {
+		if !strings.Contains(s, `data-ct="`+ma+`"`) {
+			t.Errorf("kho thiếu sơ đồ cho đời %s", ma)
+		}
+	}
+	// Hàng phải nói nó thuộc đời nào và lõi nào, nếu không panel không biết
+	// chép hình nào. Soi trong THÂN hàng — kho hình có sẵn cả bảy mã.
+	coHang := false
+	for _, h := range strings.Split(s, `<tr class="cay"`)[1:] {
+		h = h[:strings.Index(h, ">")]
+		if strings.Contains(h, `data-ct="EP_NONG"`) && strings.Contains(h, `data-loi="PP_HONEYCOMB"`) {
+			coHang = true
+		}
+	}
+	if !coHang {
+		t.Error("hàng vợt không mang mã đời chế tạo và mã lõi")
+	}
+	// defs dùng chung phải nằm NGOÀI khối bị chép, không thì chép ra là trùng id.
+	kho := s[strings.Index(s, `id="kho-so-do"`):]
+	if i := strings.Index(kho, `data-ct=`); i >= 0 && strings.Contains(kho[i:], "<defs") {
+		t.Error("defs nằm trong khối bị chép — chép ra sẽ trùng id")
+	}
+	if !strings.Contains(s, "var CT = ") || !strings.Contains(s, "DOI = ") {
+		t.Error("trang thiếu map DOI cho panel")
+	}
+}
+
+// Thêm mã che_tao mới vào data/vot.yaml mà quên vẽ hình thì cây đó mất sơ đồ
+// trong im lặng. Soát mã thật với kho hình thật.
+func TestMoiDoiCheTaoDeuCoSoDo(t *testing.T) {
+	if err := InitTemplates(); err != nil {
+		t.Fatal(err)
+	}
+	var b strings.Builder
+	if err := tpl.ExecuteTemplate(&b, "hinh-cau-tao-kho", nil); err != nil {
+		t.Fatal(err)
+	}
+	kho := b.String()
+
+	cu, cuKho, cuMtime := Root, votKho, votMtime
+	Root = filepath.Join("..", "..")
+	votKho, votMtime = nil, 0
+	t.Cleanup(func() {
+		votMu.Lock()
+		Root, votKho, votMtime = cu, cuKho, cuMtime
+		votMu.Unlock()
+	})
+
+	k, err := NapVot()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for ma, ti := range k.CheTaoJSON() {
+		if !strings.Contains(kho, `data-ct="`+ma+`"`) {
+			t.Errorf("đời %s (%s) chưa có sơ đồ trong hinh.html", ma, ti.Ten)
+		}
+	}
+}
+
+// Một dòng bán cả cây tổ ong lẫn cây lõi bọt (Kamito). Bảng đã giải đúng lõi
+// của từng cây từ lâu; panel thì đọc lõi của DÒNG, nên cây bọt hiện ra "tổ ong
+// PP" — ngay trên sơ đồ nói "bỏ hẳn tổ ong". Hàng phải mang mã lõi đã giải để
+// panel tra lại.
+func TestBienTheGhiDeLoiThiHangMangLoiRieng(t *testing.T) {
+	k := &KhoVot{
+		Loi: []MoTaLoi{
+			{Ma: "PP_HONEYCOMB", Ten: "Tổ ong PP"},
+			{Ma: "FOAM_DAC", Ten: "Bọt đặc"},
+		},
+		CheTao: []MoTaCheTao{{Ma: "KHONG_RO", Ten: "Không rõ"}},
+		DongVot: []DongVot{{
+			Ma: "X", Hang: "H", Dong: "D", Loi: "PP_HONEYCOMB",
+			CheTao: []string{"KHONG_RO"}, MucGap: "hiem",
+			BienThe: []BienThe{
+				{Ten: "Cây tổ ong", CheTao: "KHONG_RO"},
+				{Ten: "Cây bọt", Loi: "FOAM_DAC", CheTao: "KHONG_RO"},
+			},
+		}},
+	}
+	for _, h := range k.BangVot() {
+		muon := "PP_HONEYCOMB"
+		if h.Ten == "Cây bọt" {
+			muon = "FOAM_DAC"
+		}
+		if h.MaLoi != muon {
+			t.Errorf("%s: mã lõi %q, đáng lẽ %q", h.Ten, h.MaLoi, muon)
+		}
+	}
+}

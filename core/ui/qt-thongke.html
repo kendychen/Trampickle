@@ -1,78 +1,168 @@
 {{define "qt-thongke.html"}}
 {{template "qt-dau" .}}
 {{$tk := .TK}}
+{{$nay := .Nay}}
 
 <div class="qt-dau-trang">
-  <h1>Thống kê</h1>
-  <div class="phai"><a class="nut nut-vien" href="/qt/don">Danh sách đơn</a></div>
+  <h1>Quản lý đơn</h1>
 </div>
 
-<p class="mo" style="max-width:64ch;margin-bottom:20px">
-  Doanh thu chỉ tính trên đơn <b>đã giao</b>. Đơn đang sửa chưa phải tiền —
-  vợt còn trên bàn thì khách vẫn có quyền đổi ý.
+{{template "qt-tab-don" .}}
+
+{{/* Lọc theo nghề. Ba đường dẫn thường chứ không phải form: chỉ có ba lựa
+     chọn, mà mỗi lựa chọn phải mang theo kỳ đang xem — link giữ được cả hai
+     thứ mà không cần thêm một cái form nữa cạnh form chọn kỳ. */}}
+<nav class="tab-day loc-nghe" style="margin-bottom:18px">
+  <a href="/qt/thong-ke?{{.Ky.Q}}" {{if not .Loai}}class="day"{{end}}>Cả hai nghề</a>
+  <a href="/qt/thong-ke?{{.Ky.Q}}&loai=vot" {{if eq .Loai "vot"}}class="day"{{end}}>Chỉ vợt</a>
+  <a href="/qt/thong-ke?{{.Ky.Q}}&loai=giay" {{if eq .Loai "giay"}}class="day"{{end}}>Chỉ giày</a>
+</nav>
+
+<p class="mo" style="max-width:70ch;margin-bottom:20px">
+  Đang xem <b>{{.Ky.Ten}}</b>. Hai con số dưới đây đếm theo hai mốc khác nhau,
+  và chúng lệch nhau là bình thường: <b>đơn nhận</b> tính theo ngày khách mang
+  đồ tới, <b>doanh thu</b> tính theo ngày giao trả. Vợt còn trên bàn chưa phải
+  tiền — khách vẫn có quyền đổi ý.
+</p>
+
+{{/* Dòng này là thứ ngăn người đọc tin nhầm hai bảng. Giá vốn vật tư ở đây
+     ước tính theo giá nhập gần nhất, còn Sổ tiền ghi tiền mặt lúc mua hàng.
+     Hai con số không bao giờ bằng nhau và không cần bằng nhau. */}}
+<p class="nho mo" style="max-width:70ch;margin:-14px 0 20px">
+  Giá vốn vật tư là <b>ước tính</b> theo giá nhập gần nhất của từng loại, cộng
+  trên phiếu xuất kho của chính mấy đơn đã giao trong kỳ. Con số tiền mặt thật
+  nằm ở <a href="/qt/tien">Sổ tiền</a> — tiền ra lúc mua hàng, không phải lúc dùng.
 </p>
 
 <div class="luoi-so" style="margin-bottom:22px">
-  <div class="o-so"><div class="v">{{$tk.TongDon}}</div><div class="t">tổng đơn</div></div>
-  <div class="o-so"><div class="v">{{$tk.DangChay}}</div><div class="t">đang trên bàn</div></div>
-  <div class="o-so {{if $tk.QuaHan}}canh-bao{{end}}"><div class="v">{{$tk.QuaHan}}</div><div class="t">quá hẹn trả</div></div>
+  <div class="o-so"><div class="v">{{$tk.NhanDon}}</div><div class="t">đơn nhận trong kỳ</div></div>
+  <div class="o-so"><div class="v">{{$tk.GiaoDon}}</div><div class="t">đơn giao trong kỳ</div></div>
+  <div class="o-so tot"><div class="v" style="font-size:19px">{{tien $tk.DoanhThu}}</div><div class="t">doanh thu (đơn đã giao)</div></div>
+  <div class="o-so"><div class="v" style="font-size:19px">{{tien $tk.DaThu}}</div><div class="t">đã thu về</div></div>
+  <div class="o-so {{if $tk.ConNo}}canh-bao{{end}}"><div class="v" style="font-size:19px">{{tien $tk.ConNo}}</div><div class="t">đơn đã giao còn nợ</div></div>
+  <div class="o-so"><div class="v" style="font-size:19px">{{tien $tk.LaiGop}}</div><div class="t">lãi gộp (trừ tiền tiệm ngoài)</div></div>
+  <div class="o-so"><div class="v" style="font-size:19px">{{tien $tk.VatTu}}</div><div class="t">giá vốn vật tư (ước tính)</div></div>
+  <div class="o-so tot"><div class="v" style="font-size:19px">{{tien $tk.LaiSauVatTu}}</div><div class="t">lãi sau vật tư</div></div>
+  <div class="o-so"><div class="v" style="font-size:19px">{{tien $tk.TBMotDon}}</div><div class="t">trung bình một đơn</div></div>
   <div class="o-so"><div class="v">{{$tk.TyLeTuChoi}}%</div><div class="t">tỷ lệ từ chối</div></div>
-  <div class="o-so"><div class="v" style="font-size:19px">{{tien $tk.ConNoTong}}</div><div class="t">khách còn nợ</div></div>
+  {{/* Đơn bảo hành đếm theo ngày nhận như đơn thường, và KHÔNG nằm trong mẫu
+       số của "trung bình một đơn" — làm lại không công mà vẫn chia vào đó thì
+       con số trung bình tụt xuống trông như ế khách. */}}
+  <div class="o-so {{if $tk.DonBaoHanh}}canh-bao{{end}}"><div class="v">{{$tk.DonBaoHanh}}</div><div class="t">đơn bảo hành nhận lại</div></div>
+  <div class="o-so {{if $tk.DonBaoHanh}}canh-bao{{end}}"><div class="v">{{$tk.TyLeBaoHanh}}%</div><div class="t">tỷ lệ làm lại</div></div>
 </div>
 
 <div class="ct-2cot">
   <div>
     <div class="the-nhom">
-      <h3>Doanh thu 12 tháng gần nhất</h3>
+      <h3>Doanh thu theo {{if eq .Ky.Kieu "nam"}}tháng{{else if eq .Ky.Kieu ""}}tháng{{else}}ngày{{end}}</h3>
       <div class="noi">
-        {{if $tk.DoanhThuThang}}
+        {{if $tk.Dong}}
         <div class="bieu-do">
-          {{$cn := .CaoNhat}}{{$dp := .DinhPhi}}
-          {{range $tk.DoanhThuThang}}
+          {{$cn := .CaoNhat}}
+          {{range $tk.Dong}}
           <div class="dong">
-            <span class="mo">{{thangDep .Thang}}</span>
+            <span class="mo">{{.Ten}}</span>
             <span style="display:block"><span class="cot" style="display:block;height:14px;width:{{ptram .DoanhThu $cn}}%"></span></span>
             <span class="st">{{tien .DoanhThu}}</span>
           </div>
           {{end}}
         </div>
-        {{if $dp}}
+        {{if .DinhPhi}}
         <p class="nho mo" style="margin-top:16px">
-          Định phí một tháng đang khai trong bảng giá là {{tien $dp}}. Tháng nào cột
-          ngắn hơn con số đó là tháng trạm ăn vào vốn.
+          Định phí khai trong bảng giá quy về kỳ này là {{tien .DinhPhi}}. Cột nào
+          ngắn hơn con số đó là quãng trạm ăn vào vốn.
         </p>
         {{end}}
         {{else}}
-        <p class="nho mo">Chưa có đơn nào giao xong.</p>
+        <p class="nho mo">Trong {{.Ky.Ten}} chưa có đơn nào giao xong.</p>
         {{end}}
       </div>
     </div>
 
     <div class="the-nhom">
-      <h3>Chi tiết theo tháng</h3>
+      <h3>Chi tiết từng mốc</h3>
       <div class="cuon">
-        <table class="bang">
-          <thead><tr><th>Tháng</th><th class="p">Đơn đã giao</th><th class="p">Doanh thu</th><th class="p">Đã thu</th></tr></thead>
+        <table class="bang bang-the">
+          <thead><tr><th>Mốc</th><th class="p">Nhận</th><th class="p">Giao</th><th class="p">Doanh thu</th><th class="p">Đã thu</th></tr></thead>
           <tbody>
-            {{range $tk.DoanhThuThang}}
+            {{range $tk.Dong}}
             <tr>
-              <td>{{thangDep .Thang}}</td>
-              <td class="p">{{.SoDon}}</td>
-              <td class="p">{{tien .DoanhThu}}</td>
-              <td class="p">{{tien .DaThu}}</td>
+              <td>{{.Ten}}</td>
+              <td data-n="Nhận" class="p">{{.NhanDon}}</td>
+              <td data-n="Giao" class="p">{{.GiaoDon}}</td>
+              <td data-n="Doanh thu" class="p">{{tien .DoanhThu}}</td>
+              <td data-n="Đã thu" class="p">{{tien .DaThu}}</td>
             </tr>
             {{else}}
-            <tr><td colspan="4" class="mo">Chưa có gì.</td></tr>
+            <tr><td colspan="5" class="mo">Trong {{.Ky.Ten}} chưa có gì.</td></tr>
+            {{end}}
+          </tbody>
+          {{if $tk.Dong}}
+          <tfoot>
+            <tr>
+              <td>Cộng</td>
+              <td class="p">{{$tk.NhanDon}}</td>
+              <td class="p">{{$tk.GiaoDon}}</td>
+              <td class="p">{{tien $tk.DoanhThu}}</td>
+              <td class="p">{{tien $tk.DaThu}}</td>
+            </tr>
+          </tfoot>
+          {{end}}
+        </table>
+      </div>
+      <div class="the-chan">
+        <a class="nut nut-vien" href="/qt/thong-ke.csv?{{.Ky.Q}}{{if .Loai}}&loai={{.Loai}}{{end}}">Tải bảng thống kê (CSV)</a>
+        <span class="nho mo">Mở được bằng Excel hoặc Google Sheets.</span>
+      </div>
+    </div>
+
+    <div class="the-nhom">
+      <h3>Tiền về từ việc gì</h3>
+      <div class="cuon">
+        <table class="bang bang-the">
+          <thead><tr><th>Đầu việc</th><th class="p">Số lần</th><th class="p">Thành tiền</th></tr></thead>
+          <tbody>
+            {{range $tk.TheoDichVu}}
+            <tr>
+              <td>{{.Ten}}</td>
+              <td data-n="Số lần" class="p">{{.So}}</td>
+              <td data-n="Thành tiền" class="p">{{tien .SoTien}}</td>
+            </tr>
+            {{else}}
+            <tr><td colspan="3" class="mo">Chưa có dòng tiền nào trong kỳ.</td></tr>
             {{end}}
           </tbody>
         </table>
       </div>
+      <p class="nho mo" style="padding:0 18px 16px">
+        Chỉ gộp dòng tiền của đơn đã giao trong kỳ. Dòng giảm giá gộp về một mục
+        chứ không tách theo lý do.
+      </p>
     </div>
   </div>
 
   <div>
+    {{/* Khối này KHÔNG theo kỳ. Vợt trễ hẹn thì trễ ngay bây giờ, bất kể đang
+         xem tháng nào — để nó chạy theo bộ lọc là giấu mất việc đang cháy. */}}
     <div class="the-nhom">
-      <h3>Đơn theo trạng thái</h3>
+      <h3>Ngay lúc này</h3>
+      <div class="noi">
+        <dl class="kv">
+          <dt>Đang trên bàn</dt><dd class="so">{{$nay.DangChay}}</dd>
+          <dt>Quá hẹn trả</dt><dd class="so">{{if $nay.QuaHan}}<b style="color:var(--tuchoi)">{{$nay.QuaHan}}</b>{{else}}0{{end}}</dd>
+          <dt>Gửi tiệm ngoài</dt><dd class="so">{{$nay.OTiemNgoai}}</dd>
+          <dt>Khách còn nợ</dt><dd class="so">{{tien $nay.ConNoTong}}</dd>
+          <dt>Nợ tiệm ngoài</dt><dd class="so">{{tien $nay.NoDoiTacTong}}</dd>
+        </dl>
+        <p class="nho mo" style="margin-top:14px">
+          Năm dòng này đếm toàn bộ đơn đang mở, không theo kỳ đang chọn.
+        </p>
+      </div>
+    </div>
+
+    <div class="the-nhom">
+      <h3>Đơn nhận trong kỳ, theo trạng thái</h3>
       <div class="noi">
         <dl class="kv">
           {{range $tk.TheoTrangThai}}
@@ -82,21 +172,39 @@
       </div>
     </div>
 
+    {{if not .Loai}}
+    <div class="the-nhom">
+      <h3>Đơn nhận trong kỳ, theo nghề</h3>
+      <div class="noi">
+        <dl class="kv">
+          {{range $tk.TheoLoai}}
+          <dt>{{.Ten}}</dt><dd class="so">{{.So}}</dd>
+          {{end}}
+        </dl>
+      </div>
+    </div>
+    {{end}}
+
     <div class="the-nhom">
       <h3>Đọc mấy con số này thế nào</h3>
       <div class="noi doc">
+        <p class="nho">
+          <b>Đơn nhận</b> và <b>đơn giao</b> đếm theo hai ngày khác nhau nên gần
+          như không bao giờ bằng nhau. Nhận nhiều hơn giao kéo dài nghĩa là việc
+          đang dồn lại trên bàn.
+        </p>
         <p class="nho">
           <b>Tỷ lệ từ chối</b> thấp quá cũng là dấu hiệu xấu: nghĩa là đang nhận cả
           vợt đáng ra phải trả lại. Trạm mới mở, một phần tư số vợt bị từ chối là
           bình thường.
         </p>
         <p class="nho">
-          <b>Khách còn nợ</b> là tiền của đơn đang chạy chưa thu. Con số này lớn dần
-          mà doanh thu không tăng nghĩa là đang làm nhiều mà thu ít.
+          <b>Còn lại sau tiền tiệm ngoài</b> là doanh thu trừ phần đã trả cho tiệm
+          làm hộ — chưa trừ định phí, chưa trừ vật tư mua ngoài.
         </p>
         <p class="nho">
-          <b>Quá hẹn trả</b> là thứ giết uy tín nhanh nhất. Trễ thì nhắn khách trước
-          khi khách phải hỏi.
+          <b>Đơn đã giao còn nợ</b> là tiền đã làm xong mà chưa cầm về. Con số này
+          lớn dần nghĩa là đang làm nhiều mà thu ít.
         </p>
       </div>
     </div>

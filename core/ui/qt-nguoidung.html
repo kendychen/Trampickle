@@ -14,17 +14,17 @@
     <div class="the-nhom">
       <h3>Người đang có tài khoản</h3>
       <div class="cuon">
-        <table class="bang">
+        <table class="bang bang-the">
           <thead><tr><th>Tên đăng nhập</th><th>Họ tên</th><th>Vai trò</th><th>Trạng thái</th><th></th></tr></thead>
           <tbody>
             {{range .DS}}
             <tr>
               <td class="so">{{.Ten}}</td>
-              <td>{{if .HoTen}}{{.HoTen}}{{else}}<span class="mo">—</span>{{end}}</td>
-              <td>
+              <td data-n="Họ tên">{{if .HoTen}}{{.HoTen}}{{else}}<span class="mo">—</span>{{end}}</td>
+              <td data-n="Vai trò">
                 {{if .LaChu}}<span class="chip chip-nhan">Chủ</span>{{else}}<span class="chip chip-trung">Thợ</span>{{end}}
               </td>
-              <td>{{if .Tat}}<span class="chip chip-tuchoi">Đã khoá</span>{{else}}<span class="mo nho">đang dùng</span>{{end}}</td>
+              <td data-n="Trạng thái">{{if .Tat}}<span class="chip chip-tuchoi">Đã khoá</span>{{else}}<span class="mo nho">đang dùng</span>{{end}}</td>
               <td>
                 <form method="post" action="/qt/nguoi-dung" class="hang" style="gap:6px;align-items:center">
                   <input type="hidden" name="_csrf" value="{{$.CSRF}}">

@@ -3,13 +3,13 @@
      chứ không riêng màn hình app. */}}
 {{define "pwa-dau"}}
 <link rel="manifest" href="/manifest.webmanifest">
-<meta name="theme-color" content="{{mauNhan .Theme}}">
+<meta name="theme-color" content="{{mauNhan}}">
 {{/* iOS bỏ qua manifest. Ba thẻ dưới đây là cách duy nhất bảo Safari mở toàn
      màn hình và lấy đúng tên khi khách tự thêm vào màn hình chính. */}}
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="{{.Brand.Ten}}">
-<link rel="apple-touch-icon" href="{{iconURL}}">
+<link rel="apple-touch-icon" href="{{iconTouch}}">
 {{end}}
 
 
@@ -22,16 +22,41 @@
      ô nhập to bằng ngón tay. Bản web vẫn còn nguyên ở /tra-cuu, /quy-trinh
      cho Google và cho người ngồi máy tính. */}}
 {{define "thanh-app"}}
+{{/* Vạch chạy trên đỉnh màn hình lúc đang sang trang. Đặt trong khối này vì
+     khối này có mặt ở mọi trang app lẫn web trên điện thoại — thêm một chỗ là
+     đủ cho cả site, khỏi phải nhớ dán vào từng tệp. */}}
+<div class="app-tai" aria-hidden="true"><i></i></div>
 <nav class="app-chan" aria-label="Thanh điều hướng">
   <a href="/app"{{if eq .Trang "app"}} class="dang"{{end}}>{{template "bt-nha"}}<span>{{nd "app.nut.trang-chu"}}</span></a>
   <a href="/app/tra-cuu"{{if eq .Trang "tra-cuu"}} class="dang"{{end}}>{{template "bt-tim"}}<span>{{nd "app.nut.tra-cuu"}}</span></a>
 
-  {{/* Nút giữa nhô lên: thứ khách cần nhất là gọi được người sửa. In thẳng số
-       ra dưới nút chứ không để chữ "Liên hệ" — khách nhìn thấy số thật thì mới
-       tin là gọi được, và ai muốn lưu danh bạ cũng đọc được luôn. Bấm là máy
-       quay số. Chưa điền số thì lùi về chữ và dẫn sang trang liên hệ chứ không
-       để nút chết. */}}
-  <a class="app-chan-tron" href="{{if .LienHe.DienThoai}}tel:{{soGoi .LienHe.DienThoai}}{{else}}/lien-he{{end}}">
+  {{/* Nút giữa nhô lên: thứ khách cần nhất là liên hệ được người sửa. In thẳng
+       số ra dưới nút chứ không để chữ "Liên hệ" — khách nhìn thấy số thật thì
+       mới tin là gọi được, và ai muốn lưu danh bạ cũng đọc được luôn.
+
+       Zalo nằm TRONG nút này, không chiếm ô riêng. Kendy: "Zalo phải cùng với
+       cái sđt vì nó là liên hệ". Hai thứ ấy là hai đường tới cùng một người;
+       tách ra hai ô ngang hàng là bắt khách chọn giữa hai cái giống nhau, mà
+       lại đá mất ô thứ năm vốn dẫn vào Quy trình.
+
+       Ba trường hợp, không gộp được:
+         có cả số lẫn Zalo → nút bật ra hai dòng để chọn.
+         chỉ có một trong hai → bấm chạy thẳng, đừng chèn thêm một nhịp bấm
+           vào giữa chỉ để chọn cái duy nhất.
+         chưa điền gì → dẫn sang trang liên hệ, chứ không để nút chết. */}}
+  {{if and .LienHe.DienThoai .LienHe.Zalo}}
+  <details class="app-chan-tron app-lh">
+    <summary>
+      <span class="tron">{{template "bt-goi"}}</span>
+      <span class="app-chan-so">{{soGoi .LienHe.DienThoai}}</span>
+    </summary>
+    <div class="app-lh-menu">
+      <a href="tel:{{soGoi .LienHe.DienThoai}}">{{template "bt-goi"}}<span>{{nd "app.lh.goi"}}<b>{{.LienHe.DienThoai}}</b></span></a>
+      <a href="https://zalo.me/{{.LienHe.Zalo}}">{{template "bt-chat"}}<span>{{nd "app.nut.zalo"}}<b>{{.LienHe.Zalo}}</b></span></a>
+    </div>
+  </details>
+  {{else}}
+  <a class="app-chan-tron" href="{{if .LienHe.DienThoai}}tel:{{soGoi .LienHe.DienThoai}}{{else if .LienHe.Zalo}}https://zalo.me/{{.LienHe.Zalo}}{{else}}/lien-he{{end}}">
     <span class="tron">{{template "bt-goi"}}</span>
     {{if .LienHe.DienThoai}}
     <span class="app-chan-so">{{soGoi .LienHe.DienThoai}}</span>
@@ -39,14 +64,69 @@
     <span>{{nd "app.nut.lien-he"}}</span>
     {{end}}
   </a>
+  {{end}}
 
   <a href="/app/gui-anh"{{if eq .Trang "gui-anh"}} class="dang"{{end}}>{{template "bt-anh"}}<span>{{nd "app.nut.gui-anh"}}</span></a>
-  {{if .LienHe.Zalo}}
-  <a href="https://zalo.me/{{.LienHe.Zalo}}">{{template "bt-chat"}}<span>{{nd "app.nut.zalo"}}</span></a>
-  {{else}}
   <a href="/app/quy-trinh"{{if eq .Trang "quy-trinh"}} class="dang"{{end}}>{{template "bt-sach"}}<span>{{nd "app.nut.quy-trinh"}}</span></a>
-  {{end}}
 </nav>
+
+<script nonce="{{$.Nonce}}">
+(function () {
+  var goc = document.documentElement, hen, hetGio;
+
+  // --- Vạch chạy trên đỉnh -------------------------------------------------
+  // Trang dựng ở máy chủ nên bấm link là đi lấy trang mới, và trong lúc chờ
+  // màn hình đứng im y như lúc chưa bấm — khách tưởng nút chết nên bấm lại.
+  //
+  // Chờ 90ms mới hiện: mạng nhanh thì trang mới về trước lúc ấy, mà một vạch
+  // loé lên 40ms rồi tắt còn khó chịu hơn không có gì. Và tự tắt sau 15s: nếu
+  // trang không đi được thật (mất mạng, khách bấm dừng) thì đừng để cái vạch
+  // chạy mãi, nó nói dối.
+  function bat() {
+    goc.classList.add('dang-tai');
+    clearTimeout(hetGio); hetGio = setTimeout(tat, 15000);
+  }
+  function tat() {
+    clearTimeout(hen); clearTimeout(hetGio);
+    goc.classList.remove('dang-tai');
+  }
+  function sapDi() { clearTimeout(hen); hen = setTimeout(bat, 90); }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) { return; }
+    var a = e.target.closest ? e.target.closest('a[href]') : null;
+    if (!a || a.hasAttribute('download')) { return; }
+    if (a.target && a.target !== '_self') { return; }
+    // tel:, mailto:, zalo.me — không rời trang theo cách thường, hoặc mở app
+    // khác rồi quay lại ngay. Bật vạch ở đây là bật rồi treo luôn.
+    if (a.origin !== location.origin) { return; }
+    // Neo trong cùng một trang: nhảy xuống mục khác chứ không tải gì.
+    if (a.href.split('#')[0] === location.href.split('#')[0]) { return; }
+    sapDi();
+  }, true);
+
+  document.addEventListener('submit', function (e) {
+    if (!e.defaultPrevented) { sapDi(); }
+  }, true);
+
+  // Lùi trang từ bộ nhớ đệm: trang cũ hiện lại nguyên trạng, kể cả cái vạch
+  // đang chạy dở lúc rời đi. Dọn.
+  window.addEventListener('pageshow', tat);
+
+  // --- Đóng nút liên hệ khi bấm ra chỗ khác --------------------------------
+  // <details> tự lo mở và đóng bằng chính cái nút, nhưng không tự đóng khi
+  // mất chú ý — bấm ra ngoài xong nó vẫn nằm đấy che mất thanh đáy.
+  document.addEventListener('click', function (e) {
+    var d = document.querySelector('details.app-lh[open]');
+    if (d && !d.contains(e.target)) { d.open = false; }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') { return; }
+    var d = document.querySelector('details.app-lh[open]');
+    if (d) { d.open = false; }
+  });
+})();
+</script>
 {{end}}
 
 

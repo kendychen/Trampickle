@@ -102,7 +102,7 @@ func logoURL() string {
 func iconURL() string {
 	ten, khi := tepLogo(loaiIcon)
 	if ten == "" {
-		return "/favicon.svg"
+		return duongFavicon()
 	}
 	return fmt.Sprintf("/bieu-tuong?v=%d", khi)
 }

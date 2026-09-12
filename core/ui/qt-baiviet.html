@@ -18,7 +18,7 @@
 {{if .DS}}
 <div class="the-nhom" style="margin-top:22px">
   <div class="cuon">
-    <table class="bang">
+    <table class="bang bang-the">
       <thead>
         <tr>
           <th style="width:70px">Thứ tự</th>
@@ -32,14 +32,14 @@
       <tbody>
         {{range .DS}}
         <tr>
-          <td class="so">{{.ThuTu}}</td>
-          <td>
+          <td data-n="Thứ tự" class="so">{{.ThuTu}}</td>
+          <td data-n="Tiêu đề">
             <a href="/qt/bai-viet/{{.Slug}}"><b>{{.TieuDe}}</b></a>
             <div class="nho mo so" style="margin-top:4px">/bai-viet/{{.Slug}}</div>
           </td>
-          <td class="so nho">{{ngaydep .Ngay}}</td>
-          <td class="so nho">{{if .Sua}}{{ngaydep .Sua}}{{else}}<span class="mo">—</span>{{end}}</td>
-          <td>
+          <td data-n="Đăng" class="so nho">{{ngaydep .Ngay}}</td>
+          <td data-n="Sửa" class="so nho">{{if .Sua}}{{ngaydep .Sua}}{{else}}<span class="mo">—</span>{{end}}</td>
+          <td data-n="Trạng thái">
             {{if .Nhap}}<span class="chip chip-trung">Nháp</span>
             {{else}}<span class="chip chip-nhan">Đang đăng</span>{{end}}
           </td>

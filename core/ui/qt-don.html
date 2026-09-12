@@ -1,26 +1,39 @@
 {{define "qt-don.html"}}
 {{template "qt-dau" .}}
+{{$giay := .LaGiay}}
+{{$duong := "vot"}}{{if $giay}}{{$duong = "giay"}}{{end}}
 
 <div class="qt-dau-trang">
-  <h1>Đơn sửa</h1>
+  <h1>Quản lý đơn</h1>
   <div class="phai">
-    {{if .SoYeuCau}}<a class="nut nut-vien" href="/qt/yeu-cau">{{.SoYeuCau}} yêu cầu chưa xử lý</a>{{end}}
-    <a class="nut nut-chinh" href="/qt/don-moi">+ Tạo đơn</a>
+    <a class="nut nut-vien" href="/qt/don-{{$duong}}?trang_thai=cho_hang_ve{{.Ky.Truy}}">Chờ hàng về</a>
+    <a class="nut nut-vien" href="/qt/don-{{$duong}}?trang_thai=xong&con_no=1{{.Ky.Truy}}">Xong, chưa thu đủ</a>
+    <a class="nut nut-vien" href="/qt/don-{{$duong}}?bo_quen=1{{.Ky.Truy}}">Xong, chưa ai lấy</a>
+    <a class="nut nut-vien" href="/qt/don-{{$duong}}?con_bao_hanh=1{{.Ky.Truy}}">Còn bảo hành</a>
+    <a class="nut nut-chinh" href="/qt/don-moi?loai={{.Loai}}">+ Tạo đơn {{.TenLoai}}</a>
   </div>
 </div>
+
+{{template "qt-tab-don" .}}
 
 <div class="luoi-so" style="margin-bottom:22px">
   <div class="o-so"><div class="v">{{.ThongKe.DangChay}}</div><div class="t">đang trên bàn</div></div>
   <div class="o-so {{if .ThongKe.QuaHan}}canh-bao{{end}}"><div class="v">{{.ThongKe.QuaHan}}</div><div class="t">quá hẹn trả</div></div>
+  <div class="o-so {{if .ThongKe.QuaHenDoiTac}}canh-bao{{end}}"><div class="v">{{.ThongKe.OTiemNgoai}}</div><div class="t">đang ở tiệm ngoài{{if .ThongKe.QuaHenDoiTac}} · {{.ThongKe.QuaHenDoiTac}} trễ{{end}}</div></div>
   <div class="o-so"><div class="v">{{.ThongKe.TongDon}}</div><div class="t">tổng đơn</div></div>
   {{if .NguoiDung.LaChu}}
   <div class="o-so"><div class="v" style="font-size:19px">{{tien .ThongKe.ConNoTong}}</div><div class="t">khách còn nợ (đơn đang chạy)</div></div>
+  <div class="o-so"><div class="v" style="font-size:19px">{{tien .ThongKe.NoDoiTacTong}}</div><div class="t">chưa trả tiệm ngoài</div></div>
   {{end}}
 </div>
 
-<form method="get" action="/qt/don" class="the" style="margin-bottom:18px">
+<form method="get" action="/qt/don-{{$duong}}" class="the" style="margin-bottom:18px">
+  {{/* Kỳ đi kèm bộ lọc: bấm "Lọc" mà rơi mất tháng đang xem thì thanh kỳ ở
+       trên thành đồ trang trí. */}}
+  <input type="hidden" name="ky" value="{{.Ky.Kieu}}">
+  <input type="hidden" name="moc" value="{{.Ky.Moc}}">
   <div class="hang" style="align-items:flex-end">
-    <label style="margin:0">Tìm<input name="q" value="{{.Loc.Tim}}" placeholder="mã đơn, tên khách, số điện thoại, hãng vợt"></label>
+    <label style="margin:0">Tìm<input name="q" value="{{.Loc.Tim}}" placeholder="mã đơn, tên khách, số điện thoại, {{if $giay}}hãng giày, cỡ{{else}}hãng vợt{{end}}"></label>
     <label style="margin:0" class="co-hep">Trạng thái
       <select name="trang_thai">
         <option value="">Tất cả</option>
@@ -39,46 +52,107 @@
       </select>
     </label>
     {{end}}
+    {{if .DoiTac}}
+    <label style="margin:0" class="co-hep">Tiệm ngoài
+      <select name="doi_tac">
+        <option value="">Tất cả</option>
+        {{$dt := .Loc.DoiTac}}
+        {{range .DoiTac}}<option value="{{.Ma}}" {{if eq $dt .Ma}}selected{{end}}>{{.Ten}}</option>{{end}}
+      </select>
+    </label>
+    {{end}}
     <label style="margin:0;flex:0 0 auto;display:flex;align-items:center;gap:0;padding-bottom:10px">
       <input type="checkbox" name="dang_chay" value="1" {{if .DangChay}}checked{{end}}> Chỉ đơn đang chạy
+    </label>
+    <label style="margin:0;flex:0 0 auto;display:flex;align-items:center;gap:0;padding-bottom:10px">
+      <input type="checkbox" name="con_no" value="1" {{if .ConNo}}checked{{end}}> Còn nợ tiền
+    </label>
+    <label style="margin:0;flex:0 0 auto;display:flex;align-items:center;gap:0;padding-bottom:10px">
+      <input type="checkbox" name="con_bao_hanh" value="1" {{if .ConBH}}checked{{end}}> Còn bảo hành
+    </label>
+    <label style="margin:0;flex:0 0 auto;display:flex;align-items:center;gap:0;padding-bottom:10px">
+      <input type="checkbox" name="bo_quen" value="1" {{if .BoQuen}}checked{{end}}> Xong, chưa ai lấy
     </label>
     <button type="submit" style="flex:0 0 auto">Lọc</button>
   </div>
 </form>
 
+<p class="nho mo" style="margin:-6px 0 14px">
+  Bảng dưới lọc theo <b>ngày nhận đơn</b>, đang xem {{.Ky.Ten}} — {{len .Don}} đơn.
+  {{if .NguoiDung.LaChu}}Tiền của ngày nào thì bên tab <a href="/qt/thong-ke?{{.Ky.Q}}">Thống kê</a>
+  trả lời, chỗ đó đếm theo ngày giao.{{end}}
+</p>
+
 {{if .Don}}
 <div class="the-nhom">
+  {{/* Form GET bọc cả bảng: mỗi ô tick là một name="ma", trình duyệt tự
+       nối thành /qt/tem?ma=A&ma=B. Mở tab mới vì trang tem là trang để
+       bấm Ctrl+P, mất bảng đơn đang lọc thì phải lọc lại từ đầu. */}}
+  <form method="get" action="/qt/tem" target="_blank">
   <div class="cuon">
-    <table class="bang">
+    <table class="bang bang-the">
       <thead>
         <tr>
-          <th>Mã</th><th>Khách</th><th>Vợt</th><th>Trạng thái</th>
-          <th>Thợ</th><th>Hẹn trả</th><th class="p">Tổng</th><th class="p">Còn lại</th>
+          <th class="tick"><input type="checkbox" id="tick-het" title="Chọn tất cả đơn trong bảng"> Mã</th><th>Khách</th><th>{{if $giay}}Giày / cỡ{{else}}Vợt{{end}}</th><th>Trạng thái</th>
+          <th>Thợ</th><th>Tiệm ngoài</th><th>Hẹn trả</th><th class="p">Tổng</th><th class="p">Còn lại</th>
         </tr>
       </thead>
       <tbody>
       {{range .Don}}
         {{$t := tt .TrangThai}}
         <tr class="co-link">
-          <td><a href="/qt/don/{{.Ma}}" class="so">{{.Ma}}</a></td>
-          <td>{{if .KhachTen}}{{.KhachTen}}{{else}}<span class="mo">—</span>{{end}}<div class="nho mo so">{{.KhachLienHe}}</div></td>
-          <td class="nho">{{if .VotHang}}{{.VotHang}}{{else}}<span class="mo">—</span>{{end}}</td>
-          <td><span class="chip chip-{{$t.Mau}}">{{$t.Ten}}</span></td>
-          <td class="nho mo">{{if .ThoPhuTrach}}{{.ThoPhuTrach}}{{else}}chưa nhận{{end}}</td>
-          <td class="nho {{if .QuaHan}}chip chip-tuchoi{{else}}mo{{end}}">{{ngaydep .HenTraNgay}}</td>
-          <td class="p">{{tien .TongTien}}</td>
-          <td class="p">{{if .ConNo}}{{tien .ConNo}}{{else}}<span class="mo">0đ</span>{{end}}</td>
+          {{/* Ô tick nằm chung ô mã chứ không thành một cột riêng: trên
+               điện thoại bảng này gập thành thẻ, ô đầu tiên là tiêu đề thẻ —
+               tách ra một cột nữa là mã đơn mất chỗ đứng đầu. */}}
+          <td class="tick" style="white-space:nowrap"><input type="checkbox" name="ma" value="{{.Ma}}"><a href="/qt/don/{{.Ma}}" class="so">{{.Ma}}</a>{{if eq .NguonDonHopLe "web"}} <span class="chip nho">web</span>{{end}}{{if .LaDonBaoHanh}} <span class="chip chip-trung nho">bảo hành</span>{{end}}</td>
+          <td data-n="Khách">{{if .KhachTen}}{{.KhachTen}}{{else}}<span class="mo">—</span>{{end}}<div class="nho mo so">{{.KhachLienHe}}</div></td>
+          <td class="nho" data-n="{{if $giay}}Giày{{else}}Vợt{{end}}">{{if .TenMon}}{{.TenMon}}{{else}}<span class="mo">—</span>{{end}}</td>
+          <td data-n="Trạng thái"><span class="chip chip-{{$t.Mau}}">{{$t.Ten}}</span></td>
+          <td class="nho mo" data-n="Thợ">{{if .ThoPhuTrach}}{{.ThoPhuTrach}}{{else}}chưa nhận{{end}}</td>
+          <td class="nho" data-n="Tiệm ngoài">
+            {{if .GuiRaNgoai}}
+              {{.TenDoiTac}}
+              {{if .QuaHenDoiTac}}<div class="chip chip-tuchoi nho">trễ hẹn về</div>{{end}}
+            {{else}}<span class="mo">tự làm</span>{{end}}
+          </td>
+          <td class="nho {{if .QuaHan}}chip chip-tuchoi{{else}}mo{{end}}" data-n="Hẹn trả">{{ngaydep .HenTraNgay}}</td>
+          <td class="p" data-n="Tổng">{{tien .TongTien}}</td>
+          <td class="p" data-n="Còn lại">{{if .ConNo}}{{tien .ConNo}}{{else}}<span class="mo">0đ</span>{{end}}</td>
         </tr>
       {{end}}
       </tbody>
+      {{if .NguoiDung.LaChu}}
+      <tfoot>
+        <tr>
+          <td colspan="7"><b>Cộng {{len .Don}} đơn đang hiện</b></td>
+          <td class="p" data-n="Tổng"><b>{{tien .TongTien}}</b></td>
+          <td class="p" data-n="Còn lại"><b>{{tien .ConNoKy}}</b></td>
+        </tr>
+      </tfoot>
+      {{end}}
     </table>
   </div>
+  <div class="the-chan hang-nut">
+    <button type="submit" class="nut nut-vien">In tem các đơn đã chọn ↗</button>
+    <a class="nut nut-vien" href="/qt/don-{{$duong}}.csv?{{.Ky.Q}}&q={{.Loc.Tim}}&trang_thai={{.Loc.TrangThai}}&tho={{.Loc.Tho}}&doi_tac={{.Loc.DoiTac}}{{if .DangChay}}&dang_chay=1{{end}}{{if .ConNo}}&con_no=1{{end}}{{if .ConBH}}&con_bao_hanh=1{{end}}{{if .BoQuen}}&bo_quen=1{{end}}">Xuất CSV bảng này</a>
+  </div>
+  </form>
 </div>
+
+<script nonce="{{$.Nonce}}">
+  (function () {
+    var het = document.getElementById('tick-het');
+    if (!het) return;
+    het.addEventListener('change', function () {
+      document.querySelectorAll('input[name="ma"]').forEach(function (o) { o.checked = het.checked; });
+    });
+  })();
+</script>
 {{else}}
 <div class="the trong">
-  <b>Chưa có đơn nào khớp</b>
+  <b>Chưa có đơn {{.TenLoai}} nào khớp</b>
   Bỏ bớt bộ lọc, hoặc tạo đơn đầu tiên.
-  <div style="margin-top:20px"><a class="nut nut-chinh" href="/qt/don-moi">+ Tạo đơn</a></div>
+  <div style="margin-top:20px"><a class="nut nut-chinh" href="/qt/don-moi?loai={{.Loai}}">+ Tạo đơn {{.TenLoai}}</a></div>
 </div>
 {{end}}
 

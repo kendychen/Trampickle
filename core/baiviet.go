@@ -34,15 +34,28 @@ type BaiViet struct {
 	// ThuTu quyết định thứ tự trên trang danh sách, nhỏ đứng trước. Cách
 	// nhau 10 để chèn một bài vào giữa mà không phải đánh số lại cả mục.
 	ThuTu  int    `yaml:"thu_tu"`
-	TieuDe string `yaml:"tieu_de"` // vừa là <h1> vừa là <title>
-	MoTa   string `yaml:"mo_ta"`   // <meta name=description>, 150-160 ký tự
-	Ngay   string `yaml:"ngay"`    // ngày đăng, ISO
-	Sua    string `yaml:"sua"`     // ngày sửa gần nhất, rỗng nếu chưa sửa
-	TomTat string `yaml:"tom_tat"` // hiện ở trang danh sách
-	Anh    string `yaml:"anh"`     // ảnh bìa, tên tệp trong data/bai-viet-anh
-	Nhap   bool   `yaml:"nhap"`    // bản nháp: không hiện ra trang khách
+	TieuDe string `yaml:"tieu_de"` // <h1> in trên đầu bài, viết cho người đọc
+	// TieuDeSEO: bản rút gọn chỉ dùng cho <title> và thẻ chia sẻ. Google cắt
+	// tiêu đề ở khoảng 60 ký tự, mà H1 hay dài hơn thế vì nó là một câu nói
+	// với người đọc. Tách hai chỗ ra thì không phải bóp H1 cho vừa ô kết quả
+	// tìm kiếm. Để trống thì lấy luôn TieuDe.
+	TieuDeSEO string `yaml:"tieu_de_seo,omitempty"`
+	MoTa      string `yaml:"mo_ta"`   // <meta name=description>, 150-160 ký tự
+	Ngay      string `yaml:"ngay"`    // ngày đăng, ISO
+	Sua       string `yaml:"sua"`     // ngày sửa gần nhất, rỗng nếu chưa sửa
+	TomTat    string `yaml:"tom_tat"` // hiện ở trang danh sách
+	Anh       string `yaml:"anh"`     // ảnh bìa, tên tệp trong data/bai-viet-anh
+	Nhap      bool   `yaml:"nhap"`    // bản nháp: không hiện ra trang khách
 
 	Than string `yaml:"-"` // thân bài, markdown
+}
+
+// TieuDeTab: chữ cho <title> và og:title. Xem TieuDeSEO ở trên.
+func (b BaiViet) TieuDeTab() string {
+	if s := strings.TrimSpace(b.TieuDeSEO); s != "" {
+		return s
+	}
+	return b.TieuDe
 }
 
 func (b BaiViet) NgaySua() string {
@@ -289,8 +302,18 @@ func hBaiVietMot(w http.ResponseWriter, r *http.Request) {
 	}
 	ds := DsBaiViet()
 	c := chung(r, "bai-viet")
-	c.TieuDe = bai.TieuDe
+	c.TieuDe = bai.TieuDeTab()
 	c.MoTa = bai.MoTa
+	c.LoaiOG = "article"
+	c.NgayDang = bai.Ngay
+	c.NgayCapNhat = bai.NgaySua()
+	// Bài có ảnh bìa thì ảnh ấy đi theo link, không thì rơi về tấm mặc định.
+	// Bỏ cỡ đi: ảnh bìa do người tải lên, cỡ nào cũng có, khai bừa 1200×630
+	// thì Facebook cắt sai chỗ.
+	if bai.Anh != "" {
+		c.AnhChiaSe = goc(r) + "/bai-viet-anh/" + bai.Anh
+		c.AnhRong, c.AnhCao = 0, 0
+	}
 	render(w, "baiviet-mot.html", dlBaiViet{
 		Chung:  c,
 		Bai:    bai,
@@ -356,6 +379,7 @@ func hSitemap(w http.ResponseWriter, r *http.Request) {
 	them("/dich-vu", "", "0.9")
 	them("/bai-viet", "", "0.8")
 	them("/quy-trinh", "", "0.7")
+	them("/cau-hoi", "", "0.7")
 	them("/gioi-thieu", "", "0.6")
 	them("/ve-chung-toi", "", "0.6")
 	them("/lien-he", "", "0.6")
@@ -380,5 +404,12 @@ func hSitemap(w http.ResponseWriter, r *http.Request) {
 // kiếm của khách.
 func hRobots(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	fmt.Fprintf(w, "User-agent: *\nDisallow: /qt\nDisallow: /noi-bo\nDisallow: /api\nDisallow: /dang-nhap\nDisallow: /tra-cuu\n\nSitemap: %s/sitemap.xml\n", goc(r))
+	fmt.Fprint(w, "User-agent: *\n")
+	// Danh sách nằm ở core/jsonld.go, dùng chung với chỗ quyết định trang nào
+	// được khai dữ liệu có cấu trúc — hai nơi lệch nhau thì thành ra vừa chặn
+	// bot vừa mời bot vào cùng một trang.
+	for _, d := range khongChoBot {
+		fmt.Fprintf(w, "Disallow: %s\n", d)
+	}
+	fmt.Fprintf(w, "\nSitemap: %s/sitemap.xml\n", goc(r))
 }

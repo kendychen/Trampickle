@@ -1,0 +1,93 @@
+{{define "qt-mail.html"}}
+{{template "qt-dau" .}}
+{{$t := .Thu}}
+
+<div class="qt-dau-trang">
+  <h1>Thư gửi khách</h1>
+  <div class="phai">
+    <a class="nut nut-vien" href="/qt/don/{{.Don.Ma}}">← Về đơn {{.Don.Ma}}</a>
+  </div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+{{/* Ba mẫu là ba link chứ không phải ba tab JS: bấm mẫu nào thì tải lại
+     trang với mẫu ấy, xem tận mắt bản sẽ gửi. Không có bản nháp nào được
+     lưu — mọi chữ dựng lại từ đơn mỗi lần mở. */}}
+<nav class="tab-day" style="margin-bottom:16px">
+  {{$mac := $t.Mau.Ma}}
+  {{range .Mau}}
+  <a href="/qt/don/{{$.Don.Ma}}/mail?mau={{.Ma}}" {{if eq .Ma $mac}}class="day"{{end}}>{{.Ten}}</a>
+  {{end}}
+</nav>
+
+<div class="ct-2cot">
+  <div>
+    <div class="the-nhom">
+      <h3>Bản sẽ gửi</h3>
+      <div class="noi">
+        <dl class="kv" style="margin-bottom:14px">
+          <dt>Gửi tới</dt><dd>{{if $t.Den}}{{$t.Den}}{{else}}<span class="mo">chưa có email</span>{{end}}</dd>
+          <dt>Tiêu đề</dt><dd>{{$t.TieuDe}}</dd>
+        </dl>
+        {{/* Khung xem thử. Thân thư do chính core/maildon.go dựng, chữ của
+             khách đã escape ở đó — xem ghi chú trong hQtDonMail. */}}
+        <div class="xem-thu">{{.Than}}</div>
+        <details style="margin-top:14px">
+          <summary class="nho mo">Bản chữ trơn (đi kèm, cho hộp thư không đọc HTML)</summary>
+          <pre class="nho" style="white-space:pre-wrap;margin-top:8px">{{$t.Chu}}</pre>
+        </details>
+      </div>
+      <div class="the-chan">
+        {{if $t.GuiDuoc}}
+        <form method="post" action="/qt/don/{{.Don.Ma}}/gui-mail" style="margin:0">
+          <input type="hidden" name="_csrf" value="{{.CSRF}}">
+          <input type="hidden" name="mau" value="{{$t.Mau.Ma}}">
+          <button type="submit">Gửi thư này cho khách</button>
+        </form>
+        <span class="nho mo">Gửi xong ghi một mốc vào lịch sử đơn.</span>
+        {{else}}
+        <span class="nho" style="color:var(--tuchoi)">{{$t.VuongMac}}</span>
+        {{end}}
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="the-nhom">
+      <h3>Bấm mẫu này lúc nào</h3>
+      <div class="noi doc">
+        {{range .Mau}}
+        <p class="nho"><b>{{.Ten}}</b> — {{.Khi}}</p>
+        {{end}}
+      </div>
+    </div>
+
+    <div class="the-nhom">
+      <h3>Đơn {{.Don.Ma}}</h3>
+      <div class="noi">
+        <dl class="kv">
+          <dt>Khách</dt><dd>{{if .Don.KhachTen}}{{.Don.KhachTen}}{{else}}—{{end}}</dd>
+          <dt>Email</dt><dd>{{if .Don.KhachEmail}}{{.Don.KhachEmail}}{{else}}<a href="/qt/don/{{.Don.Ma}}">điền email</a>{{end}}</dd>
+          <dt>Trạng thái</dt><dd>{{(tt .Don.TrangThai).Ten}}</dd>
+          <dt>Tổng tiền</dt><dd>{{tien .Don.TongTien}}</dd>
+        </dl>
+        <div style="margin-top:14px"><a class="nut nut-vien" href="/qt/don/{{.Don.Ma}}/hoa-don" target="_blank">Xem hoá đơn ↗</a></div>
+      </div>
+    </div>
+
+    <div class="the-nhom">
+      <h3>Zalo thì nhắn tay</h3>
+      <div class="noi doc">
+        <p class="nho">
+          Zalo OA bắt duyệt từng mẫu tin trước khi cho gửi, không đáng cho một
+          trạm nhỏ. Copy đoạn chữ trơn bên trái dán vào Zalo là xong.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{template "qt-chan" .}}
+{{end}}

@@ -1,0 +1,58 @@
+{{/* Trang của một ca trạm KHÔNG nhận (khối khong_ban trong bang-gia.yaml).
+     Khác trang dịch vụ bình thường ở chỗ không có giá, không có số ngày làm,
+     không có quy trình — vì không có việc nào để làm. Thứ duy nhất trang này
+     có là bài: vì sao hỏng, tự kiểm tra thế nào, làm gì cho đỡ bị.
+     Chỉ dựng khi việc ấy đã có bài; chưa có bài thì hDichVuMot trả 404 chứ
+     không dựng một trang trống. */}}
+{{define "dichvu-tuchoi.html"}}
+{{template "html-dau" .}}
+
+<section class="hero">
+  <div class="khung">
+    <a href="/dich-vu" class="nhan-nho" style="text-decoration:none">{{nd "dichvumot.quay-lai"}}</a>
+    <h1 style="margin-top:16px">{{.KB.Ten}}</h1>
+    <div class="bao bao-luu" style="margin:22px 0 0;max-width:64ch">
+      <b>{{nd "dichvumot.tuchoi.chip"}}.</b>
+      {{nd "dichvumot.tuchoi.viSao"}} {{.KB.LyDo}}
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="khung doi-cot">
+    <article class="bai">{{.Than}}</article>
+    <div class="canh">
+      <div class="the">
+        <h3>{{nd "dichvumot.gui.h3"}}</h3>
+        <p class="nho mo" style="margin-top:8px">{{ndd "dichvumot.gui.chu"}}</p>
+        <p style="margin-top:14px"><a class="nut nut-chinh" href="/#gui-yeu-cau">{{nd "chung.nut.gui-anh"}}</a></p>
+        <p style="margin-top:10px"><a class="nut nut-vien" href="/quy-trinh">{{nd "dichvumot.gui.nut-2"}}</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="nen2">
+  <div class="khung doc-lon">
+    <div>
+      <div class="nhan-nho nhan-vach">{{nd "dichvumot.khac.nhan"}}</div>
+    </div>
+    <div class="luoi-vach">
+      {{range .Khac}}
+      <a class="dv-the" href="/dich-vu/{{.Ma}}">
+        <div class="bt-o">{{template "bt-dv-mau" .Ma}}</div>
+        <div class="dau-the"><h3>{{.Ten}}</h3></div>
+        {{with giaKhach .}}<div class="dv-gia">{{.}}</div>{{end}}
+      </a>
+      {{end}}
+      <a class="dv-the" href="/#gui-yeu-cau">
+        <div class="bt-o">{{template "btm-hoi"}}</div>
+        <div class="dau-the"><h3>{{nd "dichvu.hoi.h3"}}</h3></div>
+        <span class="chip chip-trung">{{nd "dichvu.hoi.chip"}}</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+{{template "html-chan" .}}
+{{end}}

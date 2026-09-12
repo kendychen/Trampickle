@@ -117,6 +117,7 @@ type Khoan struct {
 	MaDon      string `json:"ma_don"`     // khoản thu gắn với đơn sửa
 	MaPhieu    string `json:"ma_phieu"`   // khoản chi sinh từ phiếu nhập kho
 	MaDinhKy   string `json:"ma_dinh_ky"` // sinh từ khai báo định kỳ
+	MaDoNghe   string `json:"ma_do_nghe"` // khoản chi sinh từ việc sắm đồ nghề
 	// ChoDuyet: khoản định kỳ hệ thống dựng sẵn đầu tháng, CHƯA tính vào báo
 	// cáo. Tháng nào quên trả tiền nhà mà sổ vẫn ghi đã chi thì sổ nói dối,
 	// nên phải có người bấm xác nhận đã trả rồi mới vào sổ.
@@ -604,7 +605,7 @@ type TongQuanTien struct {
 
 func LayTongQuanTien() TongQuanTien {
 	tq := TongQuanTien{
-		CongNoKhach: LayThongKeDon().ConNoTong,
+		CongNoKhach: LayThongKeDon("").ConNoTong,
 		GiaTriTon:   GiaTriTonKho(),
 		ChoDuyet:    SoKhoanChoDuyet(),
 		DinhPhiBang: GIA.DinhPhiThang,

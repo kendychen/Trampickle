@@ -1,0 +1,136 @@
+{{define "qt-doitac.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang">
+  <h1>Đối tác gia công</h1>
+  <div class="phai"><a class="nut nut-vien" href="/qt/don-giay">Đơn giày</a></div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<div class="ct-2cot">
+  <div>
+    <div class="the-nhom">
+      <h3>Các tiệm đang có</h3>
+      {{if .DoiTac}}
+      <div class="cuon">
+        <table class="bang bang-the">
+          <thead>
+            <tr>
+              <th>Tiệm</th><th>Liên hệ</th><th class="p">Đơn</th><th class="p">Đang ở tiệm</th>
+              <th class="p">Đã trả</th><th class="p">Chưa trả</th><th class="p">Trạm ăn</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{range .DoiTac}}
+            <tr>
+              <td>
+                <b>{{.Ten}}</b>
+                {{if .Ngung}}<span class="chip chip-tuchoi">ngừng</span>{{end}}
+                {{if .Nghe}}<div class="nho mo">{{.Nghe}}</div>{{end}}
+                <div class="nho mo so">{{.Ma}}</div>
+              </td>
+              <td data-n="Liên hệ" class="nho">
+                {{if .LienHe}}<span class="so">{{.LienHe}}</span>{{else}}<span class="mo">—</span>{{end}}
+                {{if .DiaChi}}<div class="mo">{{.DiaChi}}</div>{{end}}
+              </td>
+              <td data-n="Đơn" class="p">{{.SoDon}}</td>
+              <td data-n="Đang ở tiệm" class="p">{{.DangGui}}{{if .QuaHen}}<div class="chip chip-tuchoi nho">{{.QuaHen}} trễ</div>{{end}}</td>
+              <td data-n="Đã trả" class="p mo">{{tien .DaTra}}</td>
+              <td data-n="Chưa trả" class="p">{{if .ConNo}}{{tien .ConNo}}{{else}}<span class="mo">0đ</span>{{end}}</td>
+              <td data-n="Trạm ăn" class="p">{{tien .TongChenh}}</td>
+            </tr>
+            {{end}}
+          </tbody>
+        </table>
+      </div>
+      <p class="nho mo" style="margin:12px 16px 16px">
+        "Chưa trả" là những đơn đã chốt tiền trả tiệm mà chưa bấm đã trả. "Trạm ăn"
+        là tổng tiền khách trả trừ tiền trả tiệm — cả hai con số đều do người gõ.
+      </p>
+      {{else}}
+      <div class="noi"><p class="nho mo" style="margin:0">Chưa khai tiệm nào. Thêm ở ô bên phải.</p></div>
+      {{end}}
+    </div>
+
+    {{if .DoiTac}}
+    <div class="the-nhom">
+      <h3>Sửa một tiệm</h3>
+      <div class="noi">
+        {{range .DoiTac}}
+        <form method="post" action="/qt/doi-tac/luu" class="doc" style="gap:10px;padding-bottom:16px;border-bottom:1px solid var(--vien);margin-bottom:16px">
+          <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+          <input type="hidden" name="ma" value="{{.Ma}}">
+          <div class="hang" style="margin:0">
+            <label style="margin:0">Tên tiệm<input name="ten" maxlength="100" value="{{.Ten}}" required></label>
+            <label style="margin:0" class="co-hep">Làm nghề gì<input name="nghe" maxlength="80" value="{{.Nghe}}"></label>
+          </div>
+          <div class="hang" style="margin:0">
+            <label style="margin:0" class="co-hep">Điện thoại / Zalo<input name="lien_he" maxlength="60" value="{{.LienHe}}"></label>
+            <label style="margin:0">Địa chỉ<input name="dia_chi" maxlength="200" value="{{.DiaChi}}"></label>
+            <label style="margin:0" class="co-hep">Tình trạng
+              <select name="ngung">
+                <option value="0" {{if not .Ngung}}selected{{end}}>Đang hợp tác</option>
+                <option value="1" {{if .Ngung}}selected{{end}}>Ngừng hợp tác</option>
+              </select>
+            </label>
+          </div>
+          <label style="margin:0">Ghi chú<input name="ghi_chu" maxlength="300" value="{{.GhiChu}}"></label>
+          <div class="hang-nut" style="margin:0">
+            <button type="submit" class="nut-nho">Lưu</button>
+          </div>
+        </form>
+        {{end}}
+
+        <p class="nho mo" style="margin:0">
+          Không dùng tiệm nào nữa thì để "Ngừng hợp tác" — tiệm biến khỏi ô chọn
+          của đơn mới, nhưng đơn cũ vẫn hiện đúng tên.
+        </p>
+      </div>
+    </div>
+    {{end}}
+  </div>
+
+  <div>
+    <div class="the-nhom">
+      <h3>Thêm tiệm mới</h3>
+      <div class="noi">
+        <form method="post" action="/qt/doi-tac/luu" class="doc" style="gap:12px">
+          <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+          <label style="margin:0">Tên tiệm
+            <span class="hd">Gọi sao cho sau này nhìn là biết ngay tiệm nào.</span>
+            <input name="ten" maxlength="100" required placeholder="Anh Tuấn giày Nguyễn Trãi">
+          </label>
+          <label style="margin:0">Làm nghề gì<input name="nghe" maxlength="80" placeholder="dán đế, khâu mũi giày"></label>
+          <label style="margin:0">Điện thoại / Zalo<input name="lien_he" maxlength="60"></label>
+          <label style="margin:0">Địa chỉ<input name="dia_chi" maxlength="200"></label>
+          <label style="margin:0">Ghi chú<input name="ghi_chu" maxlength="300" placeholder="nhận hàng trước 5h chiều"></label>
+          <button type="submit">Thêm tiệm</button>
+        </form>
+      </div>
+    </div>
+
+    {{if .DoiTac}}
+    <div class="the-nhom">
+      <h3>Xoá hẳn một tiệm</h3>
+      <div class="noi">
+        <form method="post" action="/qt/doi-tac/xoa" class="hang" style="align-items:flex-end"
+              onsubmit="return confirm('Xoá hẳn tiệm này khỏi danh sách?')">
+          <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+          <label style="margin:0">Tiệm
+            <select name="ma">{{range .DoiTac}}<option value="{{.Ma}}">{{.Ten}}</option>{{end}}</select>
+          </label>
+          <button type="submit" class="phu" style="flex:0 0 auto">Xoá</button>
+        </form>
+        <p class="nho mo" style="margin:10px 0 0">
+          Tiệm đã dính vào đơn nào thì không xoá được — dùng "Ngừng hợp tác".
+        </p>
+      </div>
+    </div>
+    {{end}}
+  </div>
+</div>
+
+{{template "qt-chan" .}}
+{{end}}

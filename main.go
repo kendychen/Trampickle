@@ -63,13 +63,11 @@ func main() {
 	if err := core.NapKho(); err != nil {
 		fmt.Fprintln(os.Stderr, "Cảnh báo kho:", err)
 	}
+	if err := core.NapDoNghe(); err != nil {
+		fmt.Fprintln(os.Stderr, "Cảnh báo đồ nghề:", err)
+	}
 	if err := core.NapDinhKy(); err != nil {
 		fmt.Fprintln(os.Stderr, "Cảnh báo khoản định kỳ:", err)
-	}
-	// Giao diện hỏng thì chỉ cảnh báo rồi chạy tiếp bằng bản mặc định —
-	// không đáng để cả xưởng mất web vì một dòng yaml sai.
-	if err := core.NapGiaoDien(); err != nil {
-		fmt.Fprintln(os.Stderr, "Cảnh báo giao diện:", err)
 	}
 	// Băng ảnh trang chủ cũng vậy: hỏng thì trang chủ quay về bản vẽ cây vợt.
 	if err := core.NapAnhHero(); err != nil {
@@ -80,10 +78,20 @@ func main() {
 	if err := core.NapBaiViet(); err != nil {
 		fmt.Fprintln(os.Stderr, "Cảnh báo bài viết:", err)
 	}
+	// Bài của từng việc ở data/dich-vu-bai/, cũng không nằm trong binary.
+	// Thiếu thì trang dịch vụ mất phần chữ, còn nguyên giá — chỉ cảnh báo.
+	if err := core.NapBaiDichVu(); err != nil {
+		fmt.Fprintln(os.Stderr, "Cảnh báo bài dịch vụ:", err)
+	}
 	// Chữ đã sửa ở /qt/noi-dung. Thiếu file thì mọi câu chữ lấy mặc định
 	// trong code — trang vẫn đủ chữ, chỉ là chưa có phần Kendy đổi.
 	if err := core.NapND(); err != nil {
 		fmt.Fprintln(os.Stderr, "Cảnh báo nội dung:", err)
+	}
+	// Công tắc Tại xưởng / Online ở data/giao-dien.yaml, đổi ở /qt/giao-dien.
+	// Thiếu file hay file hỏng thì chạy bản Tại xưởng — bản cũ, an toàn nhất.
+	if err := core.NapCheDo(); err != nil {
+		fmt.Fprintln(os.Stderr, "Cảnh báo chế độ:", err)
 	}
 	// Cụm liên hệ sửa ở /qt/lien-he. Thiếu file thì lấy khoá lien_he trong
 	// config.yaml như trước khi có trang ấy.
@@ -93,6 +101,31 @@ func main() {
 	}
 	if err := core.NapLienHe(); err != nil {
 		fmt.Fprintln(os.Stderr, "Cảnh báo liên hệ:", err)
+	}
+	// Danh sách tiệm gia công ngoài ở data/doi-tac.yaml. Chưa có file thì
+	// danh sách rỗng — đơn vẫn chạy, chỉ là chưa gửi đi đâu được.
+	if err := core.NapDoiTac(); err != nil {
+		fmt.Fprintln(os.Stderr, "Cảnh báo đối tác:", err)
+	}
+	// Hồ sơ khách ở data/khach-hang.yaml. File hỏng cũng không được chặn khởi
+	// động: trạm vẫn phải nhận đơn được, chỉ là mất phần gợi ý khách quen.
+	// Ngưỡng nội bộ (mức giảm khách quen). Thiếu file thì dùng mặc định khai
+	// trong core/nguongtram.go, không chặn khởi động.
+	if err := core.NapNguongTram(); err != nil {
+		fmt.Fprintln(os.Stderr, "Cảnh báo ngưỡng trạm:", err)
+	}
+	if err := core.NapKhach(); err != nil {
+		fmt.Fprintln(os.Stderr, "Cảnh báo khách hàng:", err)
+	}
+	// Câu hỏi thường gặp ở data/cau-hoi.yaml. Chưa có file thì trang /cau-hoi
+	// hiện câu "chưa có câu nào" — không phải lỗi, chỉ là Kendy chưa gõ.
+	if err := core.NapCauHoi(); err != nil {
+		fmt.Fprintln(os.Stderr, "Cảnh báo câu hỏi:", err)
+	}
+	// Cấu hình màn app (ảnh banner, đợt khuyến mãi, icon động) ở data/app.yaml.
+	// Chưa có file thì chạy bằng mặc định trong code, nên chỉ cảnh báo.
+	if err := core.NapAppCauHinh(); err != nil {
+		fmt.Fprintln(os.Stderr, "Cảnh báo cấu hình app:", err)
 	}
 	// Logo/biểu tượng tab tải lên nằm ở data/logo/. Không có thì đầu trang
 	// dùng SVG nhúng trong binary, nên đây cũng chỉ là cảnh báo.

@@ -1,0 +1,96 @@
+{{define "qt-khach-ct.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang">
+  <h1>{{if .Khach.Ten}}{{.Khach.Ten}}{{else}}Khách {{.Khach.Ma}}{{end}}</h1>
+  <div class="phai">
+    <a class="nut nut-vien" href="/qt/khach">← Danh sách khách</a>
+    <a class="nut nut-chinh" href="/qt/don-moi?khach={{.Khach.Ma}}">+ Tạo đơn cho khách này</a>
+  </div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<div class="luoi-so" style="margin-bottom:22px">
+  <div class="o-so"><div class="v">{{.SoLieu.SoDon}}</div><div class="t">đơn đã làm{{if .SoLieu.SoDonDang}} · {{.SoLieu.SoDonDang}} đang chạy{{end}}</div></div>
+  <div class="o-so"><div class="v" style="font-size:19px">{{tien .SoLieu.TongChi}}</div><div class="t">tổng đã trả</div></div>
+  <div class="o-so {{if .SoLieu.ConNo}}canh-bao{{end}}"><div class="v" style="font-size:19px">{{tien .SoLieu.ConNo}}</div><div class="t">còn nợ</div></div>
+  <div class="o-so"><div class="v">{{if .SoLieu.LanCuoi}}{{.SoLieu.NgayVang}}{{else}}—{{end}}</div><div class="t">ngày kể từ lần cuối</div></div>
+</div>
+
+<div class="ct-2cot">
+  <div>
+    <div class="the-nhom">
+      <h3>Đơn của khách này</h3>
+      {{if .Don}}
+      <div class="cuon">
+        <table class="bang bang-the">
+          <thead>
+            <tr><th>Mã</th><th>Món</th><th>Trạng thái</th><th>Ngày nhận</th><th class="p">Tổng</th><th class="p">Còn lại</th></tr>
+          </thead>
+          <tbody>
+          {{range .Don}}
+            {{$t := tt .TrangThai}}
+            <tr class="co-link">
+              <td><a href="/qt/don/{{.Ma}}" class="so">{{.Ma}}</a>{{if .LaDonBaoHanh}} <span class="chip chip-trung nho">bảo hành</span>{{end}}</td>
+              <td class="nho" data-n="Món">{{if .TenMon}}{{.TenMon}}{{else}}<span class="mo">—</span>{{end}}</td>
+              <td data-n="Trạng thái"><span class="chip chip-{{$t.Mau}}">{{$t.Ten}}</span></td>
+              <td class="nho mo" data-n="Ngày nhận">{{ngaydep .Ngay}}</td>
+              <td class="p" data-n="Tổng">{{tien .TongTien}}</td>
+              <td class="p" data-n="Còn lại">{{if .ConNo}}<b>{{tien .ConNo}}</b>{{else}}<span class="mo">0đ</span>{{end}}</td>
+            </tr>
+          {{end}}
+          </tbody>
+        </table>
+      </div>
+      {{else}}
+      <div class="noi"><p class="nho mo" style="margin:0">Chưa có đơn nào gắn với hồ sơ này.</p></div>
+      {{end}}
+    </div>
+  </div>
+
+  <div>
+    <div class="the-nhom">
+      <h3>Hồ sơ</h3>
+      <div class="noi">
+        <form method="post" action="/qt/khach/{{.Khach.Ma}}/luu" class="doc" style="gap:12px">
+          <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+          <label style="margin:0">Tên<input name="ten" maxlength="100" value="{{.Khach.Ten}}"></label>
+          <label style="margin:0">Điện thoại / Zalo
+            <span class="hd">Đây là khoá gộp đơn. Đổi số sang số của người khác thì trạm chặn.</span>
+            <input name="lien_he" maxlength="60" value="{{.Khach.LienHe}}" required>
+          </label>
+          <label style="margin:0">Email<input name="email" type="email" maxlength="254" value="{{.Khach.Email}}"></label>
+          <label style="margin:0">Địa chỉ<input name="dia_chi" maxlength="200" value="{{.Khach.DiaChi}}"></label>
+          <div class="hang" style="margin:0">
+            <label style="margin:0" class="co-hep">Nhóm
+              <select name="nhom">
+                {{$nh := .Khach.Nhom}}
+                {{range .Nhom}}<option value="{{.Ma}}" {{if eq $nh .Ma}}selected{{end}}>{{.Ten}}</option>{{end}}
+              </select>
+            </label>
+            <label style="margin:0" class="co-hep">Tình trạng
+              <select name="ngung">
+                <option value="0" {{if not .Khach.Ngung}}selected{{end}}>Đang theo dõi</option>
+                <option value="1" {{if .Khach.Ngung}}selected{{end}}>Ngừng gợi ý</option>
+              </select>
+            </label>
+          </div>
+          <label style="margin:0">Ghi chú
+            <span class="hd">Thứ cần nhớ lần sau: chơi vợt gì, thích căng bao nhiêu cân, hay trả chậm.</span>
+            <input name="ghi_chu" maxlength="500" value="{{.Khach.GhiChu}}">
+          </label>
+          <button type="submit">Lưu hồ sơ</button>
+        </form>
+        <p class="nho mo" style="margin:12px 0 0">
+          Mã <span class="so">{{.Khach.Ma}}</span>
+          {{if .Khach.LanDau}} · lần đầu {{ngaydep .Khach.LanDau}}{{end}}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{template "qt-chan" .}}
+{{end}}

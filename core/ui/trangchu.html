@@ -39,7 +39,7 @@
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/>
               <circle cx="12" cy="10" r="2.6"/>
-            </svg>{{.DiaChi}}
+            </svg><span>{{nd "trangchu.hero.dia-chi-nhan"}}: {{.DiaChi}}</span>
           </span>
           {{end}}
           {{if .DienThoai}}
@@ -59,6 +59,7 @@
         </p>
         {{end}}
         {{end}}
+        {{template "tb-chua-mo"}}
       </div>
 
       {{/* Có ảnh thật thì ảnh thắng bản vẽ — ảnh chụp việc đã làm nói được thứ
@@ -69,7 +70,7 @@
         <div class="bang-anh-khung">
           {{range $i, $a := .Anh}}
           <figure class="ba-o{{if eq $i 0}} hien{{end}}">
-            <img src="/anh-trang-chu/{{$a.Ten}}" alt="{{$a.ChuThich}}"
+            <img src="/anh-trang-chu/{{$a.Ten}}" alt="{{if $a.ChuThich}}{{$a.ChuThich}}{{else}}Ảnh việc {{$.Brand.Ten}} đã làm{{end}}"
                  {{if eq $i 0}}fetchpriority="high"{{else}}loading="lazy"{{end}}>
             {{if $a.ChuThich}}<figcaption>{{$a.ChuThich}}</figcaption>{{end}}
           </figure>
@@ -218,16 +219,21 @@
       <p class="dan-lon" style="margin-top:10px">{{ndd "trangchu.dv.dan"}}</p>
     </div>
     <div class="luoi-vach">
+      {{/* Nổi bật tô TẠI CHỖ, không nhấc lên đầu và không tách thành khối
+           riêng. Lưới này xếp theo thu_tu — nhấc mấy ô lên trên là thứ tự
+           Kendy đặt ở /qt/dich-vu mất tác dụng, mà khách quay lại lần sau
+           thấy lưới đảo chỗ thì phải đọc lại từ đầu. */}}
       {{range .DichVu}}
-      <a class="dv-the" href="/dich-vu/{{.Ma}}">
-        <div class="bt-o">{{template "bt-dich-vu" .Ma}}</div>
+      <a class="dv-the{{if and $.NoiBat .NoiBat}} dv-noi-bat{{end}}" href="/dich-vu/{{.Ma}}">
+        <div class="bt-o">{{template "bt-dv-mau" .Ma}}</div>
         <div class="dau-the">
           <h3>{{.Ten}}</h3>
         </div>
-        <span class="chip chip-trung">{{nhom .Nhom}}</span>
+        {{if and $.NoiBat .NoiBat}}<span class="chip chip-noi-bat">{{nd "trangchu.dv.noi-bat"}}</span>{{end}}
+        {{with giaKhach .}}<div class="dv-gia">{{.}}</div>{{end}}
         {{if .DieuKien}}<div class="mota">{{.DieuKien}}</div>{{end}}
         <div class="chan">
-          {{if .LeadTimeNgay}}<span>{{.LeadTimeNgay}} ngày</span>{{end}}
+          {{with .LeadChu}}<span>{{.}}</span>{{end}}
           {{if .BaoHanhThang}}<span>BH {{.BaoHanhThang}} tháng</span>{{end}}
         </div>
       </a>
@@ -237,13 +243,16 @@
            nào. Đặt trong lưới chứ không tách ra dưới: người đã quét hết lưới mà
            không thấy việc của mình thì đang ở đúng chỗ này. */}}
       <a class="dv-the" href="#gui-yeu-cau">
-        <div class="bt-o">{{template "bt-hoi"}}</div>
+        <div class="bt-o">{{template "btm-hoi"}}</div>
         <div class="dau-the"><h3>{{nd "trangchu.dv.khac-h3"}}</h3></div>
         <span class="chip chip-trung">{{nd "trangchu.dv.khac-chip"}}</span>
         <div class="mota">{{ndd "trangchu.dv.khac-chu"}}</div>
         <div class="chan"><span>{{nd "trangchu.dv.khac-chan"}}</span></div>
       </a>
     </div>
+
+    {{/* Xem chú thích ở dichvu.html — cùng một câu, cùng một luật hiện. */}}
+    {{if giaTuyThe .DichVu}}<p class="dv-luoi-chu">{{ndd "app.gia.tuy-the"}}</p>{{end}}
   </div>
 </section>
 

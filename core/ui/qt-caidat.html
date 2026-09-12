@@ -1,7 +1,7 @@
 {{define "qt-caidat.html"}}
 {{template "qt-dau" .}}
 
-<div class="qt-dau-trang"><h1>Khóa API &amp; model</h1></div>
+<div class="qt-dau-trang"><h1>Khóa API &amp; thông báo</h1></div>
 
 {{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
 {{if .KetQua}}<div class="bao bao-ok">{{.KetQua}}</div>{{end}}
@@ -21,7 +21,7 @@
 <form method="post" action="/qt/cai-dat" style="max-width:760px;margin-top:24px">
   <input type="hidden" name="_csrf" value="{{$.CSRF}}">
 
-  <div class="o-nguong" style="border-left:3px solid var(--nhan,#d6f32f);padding:12px 0 12px 16px;margin:16px 0">
+  <div class="o-nguong" style="border-left:3px solid var(--nhan,#FFC72C);padding:12px 0 12px 16px;margin:16px 0">
     <label for="gemini"><b>Khóa Gemini</b></label>
     <div class="nho mo" style="margin:4px 0 8px">
       {{if .CheGemini}}Đang dùng: <code class="so">{{.CheGemini}}</code>{{else}}<b>Chưa có khóa.</b> Trợ lý kỹ thuật sẽ báo lỗi khi bấm Hỏi.{{end}}
@@ -41,7 +41,7 @@
     </div>
   </div>
 
-  <div class="o-nguong" style="border-left:3px solid var(--nhan,#d6f32f);padding:12px 0 12px 16px;margin:16px 0">
+  <div class="o-nguong" style="border-left:3px solid var(--nhan,#FFC72C);padding:12px 0 12px 16px;margin:16px 0">
     <label for="resend"><b>Khóa Resend</b></label>
     <div class="nho mo" style="margin:4px 0 8px">
       {{if .CheResend}}Đang dùng: <code class="so">{{.CheResend}}</code>{{else}}<b>Chưa có khóa.</b> Web vẫn nhận yêu cầu, chỉ là khách không nhận được mail xác nhận.{{end}}
@@ -61,7 +61,7 @@
     </div>
   </div>
 
-  <div class="o-nguong" style="border-left:3px solid var(--nhan,#d6f32f);padding:12px 0 12px 16px;margin:16px 0">
+  <div class="o-nguong" style="border-left:3px solid var(--nhan,#FFC72C);padding:12px 0 12px 16px;margin:16px 0">
     <label for="nha_cung_cap"><b>Model trả lời</b></label>
     <div style="margin:8px 0">
       <select id="nha_cung_cap" name="nha_cung_cap" style="max-width:320px">
@@ -85,6 +85,96 @@
   </div>
 
   <button class="nut nut-chinh" type="submit" name="viec" value="luu" style="margin-top:20px">Lưu</button>
+</form>
+
+
+<h2 style="margin:36px 0 4px">Thông báo đơn hàng</h2>
+<p class="mo" style="max-width:64ch;margin:0 0 8px">
+  Ba việc được báo: <b>khách gửi yêu cầu từ web</b>, <b>đơn tới hẹn hoặc quá hẹn
+  mà chưa trả</b>, và <b>khách chuyển khoản khớp đơn</b>. Thợ đổi trạng thái đơn
+  thì không báo — một ngày vài chục lần, báo hết là tới hôm thứ ba anh tắt
+  thông báo và mất luôn ba việc trên.
+</p>
+<p class="nho mo" style="max-width:64ch">
+  Ba kênh chạy song song, kênh nào chưa khai thì im lặng bỏ qua. Chỉ gửi cho
+  chủ trạm, thợ không nhận gì cả.
+</p>
+
+<form method="post" action="/qt/cai-dat" style="max-width:760px;margin-top:16px">
+  <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+
+  <div class="o-nguong" style="border-left:3px solid var(--nhan,#FFC72C);padding:12px 0 12px 16px;margin:16px 0">
+    <label for="telegram_token"><b>Telegram</b></label>
+    <div class="nho mo" style="margin:4px 0 8px">
+      {{if .CheTelegram}}Token đang dùng: <code class="so">{{.CheTelegram}}</code>{{else}}<b>Chưa khai token.</b> Kênh này đang tắt.{{end}}
+      {{if .EnvTelegram}}<br><b>Biến môi trường TELEGRAM_BOT_TOKEN đang đè lên file này.</b>{{end}}
+      {{if .TenBot}}<br>Bot: <b>{{.TenBot}}</b>{{if .LinkBot}} — <a href="{{.LinkBot}}" target="_blank" rel="noopener">mở cuộc trò chuyện ↗</a>{{end}}{{end}}
+    </div>
+    <div style="margin:8px 0">
+      <input id="telegram_token" name="telegram_token" type="password" autocomplete="off"
+             placeholder="{{if .CheTelegram}}để trống = giữ token đang dùng{{else}}dán token của @BotFather{{end}}"
+             style="width:100%;max-width:520px">
+    </div>
+    <div style="margin:12px 0 4px">
+      <label for="telegram_chat" class="nho">Chat id — nơi bot nhắn tới</label>
+    </div>
+    <div style="margin:4px 0">
+      <input id="telegram_chat" name="telegram_chat" type="text" inputmode="numeric" autocomplete="off"
+             value="{{.ChatTelegram}}" placeholder="ví dụ 123456789" style="max-width:260px">
+    </div>
+    <div class="nho mo" style="margin-top:8px;max-width:60ch">
+      Ba bước: nhắn <code>/newbot</code> cho <code>@BotFather</code> để lấy token,
+      dán vào ô trên. Rồi mở bot vừa tạo và nhắn cho nó một câu bất kỳ — bot
+      <b>không được phép</b> nhắn trước cho ai. Xong bấm <b>Dò chat id</b>.
+    </div>
+    <div class="hang-nut" style="margin-top:10px">
+      <button class="nut nut-phu" type="submit" name="viec" value="thu-telegram">Lưu &amp; kiểm tra token</button>
+      <button class="nut nut-phu" type="submit" name="viec" value="do-chat">Dò chat id</button>
+      {{if .CheTelegram}}<button class="nut nut-phu" type="submit" name="viec" value="xoa-telegram">Xóa</button>{{end}}
+    </div>
+  </div>
+
+  <div class="o-nguong" style="border-left:3px solid var(--nhan,#FFC72C);padding:12px 0 12px 16px;margin:16px 0">
+    <b>Mail báo việc</b>
+    <div class="nho mo" style="margin:4px 0 0;max-width:60ch">
+      {{if and .MailBat .MailChu}}Gửi về <code class="so">{{.MailChu}}</code>.{{else if .MailChu}}<b>Đang tắt</b> — thiếu khóa Resend hoặc <code>email.bat</code> trong config.yaml. Địa chỉ nhận đã khai: <code class="so">{{.MailChu}}</code>.{{else}}<b>Chưa khai địa chỉ nhận.</b> Đặt <code>email.bao_cao</code> trong config.yaml.{{end}}
+      <br>Cùng địa chỉ nhận báo cáo tháng, không khai riêng.
+    </div>
+  </div>
+
+  <div class="o-nguong" style="border-left:3px solid var(--nhan,#FFC72C);padding:12px 0 12px 16px;margin:16px 0">
+    <b>Thông báo trên máy ({{len .PushMay}})</b>
+    <div class="nho mo" style="margin:4px 0 8px;max-width:60ch">
+      Hiện trên màn hình khóa kể cả khi app quản lý đang đóng. Bật bằng nút
+      <b>“Bật thông báo trên máy này”</b> dưới đáy menu bên trái — phải bấm
+      trên chính cái máy muốn nhận.
+      <br>iPhone chỉ nhận sau khi đã <b>Thêm vào Màn hình chính</b>; mở trong
+      tab Safari thường thì nút kia sẽ báo là máy không nhận được.
+    </div>
+    {{if .PushMay}}
+    <table class="bang bang-the" style="margin-top:8px">
+      <thead><tr><th>Máy</th><th>Bật từ</th><th></th></tr></thead>
+      <tbody>
+        {{range .PushMay}}
+        <tr>
+          <td>{{if .May}}{{.May}}{{else}}(không rõ){{end}}{{if .LoiCuoi}}<br><span class="nho" style="color:var(--md-error)">Lỗi lần gửi gần nhất: {{.LoiCuoi}}</span>{{end}}</td>
+          <td data-n="Bật từ" class="nho">{{.Them}}</td>
+          {{/* Endpoint đi thẳng trong value của nút, không qua ô ẩn: cả bảng
+               nằm chung một biểu mẫu, nên mọi ô ẩn đều được gửi lên và
+               FormValue chỉ đọc được cái đầu tiên — bấm bỏ máy thứ ba thì
+               máy thứ nhất biến mất. */}}
+          <td data-n=""><button class="nut-nho" type="submit" name="xoa_push" value="{{.Endpoint}}">Bỏ máy này</button></td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+    {{end}}
+  </div>
+
+  <div class="hang-nut" style="margin-top:20px">
+    <button class="nut nut-chinh" type="submit" name="viec" value="luu">Lưu</button>
+    <button class="nut nut-phu" type="submit" name="viec" value="gui-thu">Gửi thử cả ba kênh</button>
+  </div>
 </form>
 
 {{template "qt-chan" .}}

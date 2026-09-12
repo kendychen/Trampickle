@@ -72,8 +72,9 @@ func khopHang(a, b string) bool {
 // thử đầu — hỏng lộ ra chứ không âm thầm mất bảo vệ.
 func multipartChoPhep(duong string) bool {
 	switch duong {
-	case "/gui-yeu-cau", "/app/gui-anh",
-		"/qt/giao-dien/logo", "/qt/anh-trang-chu/them", "/qt/bai-viet/anh":
+	case "/gui-yeu-cau", "/app/gui-anh", "/cua-hang",
+		"/qt/giao-dien/logo", "/qt/anh-trang-chu/them", "/qt/bai-viet/anh",
+		"/qt/app/anh", "/qt/app/video":
 		return true
 	}
 	// /qt/don/{ma}/anh — mã đơn nằm giữa nên không so bằng được.

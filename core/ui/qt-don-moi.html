@@ -1,16 +1,30 @@
 {{define "qt-don-moi.html"}}
 {{template "qt-dau" .}}
 {{$d := .Truoc}}
+{{$giay := .LaGiay}}
+{{$ds := "/qt/don-vot"}}{{if $giay}}{{$ds = "/qt/don-giay"}}{{end}}
 
 <div class="qt-dau-trang">
-  <h1>Tạo đơn mới</h1>
-  <div class="phai"><a class="nut nut-vien" href="/qt/don">Huỷ</a></div>
+  <h1>Tạo đơn {{.TenLoai}} mới</h1>
+  <div class="phai"><a class="nut nut-vien" href="{{$ds}}">Huỷ</a></div>
 </div>
 
 {{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
 
 <form method="post" action="/qt/don-moi" class="doc" style="gap:18px;max-width:820px">
   <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+  <input type="hidden" name="loai" value="{{.Loai}}">
+  {{/* Mã gốc đi theo form ẩn chứ không cho gõ tay: nó chỉ được đặt đúng một
+       lần, lúc bấm "Mở đơn bảo hành" từ đơn cũ. Sửa được thì tỷ lệ bảo hành
+       của kỳ đã chốt sẽ đổi theo. */}}
+  {{if and $d $d.MaDonGoc}}
+  <input type="hidden" name="ma_don_goc" value="{{$d.MaDonGoc}}">
+  <div class="bao bao-ok">
+    Đơn bảo hành cho <a class="so" href="/qt/don/{{$d.MaDonGoc}}">{{$d.MaDonGoc}}</a>.
+    Thông tin khách và {{if $giay}}giày{{else}}vợt{{end}} đã chép sang. Tiền vẫn ghi
+    như đơn thường — làm không công thì để tổng 0đ, đừng xoá đơn.
+  </div>
+  {{end}}
 
   <div class="the-nhom">
     <h3>Khách</h3>
@@ -19,11 +33,28 @@
         <label>Tên khách<input name="khach_ten" maxlength="100" value="{{if $d}}{{$d.KhachTen}}{{end}}" autofocus></label>
         <label>Điện thoại / Zalo *
           <span class="hd">Khách tra cứu đơn bằng 4 số cuối của số này.</span>
-          <input name="khach_lien_he" maxlength="60" value="{{if $d}}{{$d.KhachLienHe}}{{end}}" required>
+          <input name="khach_lien_he" maxlength="60" value="{{if $d}}{{$d.KhachLienHe}}{{end}}" list="ds-khach" autocomplete="off" required>
+        </label>
+      </div>
+      {{/* Gợi ý khách quen: gõ số ra hồ sơ cũ, ô nào đang trống thì trạm điền
+           hộ. Không đè lên chữ thợ vừa gõ — thợ nhìn khách trước mặt, hồ sơ
+           thì có thể đã cũ. */}}
+      <datalist id="ds-khach">
+        {{range .GoiY}}<option value="{{.LienHe}}">{{if .Ten}}{{.Ten}}{{else}}chưa có tên{{end}} · {{.SoDon}} đơn</option>{{end}}
+      </datalist>
+      <p class="nho" id="tin-khach" hidden style="margin:-8px 0 0"></p>
+      {{/* Email không bắt buộc — nhiều bác chơi pickleball chỉ dùng Zalo. Có
+           thì bấm được nút gửi báo giá và hoá đơn; không có thì thợ nhắn tay,
+           không sao cả. Gõ sai định dạng thì ô này bị bỏ qua chứ không chặn
+           lưu đơn: cái quan trọng của đơn là số điện thoại. */}}
+      <div class="hang">
+        <label>Email khách
+          <span class="hd">Để gửi mã tra cứu, báo giá và hoá đơn. Bỏ trống cũng được.</span>
+          <input type="email" name="khach_email" maxlength="254" value="{{if $d}}{{$d.KhachEmail}}{{end}}">
         </label>
       </div>
       <div class="hang">
-        <label>Nhận vợt qua
+        <label>Nhận {{.TenLoai}} qua
           <select name="kenh_nhan">
             <option value="truc_tiep">Trực tiếp</option>
             <option value="ship">Gửi từ xa</option>
@@ -42,8 +73,24 @@
   </div>
 
   <div class="the-nhom">
-    <h3>Vợt</h3>
+    <h3>{{if $giay}}Giày{{else}}Vợt{{end}}</h3>
     <div class="noi">
+      {{if $giay}}
+      <div class="hang">
+        <label>Hãng / đời giày<input name="giay_hang" maxlength="100" value="{{if $d}}{{$d.GiayHang}}{{end}}" placeholder="Nike Vapor Pro 2"></label>
+        <label class="co-hep">Cỡ<input name="giay_size" maxlength="20" value="{{if $d}}{{$d.GiaySize}}{{end}}" placeholder="42 / US 9"></label>
+        <label class="co-hep">Loại
+          <select name="giay_kieu">
+            {{$k := ""}}{{if $d}}{{$k = $d.GiayKieu}}{{end}}
+            {{range .KieuGiay}}<option value="{{.Ma}}" {{if eq $k .Ma}}selected{{end}}>{{.Ten}}</option>{{end}}
+          </select>
+        </label>
+      </div>
+      <label>Đế hiện tại
+        <span class="hd">Ghi đúng thứ đang có trên giày để sau khỏi cãi nhau lúc trả.</span>
+        <input name="de_hien_tai" maxlength="200" value="{{if $d}}{{$d.DeHienTai}}{{end}}" placeholder="đế gốc mòn gót phải, đã dán keo một lần">
+      </label>
+      {{else}}
       <div class="hang">
         <label>Hãng / đời vợt<input name="vot_hang" maxlength="100" value="{{if $d}}{{$d.VotHang}}{{end}}" placeholder="Joola Perseus 16mm"></label>
         <label class="co-hep">Giá trị vợt khách khai
@@ -55,6 +102,7 @@
           <input name="can_truoc" inputmode="decimal" value="{{if $d}}{{oso $d.CanTruocG}}{{end}}">
         </label>
       </div>
+      {{end}}
       <label>Khách mô tả tình trạng<textarea name="tinh_trang" maxlength="3000">{{if $d}}{{$d.TinhTrang}}{{end}}</textarea></label>
       <label>Thợ chẩn đoán<textarea name="chan_doan" maxlength="3000">{{if $d}}{{$d.ChanDoan}}{{end}}</textarea></label>
     </div>
@@ -63,6 +111,12 @@
   <div class="the-nhom">
     <h3>Việc và tiền</h3>
     <div class="noi">
+      {{if $giay}}
+      <p class="nho mo" style="margin-bottom:14px">
+        Bảng giá là bảng giá vợt — đơn giày không lấy giá ở đó. Gõ tay từng dòng
+        theo đúng con số đã chốt với khách.
+      </p>
+      {{else}}
       <p class="nho mo" style="margin-bottom:14px">
         Tick dịch vụ là lấy đúng giá trong bảng giá. Việc ngoài bảng thì gõ tay ở dưới.
       </p>
@@ -77,12 +131,16 @@
         </label>
         {{end}}
       </div>
+      {{end}}
 
       <div class="nhan-nho" style="margin:22px 0 10px">Dòng gõ tay</div>
       <div class="hang"><label style="margin:0">Nội dung<input name="dong_ten" maxlength="120"></label><label style="margin:0" class="co-hep">Tiền<input name="dong_tien" inputmode="numeric" class="tay"></label></div>
       <div class="hang"><label style="margin:0">Nội dung<input name="dong_ten" maxlength="120"></label><label style="margin:0" class="co-hep">Tiền<input name="dong_tien" inputmode="numeric" class="tay"></label></div>
       <div class="hang"><label style="margin:0">Nội dung<input name="dong_ten" maxlength="120"></label><label style="margin:0" class="co-hep">Tiền<input name="dong_tien" inputmode="numeric" class="tay"></label></div>
-
+      {{if $giay}}
+      <div class="hang"><label style="margin:0">Nội dung<input name="dong_ten" maxlength="120"></label><label style="margin:0" class="co-hep">Tiền<input name="dong_tien" inputmode="numeric" class="tay"></label></div>
+      <div class="hang"><label style="margin:0">Nội dung<input name="dong_ten" maxlength="120"></label><label style="margin:0" class="co-hep">Tiền<input name="dong_tien" inputmode="numeric" class="tay"></label></div>
+      {{end}}
 
       <div class="nhan-nho" style="margin:22px 0 10px">Giảm giá</div>
       <div class="hang">
@@ -119,8 +177,8 @@
   </div>
 
   <div class="hang-nut">
-    <button type="submit">Tạo đơn</button>
-    <a class="nut nut-vien" href="/qt/don">Huỷ</a>
+    <button type="submit">Tạo đơn {{.TenLoai}}</button>
+    <a class="nut nut-vien" href="{{$ds}}">Huỷ</a>
   </div>
 </form>
 
@@ -146,6 +204,50 @@ function tinhTong(){
 document.addEventListener('input', tinhTong);
 document.addEventListener('change', tinhTong);
 tinhTong();
+</script>
+
+<script nonce="{{$.Nonce}}">
+(function () {
+  var kho = {{json .GoiY}};
+  if (!kho || !kho.length) return;
+  var o = document.querySelector('input[name=khach_lien_he]');
+  var tin = document.getElementById('tin-khach');
+  if (!o || !tin) return;
+
+  function chuanSo(s) {
+    var d = (s || '').replace(/[^0-9]/g, '');
+    if (d.length === 11 && d.slice(0, 2) === '84') d = '0' + d.slice(2);
+    return d;
+  }
+  function tien(n) {
+    return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + 'đ';
+  }
+  function dienNeuTrong(ten, gt) {
+    var e = document.querySelector('[name=' + ten + ']');
+    if (e && !e.value.trim() && gt) e.value = gt;
+  }
+
+  function soi() {
+    var so = chuanSo(o.value), k = null, i;
+    for (i = 0; i < kho.length; i++) { if (kho[i].so === so) { k = kho[i]; break; } }
+    if (!k) { tin.hidden = true; tin.textContent = ''; return; }
+    dienNeuTrong('khach_ten', k.ten);
+    dienNeuTrong('khach_email', k.email);
+    var chu = 'Khách quen · ' + k.so_don + ' đơn';
+    if (k.con_no > 0) chu += ' · còn nợ ' + tien(k.con_no);
+    if (k.lan_cuoi) chu += ' · lần cuối ' + k.lan_cuoi;
+    tin.textContent = '';
+    var a = document.createElement('a');
+    a.href = '/qt/khach/' + k.ma;
+    a.textContent = chu;
+    tin.appendChild(a);
+    tin.hidden = false;
+  }
+
+  o.addEventListener('blur', soi);
+  o.addEventListener('change', soi);
+  if (o.value) soi();
+})();
 </script>
 
 {{template "qt-chan" .}}

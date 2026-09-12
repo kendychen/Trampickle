@@ -1,0 +1,115 @@
+{{define "qt-khach.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang">
+  <h1>Khách hàng</h1>
+  <div class="phai">
+    <a class="nut nut-vien" href="/qt/khach?vang=6">Chưa quay lại 6 tháng</a>
+    <a class="nut nut-vien" href="/qt/khach?con_no=1">Đang nợ tiền</a>
+    <a class="nut nut-chinh" href="/qt/don-moi">+ Tạo đơn</a>
+  </div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<div class="luoi-so" style="margin-bottom:22px">
+  <div class="o-so"><div class="v">{{.TongQuan.TongKhach}}</div><div class="t">tổng khách</div></div>
+  <div class="o-so"><div class="v">{{.TongQuan.MoiTrongThang}}</div><div class="t">khách mới tháng này</div></div>
+  <div class="o-so"><div class="v" style="font-size:19px">{{tien .TongQuan.TongConNo}}</div><div class="t">tổng còn nợ</div></div>
+  <div class="o-so"><div class="v">{{.TongQuan.SoKhachNo}}</div><div class="t">khách đang nợ</div></div>
+</div>
+
+<form method="get" action="/qt/khach" class="the" style="margin-bottom:18px">
+  <div class="hang" style="align-items:flex-end">
+    <label style="margin:0">Tìm<input name="q" value="{{.Loc.Tim}}" placeholder="tên, số điện thoại, mã khách"></label>
+    <label style="margin:0" class="co-hep">Nhóm
+      <select name="nhom">
+        <option value="">Tất cả</option>
+        {{$n := .Loc.Nhom}}
+        {{range .Nhom}}<option value="{{.Ma}}" {{if eq $n .Ma}}selected{{end}}>{{.Ten}}</option>{{end}}
+      </select>
+    </label>
+    <label style="margin:0" class="co-hep">Chưa quay lại quá
+      {{$v := .Loc.VangTuThang}}
+      <select name="vang">
+        <option value="0" {{if eq $v 0}}selected{{end}}>Không lọc</option>
+        <option value="3" {{if eq $v 3}}selected{{end}}>3 tháng</option>
+        <option value="6" {{if eq $v 6}}selected{{end}}>6 tháng</option>
+        <option value="12" {{if eq $v 12}}selected{{end}}>12 tháng</option>
+      </select>
+    </label>
+    <label style="margin:0;flex:0 0 auto;display:flex;align-items:center;gap:0;padding-bottom:10px">
+      <input type="checkbox" name="con_no" value="1" {{if .Loc.ConNo}}checked{{end}}> Còn nợ tiền
+    </label>
+    <button type="submit" style="flex:0 0 auto">Lọc</button>
+  </div>
+</form>
+
+<p class="nho mo" style="margin:-6px 0 14px">
+  Đang hiện {{len .Khach}} khách. "Ngày vắng" đếm từ ngày nhận đơn gần nhất —
+  lọc theo nó ra được danh sách để nhắn Zalo.
+</p>
+
+{{if .Khach}}
+<div class="the-nhom">
+  <div class="cuon">
+    <table class="bang bang-the">
+      <thead>
+        <tr>
+          <th>Khách</th><th>Nhóm</th><th class="p">Đơn</th><th class="p">Tổng chi</th>
+          <th class="p">Còn nợ</th><th>Lần cuối</th><th class="p">Vắng</th>
+        </tr>
+      </thead>
+      <tbody>
+      {{range .Khach}}
+        <tr class="co-link">
+          <td>
+            <a href="/qt/khach/{{.Ma}}">{{if .Ten}}{{.Ten}}{{else}}<span class="mo">chưa có tên</span>{{end}}</a>
+            {{if .Ngung}}<span class="chip chip-tuchoi">ngừng</span>{{end}}
+            <div class="nho mo so">{{.LienHe}} · {{.Ma}}</div>
+          </td>
+          <td data-n="Nhóm"><span class="chip chip-{{.MauNhom}}">{{.TenNhom}}</span></td>
+          <td class="p" data-n="Đơn">{{.SoDon}}{{if .SoDonDang}}<div class="nho mo">{{.SoDonDang}} đang chạy</div>{{end}}</td>
+          <td class="p" data-n="Tổng chi">{{tien .TongChi}}</td>
+          <td class="p" data-n="Còn nợ">{{if .SoLieuKhach.ConNo}}<b>{{tien .SoLieuKhach.ConNo}}</b>{{else}}<span class="mo">0đ</span>{{end}}</td>
+          <td class="nho mo" data-n="Lần cuối">{{if .SoLieuKhach.LanCuoi}}{{ngaydep .SoLieuKhach.LanCuoi}}{{else}}chưa có đơn{{end}}</td>
+          <td class="p nho" data-n="Vắng">{{if .SoLieuKhach.LanCuoi}}{{.NgayVang}} ngày{{else}}<span class="mo">—</span>{{end}}</td>
+        </tr>
+      {{end}}
+      </tbody>
+    </table>
+  </div>
+  <div class="the-chan">
+    <a class="nut nut-vien" href="/qt/khach.csv?q={{.Loc.Tim}}&nhom={{.Loc.Nhom}}&vang={{.Loc.VangTuThang}}{{if .Loc.ConNo}}&con_no=1{{end}}">Xuất CSV bảng này</a>
+  </div>
+</div>
+{{else}}
+<div class="the trong">
+  <b>Chưa có khách nào khớp</b>
+  Hồ sơ khách tự sinh ra mỗi lần lập đơn. Bỏ bớt bộ lọc, hoặc đổ danh bạ vào ở ô dưới.
+</div>
+{{end}}
+
+<div class="the-nhom">
+  <h3>Đổ danh bạ từ tệp CSV</h3>
+  <div class="noi">
+    <form method="post" action="/qt/khach/nhap" enctype="multipart/form-data" class="hang" style="align-items:flex-end">
+      <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+      <label style="margin:0">Tệp CSV
+        <span class="hd">Tối thiểu hai cột: tên và số điện thoại. Có thêm email, địa chỉ, nhóm, ghi chú thì nhận luôn.</span>
+        <input type="file" name="tep" accept=".csv,text/csv" required>
+      </label>
+      <button type="submit" style="flex:0 0 auto">Nhập</button>
+    </form>
+    <p class="nho mo" style="margin:10px 0 0">
+      Trùng số điện thoại thì cập nhật chứ không tạo thêm dòng mới, và chỉ điền
+      vào ô đang trống. Dòng thiếu số điện thoại bị bỏ qua và kể tên ra sau khi
+      nhập. Không có nút hoàn tác — bản cũ được chép sang
+      <span class="so">data/khach-hang.yaml.truoc-nhap</span> trước khi ghi.
+    </p>
+  </div>
+</div>
+
+{{template "qt-chan" .}}
+{{end}}

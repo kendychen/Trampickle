@@ -26,6 +26,11 @@
 
 {{if .Hien.MoTa}}<p class="nho mo" style="max-width:70ch;margin-top:14px">{{.Hien.MoTa}}</p>{{end}}
 
+<p class="nho mo" style="max-width:70ch;margin-top:14px">
+  Đang sửa <b>{{if .LaOnline}}bản Online{{else}}bản Tại xưởng{{end}}</b>.
+  <a href="/qt/giao-dien">Đổi bản đang chạy</a>
+</p>
+
 <form method="post" action="/qt/noi-dung/luu" id="f-nd">
   <input type="hidden" name="_csrf" value="{{$.CSRF}}">
   <input type="hidden" name="ma" value="{{.Hien.Ma}}">
@@ -45,6 +50,7 @@
         </label>
         <div class="hang nho mo" style="gap:10px;align-items:center;margin-top:6px">
           <code>{{.Khoa}}</code>
+          {{if and $.LaOnline (not .CoBanRieng)}}<span>· dùng chung cả hai bản</span>{{end}}
           {{if .DaSua}}
           <span>· đã đổi</span>
           {{/* Nút nằm trong form lưu nhưng gửi sang form khôi phục nhờ
@@ -56,7 +62,7 @@
           {{end}}
         </div>
         {{if .DaSua}}
-        <div class="nho mo" style="margin-top:4px">Mặc định: “{{.Mac}}”</div>
+        <div class="nho mo" style="margin-top:4px">Mặc định: “{{if and $.LaOnline .CoBanRieng}}{{.MacOn}}{{else}}{{.Mac}}{{end}}”</div>
         {{end}}
       </div>
       {{end}}

@@ -2,12 +2,18 @@
 {{template "qt-dau" .}}
 {{$d := .Don}}
 {{$tt := tt $d.TrangThai}}
+{{$giay := $d.LaGiay}}
 
 <div class="qt-dau-trang">
   <h1 class="so">{{$d.Ma}}</h1>
   <span class="chip chip-{{$tt.Mau}}">{{$tt.Ten}}</span>
   <div class="phai">
-    <a class="nut nut-vien" href="/qt/don">← Danh sách</a>
+    {{/* Hoá đơn mở tab mới: thợ đang giữa chừng sửa đơn, bấm in mà mất form
+         đang gõ thì lần sau không ai dám bấm. */}}
+    <a class="nut nut-vien" href="/qt/don/{{$d.Ma}}/hoa-don" target="_blank">In hoá đơn ↗</a>
+    <a class="nut nut-vien" href="/qt/don/{{$d.Ma}}/tem" target="_blank">In tem ↗</a>
+    <a class="nut nut-vien" href="/qt/don/{{$d.Ma}}/mail">Thư gửi khách</a>
+    <a class="nut nut-vien" href="{{.DuongDs}}">← Đơn {{$d.TenLoai}}</a>
   </div>
 </div>
 
@@ -23,6 +29,44 @@
 <div class="ct-2cot">
 
   <div>
+    {{/* Đơn đặt online: một nút để kiện hàng vào luồng cũ. Đặt trên ô đổi
+         trạng thái vì đây là việc duy nhất làm được ở bước này. */}}
+    {{if $d.ChoHangVe}}
+    <div class="the-nhom">
+      <h3>Kiện hàng khách gửi</h3>
+      <div class="noi">
+        {{if $d.KhachDiaChi}}<p class="nho mo" style="margin:0">Địa chỉ trả về: {{$d.KhachDiaChi}}</p>{{end}}
+        <form method="post" action="/qt/don/{{$d.Ma}}/nhan-hang" style="margin-top:10px">
+          <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+          <div class="hang" style="align-items:flex-end">
+            <label style="margin:0">Mã vận đơn khách gửi tới<input name="ma_van_don" maxlength="60" value="{{$d.MaVanDonDen}}" placeholder="VD: GHTK123456"></label>
+            <button type="submit" style="flex:0 0 auto">Đã nhận kiện hàng</button>
+          </div>
+        </form>
+        <p class="nho mo" style="margin-top:10px">Bấm nút này là đơn sang “Mới nhận”, từ đó chạy như đơn mang tới xưởng.</p>
+      </div>
+    </div>
+    {{end}}
+
+    {{/* Chiều về. Chỉ hỏi khi đơn có địa chỉ trả — đơn khách tự tới lấy thì
+         không có gì để gửi. */}}
+    {{if $d.KhachDiaChi}}
+    <div class="the-nhom">
+      <h3>Gửi đồ về cho khách</h3>
+      <div class="noi">
+        <p class="nho mo" style="margin:0">Gửi tới: {{$d.KhachDiaChi}}</p>
+        <form method="post" action="/qt/don/{{$d.Ma}}/van-don-ve" style="margin-top:10px">
+          <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+          <div class="hang" style="align-items:flex-end">
+            <label style="margin:0">Mã vận đơn gửi về<input name="ma_van_don_ve" maxlength="60" value="{{$d.MaVanDonVe}}"></label>
+            <button type="submit" class="nut-vien" style="flex:0 0 auto">Lưu</button>
+          </div>
+        </form>
+        <p class="nho mo" style="margin-top:10px">Ghi mã xong khách thấy ngay ở trang tra cứu. Nút này không đổi trạng thái đơn.</p>
+      </div>
+    </div>
+    {{end}}
+
     <div class="the-nhom">
       <h3>Đổi trạng thái</h3>
       <div class="noi">
@@ -42,16 +86,95 @@
       </div>
     </div>
 
+    {{/* Dòng hồ sơ nằm NGOÀI form sửa đơn: nút gắn là một form riêng, mà
+         form lồng trong form thì trình duyệt bỏ luôn. */}}
+    <div class="the-nhom">
+      <div class="noi hang-nut" style="align-items:center">
+        {{if .HoSo}}
+          <a class="nut nut-vien" href="/qt/khach/{{.HoSo.Ma}}">Hồ sơ khách{{if .HoSo.Ten}}: {{.HoSo.Ten}}{{end}}</a>
+          <span class="chip chip-{{.HoSo.MauNhom}}">{{.HoSo.TenNhom}}</span>
+          <span class="nho mo">{{.SoLieuKH.SoDon}} đơn · đã trả {{tien .SoLieuKH.TongChi}}{{if .SoLieuKH.ConNo}} · còn nợ <b>{{tien .SoLieuKH.ConNo}}</b>{{end}}</span>
+        {{else}}
+          <form method="post" action="/qt/don/{{$d.Ma}}/gan-khach" style="margin:0">
+            <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+            <button type="submit" class="nut nut-vien nut-nho">Gắn vào hồ sơ khách</button>
+          </form>
+          <span class="nho mo">Đơn này chưa nối với hồ sơ nào. Gắn xong mới cộng vào tổng chi tiêu và công nợ của khách.</span>
+        {{end}}
+      </div>
+    </div>
+
+    {{/* Bảo hành hai chiều. Cũng nằm ngoài form sửa đơn — nút "mở đơn bảo
+         hành" là một link, nhưng để chung chỗ với dòng hồ sơ cho thợ khỏi
+         phải cuộn tìm. Đơn bảo hành không đẻ ra đơn bảo hành: hỏng lại lần
+         nữa thì vẫn tính về cây gốc, không thì chuỗi dài ra vô tận mà tỷ lệ
+         bảo hành đếm sai. */}}
+    {{if or .DonGoc .DonBH $d.NgayGiao}}
+    <div class="the-nhom">
+      <div class="noi hang-nut" style="align-items:center">
+        {{if .DonGoc}}
+          {{$g := .DonGoc}}
+          <span class="chip chip-trung">Đơn bảo hành</span>
+          <a class="nut nut-vien" href="/qt/don/{{$g.Ma}}">← Đơn gốc {{$g.Ma}}</a>
+          <span class="nho mo">Làm lại cho {{if $g.KhachTen}}{{$g.KhachTen}}{{else}}khách{{end}}, đơn nhận {{ngaydep $g.Ngay}}.</span>
+        {{else}}
+          {{if $d.NgayGiao}}
+            <a class="nut nut-vien" href="/qt/don-moi?bao_hanh={{$d.Ma}}">+ Mở đơn bảo hành</a>
+          {{end}}
+          {{if $d.BaoHanhDen}}
+            <span class="nho {{if not $d.ConBaoHanh}}mo{{end}}">Bảo hành tới {{ngaydep $d.BaoHanhDen}}{{if not $d.ConBaoHanh}} — đã hết{{end}}</span>
+          {{end}}
+          {{if .DonBH}}
+            <span class="nho">Đã mở {{len .DonBH}} đơn bảo hành:</span>
+            {{range .DonBH}}<a class="so nho" href="/qt/don/{{.Ma}}">{{.Ma}}</a>{{end}}
+          {{end}}
+        {{end}}
+      </div>
+    </div>
+    {{end}}
+
     <form method="post" action="/qt/don/{{$d.Ma}}/luu" class="doc" style="gap:18px">
       <input type="hidden" name="_csrf" value="{{$.CSRF}}">
 
       <div class="the-nhom">
-        <h3>Khách và vợt</h3>
+        <h3>Khách và {{$d.TenLoai}}</h3>
         <div class="noi">
           <div class="hang">
             <label>Tên khách<input name="khach_ten" maxlength="100" value="{{$d.KhachTen}}"></label>
             <label>Điện thoại / Zalo<input name="khach_lien_he" maxlength="60" value="{{$d.KhachLienHe}}" required></label>
+            <label>Email
+              <span class="hd">Có email mới bấm được nút gửi thư cho khách.</span>
+              <input type="email" name="khach_email" maxlength="254" value="{{$d.KhachEmail}}">
+            </label>
           </div>
+          {{if $giay}}
+          <div class="hang">
+            <label>Hãng / đời giày<input name="giay_hang" maxlength="100" value="{{$d.GiayHang}}"></label>
+            <label class="co-hep">Cỡ<input name="giay_size" maxlength="20" value="{{$d.GiaySize}}"></label>
+            <label class="co-hep">Loại
+              <select name="giay_kieu">
+                {{range .KieuGiay}}<option value="{{.Ma}}" {{if eq .Ma $d.GiayKieu}}selected{{end}}>{{.Ten}}</option>{{end}}
+              </select>
+            </label>
+          </div>
+          <div class="hang">
+            <label>Đế hiện tại<input name="de_hien_tai" maxlength="200" value="{{$d.DeHienTai}}"></label>
+            <label class="co-hep">Nhận qua
+              <select name="kenh_nhan">
+                <option value="truc_tiep" {{if eq $d.KenhNhan "truc_tiep"}}selected{{end}}>Trực tiếp</option>
+                <option value="ship" {{if eq $d.KenhNhan "ship"}}selected{{end}}>Gửi từ xa</option>
+                <option value="web" {{if eq $d.KenhNhan "web"}}selected{{end}}>Từ web</option>
+              </select>
+            </label>
+            {{if .NguoiDung.LaChu}}
+            <label>Thợ phụ trách
+              <select name="tho">
+                {{range .Tho}}<option value="{{.Ten}}" {{if eq .Ten $d.ThoPhuTrach}}selected{{end}}>{{.TenHienThi}}</option>{{end}}
+              </select>
+            </label>
+            {{end}}
+          </div>
+          {{else}}
           <div class="hang">
             <label>Hãng / đời vợt<input name="vot_hang" maxlength="100" value="{{$d.VotHang}}"></label>
             <label class="co-hep">Giá trị vợt<input name="vot_gia_tri" inputmode="numeric" value="{{oso $d.VotGiaTri}}"></label>
@@ -77,6 +200,7 @@
             </label>
             {{end}}
           </div>
+          {{end}}
           <label>Khách mô tả<textarea name="tinh_trang" maxlength="3000">{{$d.TinhTrang}}</textarea></label>
           <label>Thợ chẩn đoán<textarea name="chan_doan" maxlength="3000">{{$d.ChanDoan}}</textarea></label>
         </div>
@@ -85,6 +209,9 @@
       <div class="the-nhom">
         <h3>Việc và tiền</h3>
         <div class="noi">
+          {{if $giay}}
+          <p class="nho mo" style="margin:0 0 4px">Đơn giày không lấy giá từ bảng giá vợt — gõ tay từng dòng.</p>
+          {{else}}
           <div class="luoi" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">
             {{range .DichVu}}
             <label class="the" style="margin:0;display:flex;align-items:flex-start;gap:10px;padding:12px 14px">
@@ -93,6 +220,7 @@
             </label>
             {{end}}
           </div>
+          {{end}}
 
           <div class="nhan-nho" style="margin:22px 0 10px">Dòng gõ tay</div>
           {{range .DongThem}}
@@ -113,10 +241,21 @@
 
 
           <div class="nhan-nho" style="margin:22px 0 10px">Giảm giá</div>
+          {{/* Điền sẵn theo nhóm khách, thợ xoá được. Máy đoán, người xác
+               nhận — khách quay lại vì đơn trước trạm làm hỏng thì giảm 10%
+               cho ca ấy là nói sai chuyện. */}}
+          {{$gg := oso $d.GiamGia}}{{$gl := $d.LyDoGiam}}
+          {{if and (eq $d.GiamGia 0) .GoiGiam}}{{$gg = oso .GoiGiam}}{{$gl = .GoiGiamLy}}{{end}}
           <div class="hang">
-            <label style="margin:0" class="co-hep">Bớt cho khách<input name="giam_gia" inputmode="numeric" class="giam" value="{{oso $d.GiamGia}}" placeholder="0"></label>
-            <label style="margin:0">Vì sao<input name="giam_ly_do" maxlength="80" value="{{$d.LyDoGiam}}" placeholder="khách quen, làm lại lần 2, sai hẹn…"></label>
+            <label style="margin:0" class="co-hep">Bớt cho khách<input name="giam_gia" inputmode="numeric" class="giam" value="{{$gg}}" placeholder="0"></label>
+            <label style="margin:0">Vì sao<input name="giam_ly_do" maxlength="80" value="{{$gl}}" placeholder="khách quen, làm lại lần 2, sai hẹn…"></label>
           </div>
+          {{if and (eq $d.GiamGia 0) .GoiGiamHa}}
+          <p class="canh-bao-dong">
+            Đã hạ từ {{tien .GoiGiamHa}} xuống {{tien .GoiGiam}} — đơn này gửi
+            tiệm ngoài, giảm thêm là dưới biên tối thiểu.
+          </p>
+          {{end}}
           <p class="nho mo" style="margin-top:8px">Gõ số dương. Để trống là bỏ giảm giá.</p>
 
           <div class="hang" style="margin-top:18px;border-top:1px solid var(--vien);padding-top:16px">
@@ -194,6 +333,73 @@
         </table>
         {{else}}
         <p class="nho mo">Chưa chốt việc nào. Tick dịch vụ bên trái rồi lưu.</p>
+        {{end}}
+      </div>
+    </div>
+
+    <div class="the-nhom">
+      <h3>Gửi đi gia công</h3>
+      <div class="noi">
+        {{if .DoiTac}}
+        <form method="post" action="/qt/don/{{$d.Ma}}/gui-di" class="doc" style="gap:12px">
+          <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+          <label style="margin:0">Tiệm nhận việc
+            <select name="ma_doi_tac">
+              <option value="">Tự làm tại trạm</option>
+              {{range .DoiTac}}<option value="{{.Ma}}" {{if eq .Ma $d.GuiDi.MaDoiTac}}selected{{end}}>{{.Ten}}{{if .Nghe}} — {{.Nghe}}{{end}}</option>{{end}}
+            </select>
+          </label>
+          <div class="hang" style="margin:0">
+            <label style="margin:0" class="co-hep">Gửi ngày<input type="date" name="ngay_gui" value="{{$d.GuiDi.NgayGui}}"></label>
+            <label style="margin:0" class="co-hep">Hẹn về<input type="date" name="ngay_hen_ve" value="{{$d.GuiDi.NgayHenVe}}"></label>
+            <label style="margin:0" class="co-hep">Đã về<input type="date" name="ngay_ve" value="{{$d.GuiDi.NgayVe}}"></label>
+          </div>
+          <label style="margin:0" class="co-hep">Trả tiệm
+            <span class="hd">Con số đã chốt với tiệm, gõ tay.</span>
+            <input name="tra_doi_tac" inputmode="numeric" value="{{oso $d.GuiDi.TraDoiTac}}">
+          </label>
+          <label style="margin:0">Ghi chú<input name="gui_ghi_chu" maxlength="500" value="{{$d.GuiDi.GhiChu}}" placeholder="dặn tiệm đừng chà mặt trên…"></label>
+          <button type="submit">Lưu phần gửi đi</button>
+        </form>
+        {{else}}
+        <p class="nho mo" style="margin:0">
+          Chưa khai tiệm nào.
+          {{if .NguoiDung.LaChu}}<a href="/qt/doi-tac">Thêm đối tác</a> rồi quay lại đây.{{else}}Bảo chủ thêm ở trang Đối tác.{{end}}
+        </p>
+        {{end}}
+
+        {{if $d.GuiRaNgoai}}
+        <table class="bang" style="font-size:14px;margin-top:16px">
+          <tbody>
+          <tr><td>Khách trả trạm</td><td class="p">{{tien $d.TongTien}}</td></tr>
+          <tr><td class="mo">Trạm trả {{$d.TenDoiTac}}</td><td class="p mo">{{tien $d.GuiDi.TraDoiTac}}</td></tr>
+          <tr><td><b>Trạm ăn</b></td><td class="p"><b>{{tien $d.LaiThat}}</b></td></tr>
+          </tbody>
+        </table>
+        {{if $d.QuaHenDoiTac}}<p class="nho" style="margin:10px 0 0"><span class="chip chip-tuchoi">Quá hẹn về</span> gọi tiệm hỏi.</p>{{end}}
+
+        {{if .NguoiDung.LaChu}}
+        <form method="post" action="/qt/don/{{$d.Ma}}/tra-doi-tac" class="doc" style="gap:12px;margin-top:16px">
+          <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+          {{if $d.GuiDi.DaTra}}
+          <input type="hidden" name="da_tra" value="0">
+          <p class="nho" style="margin:0">Đã trả tiệm {{tien $d.GuiDi.TraDoiTac}}{{if $d.GuiDi.MaKhoanChi}} — khoản chi <span class="so">{{$d.GuiDi.MaKhoanChi}}</span>{{end}}.</p>
+          <button type="submit" class="phu">Bỏ đánh dấu đã trả</button>
+          {{else}}
+          <input type="hidden" name="da_tra" value="1">
+          <label style="margin:0" class="co-hep">Trả bằng
+            <select name="phuong_thuc">
+              <option value="tien_mat">Tiền mặt</option>
+              <option value="chuyen_khoan">Chuyển khoản</option>
+            </select>
+          </label>
+          <button type="submit">Đã trả tiệm</button>
+          <p class="nho mo" style="margin:0">Bấm cái này là sổ tiền có thêm một khoản chi. Bỏ tick thì khoản đó biến mất.</p>
+          {{end}}
+        </form>
+        {{else if $d.GuiDi.DaTra}}
+        <p class="nho mo" style="margin:10px 0 0">Đã trả tiệm.</p>
+        {{end}}
         {{end}}
       </div>
     </div>
@@ -343,7 +549,12 @@
           <dt>Sửa lần cuối</dt><dd>{{$d.CapNhat}}</dd>
           <dt>Thợ</dt><dd>{{if $d.ThoPhuTrach}}{{$d.ThoPhuTrach}}{{else}}chưa ai nhận{{end}}</dd>
           <dt>Hẹn trả</dt><dd {{if $d.QuaHan}}class="chip chip-tuchoi"{{end}}>{{ngaydep $d.HenTraNgay}}</dd>
+          {{if $giay}}
+          <dt>Giày</dt><dd>{{if $d.TenMon}}{{$d.TenMon}}{{else}}chưa ghi{{end}}</dd>
+          <dt>Loại</dt><dd>{{if $d.TenKieuGiay}}{{$d.TenKieuGiay}}{{else}}chưa chọn{{end}}</dd>
+          {{else}}
           <dt>Cân</dt><dd class="so">{{canDep $d.CanTruocG}} → {{canDep $d.CanSauG}}{{if $d.ChenhCan}} ({{canDep $d.ChenhCan}}){{end}}</dd>
+          {{end}}
         </dl>
       </div>
     </div>

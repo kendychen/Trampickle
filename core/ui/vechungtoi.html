@@ -55,7 +55,7 @@
     <div class="tram-anh">
       {{range .Anh}}
       <figure>
-        <img src="/anh-trang-chu/{{.Ten}}" alt="{{.ChuThich}}" loading="lazy">
+        <img src="/anh-trang-chu/{{.Ten}}" alt="{{if .ChuThich}}{{.ChuThich}}{{else}}Ảnh việc {{$.Brand.Ten}} đã làm{{end}}" loading="lazy">
         {{if .ChuThich}}<figcaption>{{.ChuThich}}</figcaption>{{end}}
       </figure>
       {{end}}
@@ -63,6 +63,46 @@
     {{else}}
     <div class="doc" style="margin-top:12px"><p class="mo">{{ndd "vechungtoi.anh.chua-co"}}</p></div>
     {{end}}
+  </div>
+</section>
+
+{{/* Khối chào hàng nằm CUỐI trang chứ không nằm đầu. Khách vào đây để kiểm
+     tra trạm có thật; đọc lời khen trước khi thấy địa chỉ và ảnh thì lời khen
+     ấy thành quảng cáo suông. Đọc xong bằng chứng rồi mới tới đoạn vì sao nên
+     chọn trạm — lúc đó cùng một câu chữ lại có sức nặng khác.
+
+     Trong mấy thẻ này KHÔNG có con số nào. Ngưỡng tăng cân in ở /gioi-thieu,
+     chép sang đây là hai trang lệch nhau ngay lần đầu Kendy sửa một bên. */}}
+<section class="nen2">
+  <div class="khung">
+    <div class="nhan-nho nhan-vach">{{nd "vechungtoi.vs.nhan"}}</div>
+    <h2 style="margin-top:16px">{{nd "vechungtoi.vs.h2"}}</h2>
+    <div class="doc" style="margin-top:14px;max-width:64ch"><p>{{ndd "vechungtoi.vs.dan"}}</p></div>
+
+    <div class="cam-ket" style="margin-top:26px">
+      <div class="the" data-so="01">
+        <strong>{{nd "vechungtoi.vs.1-ten"}}</strong>
+        <p class="nho mo">{{ndd "vechungtoi.vs.1-chu"}}</p>
+      </div>
+      <div class="the" data-so="02">
+        <strong>{{nd "vechungtoi.vs.2-ten"}}</strong>
+        <p class="nho mo">{{ndd "vechungtoi.vs.2-chu"}}</p>
+      </div>
+      <div class="the" data-so="03">
+        <strong>{{nd "vechungtoi.vs.3-ten"}}</strong>
+        <p class="nho mo">{{ndd "vechungtoi.vs.3-chu"}}</p>
+      </div>
+      <div class="the" data-so="04">
+        <strong>{{nd "vechungtoi.vs.4-ten"}}</strong>
+        <p class="nho mo">{{ndd "vechungtoi.vs.4-chu"}}</p>
+      </div>
+    </div>
+
+    <div class="doc" style="margin-top:24px;max-width:64ch"><p>{{ndd "vechungtoi.vs.chot"}}</p></div>
+    <p style="margin-top:18px">
+      <a class="nut nut-chinh" href="/#gui">{{nd "chung.nut.gui-anh"}}</a>
+      <a class="nut nut-vien" href="/gioi-thieu">{{nd "vechungtoi.vs.nut"}}</a>
+    </p>
   </div>
 </section>
 

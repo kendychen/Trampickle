@@ -65,7 +65,7 @@
     </div>
 
     <div class="cuon" style="margin-top:6px">
-      <table class="bang">
+      <table class="bang bang-the">
         <thead>
           <tr>
             <th style="min-width:220px">Vật tư</th>
@@ -78,33 +78,33 @@
         <tbody>
           {{range $p.Dong}}
           <tr>
-            <td>
+            <td data-n="Vật tư">
               <select name="ma_vat_tu" style="width:100%">
                 <option value="">— bỏ dòng này —</option>
                 {{$mv := .MaVatTu}}
                 {{range $.VatTu}}<option value="{{.Ma}}" {{if eq .Ma $mv}}selected{{end}}>{{.Ten}} ({{.DonVi}})</option>{{end}}
               </select>
             </td>
-            <td><input name="so_luong" inputmode="decimal" value="{{slo .SoLuong}}" style="width:100%"></td>
-            {{if $nhap}}<td><input name="don_gia" inputmode="numeric" value="{{oso .DonGia}}" style="width:100%"></td>{{end}}
-            <td class="p so nho mo">{{sl (index $.Ton .MaVatTu)}}</td>
-            <td><input name="ghi_chu_dong" maxlength="120" value="{{.GhiChu}}" style="width:100%"></td>
+            <td data-n="{{if $kk}}Đếm được{{else}}Số lượng{{end}}"><input name="so_luong" inputmode="decimal" value="{{slo .SoLuong}}" style="width:100%"></td>
+            {{if $nhap}}<td data-n="Đơn giá"><input name="don_gia" inputmode="numeric" value="{{oso .DonGia}}" style="width:100%"></td>{{end}}
+            <td data-n="Đang còn" class="p so nho mo">{{sl (index $.Ton .MaVatTu)}}</td>
+            <td data-n="Ghi chú dòng"><input name="ghi_chu_dong" maxlength="120" value="{{.GhiChu}}" style="width:100%"></td>
           </tr>
           {{end}}
 
           {{/* Mấy dòng trống để thêm thứ mới mà không phải bấm nút nào. */}}
           {{range lap 4}}
           <tr>
-            <td>
+            <td data-n="Vật tư">
               <select name="ma_vat_tu" style="width:100%">
                 <option value="">— chọn vật tư —</option>
                 {{range $.VatTu}}<option value="{{.Ma}}">{{.Ten}} ({{.DonVi}})</option>{{end}}
               </select>
             </td>
-            <td><input name="so_luong" inputmode="decimal" style="width:100%"></td>
-            {{if $nhap}}<td><input name="don_gia" inputmode="numeric" style="width:100%"></td>{{end}}
-            <td></td>
-            <td><input name="ghi_chu_dong" maxlength="120" style="width:100%"></td>
+            <td data-n="{{if $kk}}Đếm được{{else}}Số lượng{{end}}"><input name="so_luong" inputmode="decimal" style="width:100%"></td>
+            {{if $nhap}}<td data-n="Đơn giá"><input name="don_gia" inputmode="numeric" style="width:100%"></td>{{end}}
+            <td data-n="Đang còn"></td>
+            <td data-n="Ghi chú dòng"><input name="ghi_chu_dong" maxlength="120" style="width:100%"></td>
           </tr>
           {{end}}
         </tbody>

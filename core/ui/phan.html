@@ -7,25 +7,51 @@
 {{if .MoTa}}<meta name="description" content="{{.MoTa}}">{{end}}
 {{if .Canonical}}<link rel="canonical" href="{{.Canonical}}">{{end}}
 <link rel="icon" href="{{iconURL}}" type="{{iconMIME}}">
-<meta property="og:type" content="website">
+<meta property="og:type" content="{{if .LoaiOG}}{{.LoaiOG}}{{else}}website{{end}}">
 <meta property="og:site_name" content="{{.Brand.Ten}}">
+<meta property="og:locale" content="vi_VN">
 <meta property="og:title" content="{{if .TieuDe}}{{.TieuDe}}{{else}}{{.Brand.Ten}}{{end}}">
 {{if .MoTa}}<meta property="og:description" content="{{.MoTa}}">{{end}}
 {{if .Canonical}}<meta property="og:url" content="{{.Canonical}}">{{end}}
-{{template "pwa-dau" .}}
-{{template "css" .}}
+{{/* Ảnh đi kèm link. Facebook và Zalo đọc thẻ này; không có nó thì link dán
+     vào group ra một ô xám trơn. Cỡ chỉ khai khi biết chắc — xem AnhRong
+     trong server.go. */}}
+{{if .AnhChiaSe}}<meta property="og:image" content="{{.AnhChiaSe}}">
+{{if .AnhRong}}<meta property="og:image:width" content="{{.AnhRong}}">
+<meta property="og:image:height" content="{{.AnhCao}}">{{end}}
+<meta property="og:image:alt" content="{{if .TieuDe}}{{.TieuDe}}{{else}}{{.Brand.Ten}} — {{.Brand.DongMoTa}}{{end}}">
+<meta name="twitter:card" content="summary_large_image">{{end}}
+{{if eq .LoaiOG "article"}}{{if .NgayDang}}<meta property="article:published_time" content="{{.NgayDang}}">{{end}}
+{{if .NgayCapNhat}}<meta property="article:modified_time" content="{{.NgayCapNhat}}">{{end}}{{end}}
+{{/* Trang đăng nhập khai là app QUẢN LÝ chứ không phải app khách: chỉ Kendy
+     và thợ mới vào đó, mà iOS lấy thẻ của đúng trang đang mở lúc bấm "Thêm
+     vào Màn hình chính". Khai nhầm thì cài ra một bản sao app khách — icon
+     đen, tên "Trạm Pickle" — chứ không phải app quản lý. */}}
+{{if eq .Trang "dang-nhap"}}{{template "pwa-dau-qt" .}}{{else}}{{template "pwa-dau" .}}{{end}}
+{{/* Dữ liệu có cấu trúc. Khối này là dữ liệu chứ không phải mã chạy được,
+     nhưng vẫn mang nonce để khỏi phải bàn lại với CSP — xem core/jsonld.go. */}}
+{{with .DuLieuCoCau}}<script type="application/ld+json" nonce="{{$.Nonce}}">{{.}}</script>{{end}}
+<link rel="stylesheet" href="{{cssURL}}">
 </head>
 {{/* Lớp thân do Go dựng (xem lopThan trong giaodien.go): tên giao diện đang
      bật, cộng "toi" ở những trang chạy nền tối. Ghi đè biến màu, tách hẳn
      khỏi data-theme sáng/tối của máy khách. */}}
-<body class="{{.LopThan}}">
+<body>
 <header class="dau">
   <div class="khung dau-trong">
-    <a class="logo" href="/">{{template "logo-o-dau"}}<span class="logo-ten">{{.Brand.Ten}}</span> <span class="logo-phu">{{.Brand.DongMoTa}}</span></a>
+    {{/* Khối XẾP DỌC: dấu hiệu ở trên, chữ T-PIC ở dưới. Bản NGANG (chữ nằm
+         cạnh hình) đã bị loại ở đây — ngay bên phải là "Trạm Pickle" viết bằng
+         chữ thật, hai cụm chữ đứng cạnh nhau ăn gần nửa bề ngang màn hình cầm
+         tay để nói đúng một cái tên. Xếp dọc giữ nguyên bề ngang, chỉ cao thêm
+         ~15px. Cỡ từng phần đặt ở .logo-khoi / .chu-tpic trong css.html.
+         Kendy tải logo riêng lên thì khối này nhường chỗ cho tệp đó. */}}
+    <a class="logo" href="/">{{template "logo-4d-o-dau"}}<span class="logo-chu"><span class="logo-ten">{{.Brand.Ten}}</span> <span class="logo-phu">{{.Brand.DongMoTa}}</span></span></a>
     <nav>
       <a href="/dich-vu" {{if eq .Trang "dich-vu"}}class="day"{{end}}>{{nd "chung.nav.dich-vu"}}</a>
+      {{if cuaHangMo}}<a href="/cua-hang" {{if eq .Trang "cua-hang"}}class="day"{{end}}>{{nd "chung.nav.cua-hang"}}</a>{{end}}
       <a href="/quy-trinh" {{if eq .Trang "quy-trinh"}}class="day"{{end}}>{{nd "chung.nav.quy-trinh"}}</a>
       <a href="/bai-viet" {{if eq .Trang "bai-viet"}}class="day"{{end}}>{{nd "chung.nav.bai-viet"}}</a>
+      <a href="/cau-hoi" {{if eq .Trang "cau-hoi"}}class="day"{{end}}>{{nd "chung.nav.cau-hoi"}}</a>
       <a href="/gioi-thieu" {{if eq .Trang "gioi-thieu"}}class="day"{{end}}>{{nd "chung.nav.gioi-thieu"}}</a>
       <a href="/ve-chung-toi" {{if eq .Trang "ve-chung-toi"}}class="day"{{end}}>{{nd "chung.nav.ve-chung-toi"}}</a>
       <a href="/lien-he" {{if eq .Trang "lien-he"}}class="day"{{end}}>{{nd "chung.nav.lien-he"}}</a>
@@ -36,6 +62,15 @@
 <main>
 {{end}}
 
+
+{{/* Dải báo "cửa hàng đang hoàn thiện". Một khối dùng cho cả ba chỗ đặt
+     địa chỉ — app, trang chủ, trang liên hệ — để ba nơi không bao giờ nói
+     lệch nhau. Ô trống ở /qt/noi-dung là không chỗ nào hiện.
+
+     Dùng lại .bao .bao-luu có sẵn chứ không đẻ màu mới: đây đúng nghĩa là
+     tin "đang chờ", cùng loại với mấy dải vàng khác trên site, và nó tự đi
+     theo bảng màu Kendy chọn ở /qt/giao-dien. */}}
+{{define "tb-chua-mo"}}{{if nd "chung.chua-mo"}}<p class="tb-chuamo">{{ndd "chung.chua-mo"}}</p>{{end}}{{end}}
 
 {{define "html-chan"}}
 </main>
@@ -52,6 +87,7 @@
         <a href="/quy-trinh">{{nd "chung.chan.quy-trinh"}}</a>
         <a href="/bai-viet">{{nd "chung.chan.bai-viet"}}</a>
         <a href="/tra-cuu">{{nd "chung.chan.tra-cuu"}}</a>
+        <a href="/cau-hoi">{{nd "chung.chan.cau-hoi"}}</a>
       </div>
       <div>
         <div class="nhan-nho" style="margin-bottom:8px">{{nd "chung.chan.cot-2"}}</div>
@@ -59,7 +95,11 @@
           {{if .DienThoai}}<a href="tel:{{soGoi .DienThoai}}">{{.DienThoai}}</a>{{end}}
           {{if .Zalo}}<a href="https://zalo.me/{{.Zalo}}">Zalo {{.Zalo}}</a>{{end}}
           {{if .Email}}<a href="mailto:{{.Email}}">{{.Email}}</a>{{end}}
-          {{if .Facebook}}<a href="{{.Facebook}}">Facebook</a>{{end}}
+          {{/* Hàng icon thay cho một dòng chữ "Facebook": bốn trang mà xếp
+               bốn dòng thì cột liên hệ dài gấp đôi ba cột kia. */}}
+          {{with .MangXaHoi}}<div class="mxh-hang">
+            {{range .}}<a href="{{.URL}}" target="_blank" rel="noopener me" title="{{.Ten}}" aria-label="{{.Ten}}">{{template "bt-mxh" .Ma}}</a>{{end}}
+          </div>{{end}}
           {{if .DiaChi}}<span>{{.DiaChi}}</span>{{end}}
           {{if not .CoGiKhong}}<span class="mo">{{nd "chung.chan.chua-co"}}</span>{{end}}
         {{end}}
@@ -214,16 +254,24 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="{{iconURL}}" type="{{iconMIME}}">
 <title>{{if .TieuDe}}{{.TieuDe}} — {{end}}Quản lý {{.Brand.Ten}}</title>
-{{template "css" .}}
+{{template "pwa-dau-qt" .}}
+<link rel="stylesheet" href="{{cssURL}}">
 </head>
 <body>
 <header class="dau">
-  <div class="khung dau-trong" style="max-width:none">
-    <a class="logo" href="/qt/don">{{template "logo-o-dau"}}<span class="logo-ten">{{.Brand.Ten}}</span> <span class="logo-phu">Quản lý</span></a>
+  <div class="khung dau-trong qt-dau-trong" style="max-width:none">
+    {{/* Nút ☰ chỉ hiện ở màn hình hẹp — ở đó cột menu bên trái đã thu vào
+         thành ngăn kéo. Vẽ ba vạch bằng thẻ chứ không dùng ký tự ☰: phông hệ
+         thống trên Windows hay thay ký tự ấy bằng một ô vuông. */}}
+    <button class="qt-menu" id="qt-menu" type="button" aria-label="Menu quản lý" aria-expanded="false" aria-controls="qt-canh"><i></i><i></i><i></i></button>
+    <a class="logo" href="/qt/don">{{template "logo-o-dau"}}<span class="logo-chu"><span class="logo-ten">{{.Brand.Ten}}</span> <span class="logo-phu">Quản lý</span></span></a>
     <nav>
-      <a href="/" target="_blank">Xem trang khách ↗</a>
+      {{/* Hai mục đầu biến mất ở màn hẹp (.qt-an-hep): tên mình và link ra
+           trang khách không đáng một dòng riêng trên màn điện thoại — cả hai
+           đã có trong ngăn kéo ☰. Nút Thoát thì ở lại. */}}
+      <a class="qt-an-hep" href="/" target="_blank">Xem trang khách ↗</a>
       {{if .DaDangNhap}}
-      <a href="/qt/mat-khau" {{if eq .Trang "mat-khau"}}class="day"{{end}}>{{.NguoiDung.TenHienThi}}{{if .NguoiDung.LaChu}} · chủ{{end}}</a>
+      <a class="qt-an-hep{{if eq .Trang "mat-khau"}} day{{end}}" href="/qt/mat-khau">{{.NguoiDung.TenHienThi}}{{if .NguoiDung.LaChu}} · chủ{{end}}</a>
       <form method="post" action="/dang-xuat" style="margin:0">
         <input type="hidden" name="_csrf" value="{{$.CSRF}}"><button class="phu nho" type="submit">Thoát</button></form>
       {{else}}
@@ -233,31 +281,54 @@
   </div>
 </header>
 <div class="qt-than">
-  <aside class="qt-canh">
-    <a href="/qt/don" {{if eq .Trang "don"}}class="day"{{end}}>Đơn sửa</a>
+  {{/* Tấm phủ mờ sau ngăn kéo menu. Bấm vào là đóng. Chỉ có mặt ở màn hẹp,
+       và chỉ khi menu đang mở. */}}
+  <div class="qt-nen" id="qt-nen" hidden></div>
+  <aside class="qt-canh" id="qt-canh">
+    {{/* Một mục cho cả bốn trang đơn — vợt, giày, yêu cầu web, thống kê đã
+         gộp thành dải tab bên trong (xem ui/qt-tabdon.html). Bốn đường dẫn cũ
+         vẫn sống, chỉ dải menu này gộp lại. */}}
+    <a href="/qt/don-hang" {{if eq .Trang "don-vot" "don-giay" "yeu-cau" "thong-ke"}}class="day"{{end}}>Quản lý đơn</a>
     <a href="/qt/don-moi" {{if eq .Trang "don-moi"}}class="day"{{end}}>+ Tạo đơn</a>
-    <a href="/qt/yeu-cau" {{if eq .Trang "yeu-cau"}}class="day"{{end}}>Yêu cầu từ web</a>
     <a href="/qt/kho" {{if batdau .Trang "kho"}}class="day"{{end}}>Kho vật tư</a>
     <a href="/qt/vot" {{if eq .Trang "vot"}}class="day"{{end}}>Danh mục vợt</a>
+    <a href="/qt/giay" {{if eq .Trang "giay"}}class="day"{{end}}>Danh mục giày</a>
     <div class="nhan-nho nhom">Tài khoản</div>
     <a href="/qt/mat-khau" {{if eq .Trang "mat-khau"}}class="day"{{end}}>Đổi mật khẩu</a>
     <a href="/qt/2fa" {{if eq .Trang "2fa"}}class="day"{{end}}>Xác thực hai bước</a>
     {{if .NguoiDung.LaChu}}
       <div class="nhan-nho nhom">Chủ trạm</div>
+      <a href="/qt/khach" {{if batdau .Trang "khach"}}class="day"{{end}}>Khách hàng</a>
       <a href="/qt/tien" {{if batdau .Trang "tien"}}class="day"{{end}}>Sổ tiền</a>
-      <a href="/qt/thong-ke" {{if eq .Trang "thong-ke"}}class="day"{{end}}>Thống kê</a>
+      <a href="/qt/do-nghe" {{if eq .Trang "do-nghe"}}class="day"{{end}}>Đồ nghề</a>
+      <a href="/qt/doi-tac" {{if eq .Trang "doi-tac"}}class="day"{{end}}>Đối tác gia công</a>
       <a href="/qt/nguoi-dung" {{if eq .Trang "nguoi-dung"}}class="day"{{end}}>Tài khoản</a>
       <a href="/qt/nhat-ky" {{if eq .Trang "nhat-ky"}}class="day"{{end}}>Nhật ký</a>
       <a href="/qt/giao-dien" {{if eq .Trang "giao-dien"}}class="day"{{end}}>Giao diện</a>
       <a href="/qt/anh-trang-chu" {{if eq .Trang "anh-trang-chu"}}class="day"{{end}}>Ảnh trang chủ</a>
+      <a href="/qt/app" {{if eq .Trang "app-qt"}}class="day"{{end}}>App điện thoại</a>
       <a href="/qt/bai-viet" {{if eq .Trang "bai-viet-qt"}}class="day"{{end}}>Bài viết</a>
       <a href="/qt/noi-dung" {{if eq .Trang "noi-dung"}}class="day"{{end}}>Chữ trên trang</a>
+      <a href="/qt/cau-hoi" {{if eq .Trang "cau-hoi-qt"}}class="day"{{end}}>Câu hỏi thường gặp</a>
       <a href="/qt/dich-vu" {{if eq .Trang "dich-vu-qt"}}class="day"{{end}}>Bảng dịch vụ</a>
           <a href="/qt/lien-he" {{if eq .Trang "lien-he-qt"}}class="day"{{end}}>Liên hệ</a>
       <a href="/qt/nguong" {{if eq .Trang "nguong"}}class="day"{{end}}>Ngưỡng &amp; cam kết</a>
-      <a href="/qt/cai-dat" {{if eq .Trang "cai-dat"}}class="day"{{end}}>Khóa API &amp; model</a>
-      <a href="/qt/giao-trinh" {{if eq .Trang "giao-trinh"}}class="day"{{end}}>Giáo trình</a>
+      <a href="/qt/cai-dat" {{if eq .Trang "cai-dat"}}class="day"{{end}}>Khóa API &amp; thông báo</a>
+      <a href="/qt/giao-trinh" {{if eq .Trang "giao-trinh"}}class="day"{{end}}>Tài liệu nội bộ</a>
       <a href="/noi-bo" {{if eq .Trang "agent"}}class="day"{{end}}>Trợ lý kỹ thuật</a>
+    {{end}}
+    {{/* Chỉ hiện ở màn hẹp: trên đầu trang hai mục này bị giấu đi cho dải
+         đầu gọn lại còn một dòng (xem .qt-chi-hep trong css.html). */}}
+    <a class="qt-chi-hep" href="/" target="_blank">Xem trang khách ↗</a>
+    {{/* Nút cài app, nằm im dưới đáy menu. JS trong pwa-chan-qt bỏ hidden khi
+         máy thật sự cài được — hiện sẵn một cái nút bấm vào không ra gì thì
+         thà đừng có. */}}
+    <button class="qt-cai" id="qt-cai" type="button" hidden>Cài lên màn hình chính</button>
+    {{/* Bật thông báo đẩy cho CHÍNH cái máy đang mở trang. Chỉ chủ trạm: người
+         nhận đã chốt là một mình Kendy. JS trong pwa-chan-qt bỏ hidden khi máy
+         thật sự có pushManager — trên Safari trong tab thường thì không có. */}}
+    {{if .NguoiDung.LaChu}}
+    <button class="qt-cai" id="qt-bao" type="button" hidden>Bật thông báo trên máy này</button>
     {{end}}
   </aside>
   <div class="qt-noi">
@@ -267,6 +338,8 @@
 {{define "qt-chan"}}
   </div>
 </div>
+{{template "qt-thanh" .}}
+{{template "pwa-chan-qt" .}}
 </body>
 </html>
 {{end}}

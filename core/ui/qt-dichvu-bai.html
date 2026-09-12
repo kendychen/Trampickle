@@ -1,0 +1,110 @@
+{{define "qt-dichvu-bai.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang">
+  <h1>Bài của việc: {{.DV.Ten}}</h1>
+  <div class="phai hang" style="gap:8px">
+    <a class="nut nut-vien" href="/qt/dich-vu">← Bảng dịch vụ</a>
+    <a class="nut nut-vien" href="/dich-vu/{{.DV.Ma}}" target="_blank">Xem trên web ↗</a>
+  </div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<div class="bao" style="max-width:900px">
+  Chữ ở đây hiện thẳng trên <code>/dich-vu/{{.DV.Ma}}</code>, không có địa chỉ nào khác.
+  <p class="nho" style="margin:6px 0 0">
+    Đừng chép lại giá, số ngày làm hay điều kiện nhận vào bài — mấy thứ đó trang
+    đã tự lấy từ bảng dịch vụ. Chép vào đây là sau này sửa giá một chỗ, chỗ kia
+    còn số cũ. Xoá trắng ô rồi lưu thì việc này trở về trang không có bài.
+  </p>
+</div>
+
+<form method="post" action="/qt/dich-vu/{{.DV.Ma}}/bai">
+  <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+
+  <div class="the-nhom">
+    <h3>Thân bài</h3>
+    <div class="noi">
+      <div class="soan-2cot">
+        <div>
+          <textarea name="than" id="o-than" rows="30" spellcheck="false"
+                    style="font-family:'Roboto Mono',monospace;font-size:13.5px;line-height:1.7">{{.Than}}</textarea>
+          <div class="hang" style="gap:10px;margin-top:12px">
+            <button type="button" id="nut-xem" class="phu" style="flex:0 0 auto">Xem thử</button>
+            <button type="submit" style="flex:0 0 auto">Lưu bài</button>
+            <span class="nho mo" id="bao-xem"></span>
+          </div>
+        </div>
+
+        <div>
+          <div class="nhan-nho">Xem thử</div>
+          <div id="khung-xem" class="bai xem-thu">
+            <p class="mo nho">Bấm <b>Xem thử</b> để dựng ra đúng cái sẽ lên trang.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<div class="the-nhom" style="margin-top:8px">
+  <h3>Viết cái gì trong này</h3>
+  <div class="noi">
+    <p class="nho">Ba mục, đúng thứ tự người ta thắc mắc khi cầm cây vợt hỏng trên tay:</p>
+    <ol class="nho" style="padding-left:20px;display:grid;gap:8px;margin:10px 0 0">
+      <li><b>Vì sao hay bị lỗi này</b> — cơ chế thật, lấy trong
+        <code>data/vot.yaml</code> hoặc <code>data/giay.yaml</code>. Không đoán.</li>
+      <li><b>Tự kiểm tra thế nào</b> — thao tác khách làm được ngay ở nhà, không
+        cần dụng cụ: gõ, ấn, soi ngược sáng, cạo móng tay. Nói rõ thấy gì thì
+        kết luận gì.</li>
+      <li><b>Cách hạn chế</b> — ba tới năm gạch đầu dòng. Việc làm được, không
+        phải lời khuyên chung chung.</li>
+    </ol>
+    <p class="nho mo" style="margin:12px 0 0">
+      Hình vẽ chèn bằng <code>:::hinh &lt;tên&gt;</code> rồi tới dòng chú thích và
+      <code>:::</code>. Tên dùng được:
+      {{range $ma, $mo := .Hinh}}<code>{{$ma}}</code> {{end}}
+    </p>
+  </div>
+</div>
+
+{{/* Xem thử gọi về server dựng, không dựng bằng JS: dùng chung đường
+     /qt/bai-viet/xem-thu với trang soạn bài viết, vì cùng một bộ dựng
+     markdown — hai chỗ mà lệch kết quả thì còn khó đoán hơn. */}}
+<script nonce="{{$.Nonce}}">
+(function () {
+  var nut = document.getElementById('nut-xem');
+  var o = document.getElementById('o-than');
+  var khung = document.getElementById('khung-xem');
+  var bao = document.getElementById('bao-xem');
+  nut.addEventListener('click', function () {
+    bao.textContent = 'đang dựng…';
+    var d = new URLSearchParams();
+    d.append('than', o.value);
+    fetch('/qt/bai-viet/xem-thu', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'X-CSRF-Token': {{$.CSRF}}
+      },
+      body: d.toString()
+    }).then(function (res) {
+      if (!res.ok) throw new Error(res.status);
+      return res.text();
+    }).then(function (h) {
+      khung.innerHTML = h;
+      bao.textContent = 'dựng lúc ' + new Date().toLocaleTimeString('vi-VN');
+    }).catch(function (e) {
+      bao.textContent = 'không dựng được: ' + e.message;
+    });
+  });
+  o.addEventListener('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); nut.click(); }
+  });
+})();
+</script>
+
+{{template "qt-chan" .}}
+{{end}}

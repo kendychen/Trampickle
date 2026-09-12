@@ -26,7 +26,7 @@
   <div class="bao bao-loi">Nhiều hơn 500 dòng — trang này chỉ hiện 500 dòng mới nhất.</div>
   {{end}}
   <div class="cuon">
-    <table class="bang">
+    <table class="bang bang-the">
       <thead>
         <tr><th>Lúc</th><th>Ai</th><th>IP</th><th>Việc</th><th>Đường</th><th>Kết quả</th><th>Chi tiết</th></tr>
       </thead>
@@ -34,12 +34,12 @@
         {{range $.Muc}}
         <tr>
           <td class="nho" style="white-space:nowrap">{{.Luc}}</td>
-          <td>{{.Ai}}</td>
-          <td class="nho mo">{{.IP}}</td>
-          <td>{{.Viec}}</td>
-          <td class="nho"><code>{{.Duong}}</code></td>
-          <td>{{if eq .KetQua "ok"}}<span class="chip chip-nhan">ok</span>{{else}}<span class="chip chip-tuchoi">{{.KetQua}}</span>{{end}}</td>
-          <td class="nho mo">{{.DoiTuong}}</td>
+          <td data-n="Ai">{{.Ai}}</td>
+          <td data-n="IP" class="nho mo">{{.IP}}</td>
+          <td data-n="Việc">{{.Viec}}</td>
+          <td data-n="Đường" class="nho">{{if .Duong}}<code>{{.Duong}}</code>{{end}}</td>
+          <td data-n="Kết quả">{{if eq .KetQua "ok"}}<span class="chip chip-nhan">ok</span>{{else}}<span class="chip chip-tuchoi">{{.KetQua}}</span>{{end}}</td>
+          <td data-n="Chi tiết" class="nho mo">{{.DoiTuong}}</td>
         </tr>
         {{end}}
       </tbody>

@@ -1,0 +1,36 @@
+{{define "cauhoi.html"}}
+{{template "html-dau" .}}
+
+<section class="hero">
+  <div class="khung hep">
+    <div class="nhan-nho">{{nd "cauhoi.nhan"}}</div>
+    <h1 style="margin-top:16px">{{nd "cauhoi.h1"}}</h1>
+    <p class="dan">{{ndd "cauhoi.dan"}}</p>
+  </div>
+</section>
+
+<section>
+  <div class="khung hep doc-lon">
+    {{/* Mở sẵn hết chứ không gập lại thành accordion. Trang này có mươi câu,
+         mà người tìm Ctrl+F một chữ trong câu trả lời đang gập thì trình
+         duyệt không thấy. Gập chỉ đáng khi danh sách dài tới mức không cuộn
+         nổi — chưa tới mức đó. */}}
+    {{range .CauHoi}}
+    <div class="the ch-muc" id="{{.Ma}}">
+      <h3><a class="ch-neo" href="#{{.Ma}}">{{.Hoi}}</a></h3>
+      <div class="ch-dap">{{.DapHTML}}</div>
+    </div>
+    {{else}}
+    <div class="the"><p class="mo">{{ndd "cauhoi.trong"}}</p></div>
+    {{end}}
+
+    <div class="the">
+      <h3>{{nd "cauhoi.chot.h3"}}</h3>
+      <p class="mo" style="margin-top:10px">{{ndd "cauhoi.chot.chu"}}</p>
+      <p style="margin-top:14px"><a class="nut nut-chinh" href="/#gui-yeu-cau">{{nd "cauhoi.chot.nut"}}</a></p>
+    </div>
+  </div>
+</section>
+
+{{template "html-chan" .}}
+{{end}}

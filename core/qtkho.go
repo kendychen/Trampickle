@@ -260,7 +260,9 @@ func hQtPhieuXoa(w http.ResponseWriter, r *http.Request) {
 
 func hQtVatTu(w http.ResponseWriter, r *http.Request) {
 	dm := map[string][]DongDinhMuc{}
-	for _, dv := range DichVuDangBan(GiaiDoan) {
+	// Định mức vật tư là chuyện trong xưởng: việc đang tắt với khách vẫn phải
+	// khai được, vì thợ vẫn nhận làm nó khi khách mang tới tận nơi.
+	for _, dv := range DichVuLenPhieu(GiaiDoan) {
 		dm[dv.Ma] = DinhMucCua(dv.Ma)
 	}
 	render(w, "qt-kho-vattu.html", struct {
@@ -271,7 +273,7 @@ func hQtVatTu(w http.ResponseWriter, r *http.Request) {
 	}{
 		dlQt:    dlQt{Chung: chung(r, "kho-vat-tu"), OK: r.URL.Query().Get("ok"), Loi: r.URL.Query().Get("loi")},
 		VatTu:   DanhSachVatTu(true),
-		DichVu:  DichVuDangBan(GiaiDoan),
+		DichVu:  DichVuLenPhieu(GiaiDoan),
 		DinhMuc: dm,
 	})
 }

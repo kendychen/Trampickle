@@ -19,11 +19,31 @@ var CayND = []TrangND{
 		MoTa: "Đầu trang, chân trang và form gửi yêu cầu — ba chỗ này hiện ở mọi trang, sửa một lần là đổi hết.",
 		Nhom: []NhomND{
 			{
+				Ten: "Thông báo trạm chưa mở cửa hàng — để trống là tắt hẳn",
+				Muc: []MucND{
+					// Hiện ngay dưới địa chỉ ở /app, trang chủ và trang liên hệ —
+					// đúng ba chỗ khách đọc địa chỉ rồi định phóng xe tới. Nói ở
+					// chỗ khác (chân trang, trang giới thiệu) thì người đã lên
+					// đường không đọc, mà người không định tới lại phải đọc.
+					//
+					// Địa chỉ vẫn để nguyên: nó là chỗ NHẬN vợt có thật, chỉ chưa
+					// phải cửa hàng bước vào xem đồ. Giấu địa chỉ đi thì khách gửi
+					// hàng biết ghi vào đâu.
+					//
+					// Mở cửa hàng xong thì xoá trắng ô này ở /qt/noi-dung là dải
+					// biến mất khỏi cả ba trang, không phải sửa code.
+					{Khoa: "chung.chua-mo", Nhan: "Câu báo — để trống thì không hiện ở đâu cả. Kẹp **hai sao** để in đậm", Dai: true,
+						Mac: "**Cửa hàng đang hoàn thiện** — trạm vẫn nhận sửa vợt và giày bình thường. Muốn mang tới tận nơi thì gọi hẹn trước cho chắc."},
+				},
+			},
+			{
 				Ten: "Thanh điều hướng",
 				Muc: []MucND{
 					{Khoa: "chung.nav.dich-vu", Nhan: "Mục Dịch vụ", Mac: "Dịch vụ"},
+					{Khoa: "chung.nav.cua-hang", Nhan: "Nav — đặt sửa online", Mac: "Đặt sửa online"},
 					{Khoa: "chung.nav.quy-trinh", Nhan: "Mục Quy trình", Mac: "Quy trình"},
 					{Khoa: "chung.nav.bai-viet", Nhan: "Mục Bài viết", Mac: "Bài viết"},
+					{Khoa: "chung.nav.cau-hoi", Nhan: "Mục Câu hỏi", Mac: "Hỏi đáp"},
 					{Khoa: "chung.nav.gioi-thieu", Nhan: "Mục Giới thiệu", Mac: "Giới thiệu"},
 					{Khoa: "chung.nav.ve-chung-toi", Nhan: "Mục Về chúng tôi", Mac: "Về chúng tôi"},
 					{Khoa: "chung.nav.lien-he", Nhan: "Mục Liên hệ", Mac: "Liên hệ"},
@@ -34,7 +54,7 @@ var CayND = []TrangND{
 				Ten: "Mức cân trạm cam kết",
 				Muc: []MucND{
 					{Khoa: "chung.can.muc", Nhan: "Mức tăng cân nói cho khách (hiện ở trang chủ, dịch vụ, quy trình, giới thiệu)",
-						Mac: "10–15 g tùy cây"},
+						Mac: "10–15 g tùy vợt"},
 				},
 			},
 			{
@@ -57,6 +77,7 @@ var CayND = []TrangND{
 					{Khoa: "chung.chan.quy-trinh", Nhan: "Cột 1 — dòng 2", Mac: "Quy trình"},
 					{Khoa: "chung.chan.bai-viet", Nhan: "Cột 1 — dòng 3", Mac: "Bài viết"},
 					{Khoa: "chung.chan.tra-cuu", Nhan: "Cột 1 — dòng 4", Mac: "Tra cứu đơn sửa"},
+					{Khoa: "chung.chan.cau-hoi", Nhan: "Cột 1 — dòng 5", Mac: "Câu hỏi thường gặp"},
 					{Khoa: "chung.chan.cot-2", Nhan: "Tên cột 2", Mac: "Liên hệ"},
 					{Khoa: "chung.chan.chua-co", Nhan: "Khi chưa điền thông tin liên hệ", Mac: "Đang cập nhật"},
 					{Khoa: "chung.chan.cot-3", Nhan: "Tên cột 3", Mac: "Khác"},
@@ -100,9 +121,13 @@ var CayND = []TrangND{
 				Ten: "Tấm đầu trang",
 				Muc: []MucND{
 					{Khoa: "trangchu.hero.nhan", Nhan: "Dòng nhãn nhỏ trên cùng", Mac: "Sửa chữa vợt Pickleball · Thay đế giày thể thao"},
-					{Khoa: "trangchu.hero.h1", Nhan: "Dòng chữ to nhất trang", Mac: "Gửi ảnh xem trước. Khám xong là có giá ngay."},
+					{Khoa: "trangchu.hero.h1", Nhan: "Dòng chữ to nhất trang",
+						Mac:   "Gửi ảnh xem trước. Khám xong là có giá ngay.",
+						MacOn: "Gửi vợt tới trạm. Sửa xong trạm gửi về tận nhà."},
 					{Khoa: "trangchu.hero.dan", Nhan: "Đoạn dẫn dưới dòng chữ to", Dai: true,
-						Mac: "Gửi ảnh, video và kể chỗ hỏng — em xem rồi nhận xét trong ngày: cây này thuộc việc gì, làm được hay không, mất mấy ngày. Chưa có con số ở bước này. Thấy ổn thì gửi vợt tới; em khám xong là báo giá ngay tại chỗ, và giá đã chốt là giá lúc nhận vợt về, không gọi lại giữa chừng."},
+						Mac:   "Gửi ảnh, video và kể chỗ hỏng — em xem rồi nhận xét trong ngày: cây này thuộc việc gì, làm được hay không, mất mấy ngày. Chưa có con số ở bước này. Thấy ổn thì gửi vợt tới; em khám xong là báo giá ngay tại chỗ, và giá đã chốt là giá lúc nhận vợt về, không gọi lại giữa chừng.",
+						MacOn: "Đặt đơn trên web, lấy mã rồi gửi vợt tới trạm. Vợt tới nơi em khám và báo giá, kèm ảnh chụp chỗ hỏng — anh/chị chốt rồi thợ mới làm. Giá đã chốt là giá cuối, không gọi lại giữa chừng."},
+					{Khoa: "trangchu.hero.dia-chi-nhan", Nhan: "Nhãn trước địa chỉ ở dòng liên hệ", Mac: "Địa chỉ", MacOn: "Gửi vợt tới"},
 					{Khoa: "trangchu.hero.nut1", Nhan: "Nút chính", Mac: "Gửi ảnh để em xem trước"},
 					{Khoa: "trangchu.hero.nut2", Nhan: "Nút phụ", Mac: "Xem bảng việc và thời gian"},
 					{Khoa: "trangchu.herodv.nhan", Nhan: "Cột phải hero — tiêu đề danh sách việc", Mac: "Trạm nhận những việc này"},
@@ -145,9 +170,12 @@ var CayND = []TrangND{
 				Ten: "Mục báo giá",
 				Muc: []MucND{
 					{Khoa: "trangchu.baogia.nhan", Nhan: "Nhãn nhỏ", Mac: "Báo giá"},
-					{Khoa: "trangchu.baogia.h2", Nhan: "Tiêu đề mục", Mac: "Giá ra tại chỗ, ngay sau khi khám"},
+					{Khoa: "trangchu.baogia.h2", Nhan: "Tiêu đề mục",
+						Mac:   "Giá ra tại chỗ, ngay sau khi khám",
+						MacOn: "Vợt tới nơi, khám xong là có giá"},
 					{Khoa: "trangchu.baogia.dan", Nhan: "Đoạn dẫn", Dai: true,
-						Mac: "Thứ làm người ta ngại mang vợt đi sửa không phải là tiền, mà là không biết bao giờ mới biết hết bao nhiêu. Nên ở đây khám xong là ra số ngay, và con số ấy đi trước công việc chứ không đi sau."},
+						Mac:   "Thứ làm người ta ngại mang vợt đi sửa không phải là tiền, mà là không biết bao giờ mới biết hết bao nhiêu. Nên ở đây khám xong là ra số ngay, và con số ấy đi trước công việc chứ không đi sau.",
+						MacOn: "Thứ làm người ta ngại gửi vợt đi sửa không phải là tiền, mà là gửi đi rồi không biết bao giờ mới biết hết bao nhiêu. Nên vợt tới nơi là khám và ra số ngay, con số ấy đi trước công việc chứ không đi sau."},
 					{Khoa: "trangchu.baogia.y1", Nhan: "Gạch đầu dòng 1", Dai: true,
 						Mac: "**Khám trước, ra giá sau.** Gõ mặt, soi mép, kiểm tra cán — rồi mới nói tiền."},
 					{Khoa: "trangchu.baogia.y2", Nhan: "Gạch đầu dòng 2", Dai: true,
@@ -181,6 +209,7 @@ var CayND = []TrangND{
 					{Khoa: "trangchu.dv.h2", Nhan: "Tiêu đề mục", Mac: "Làm ít việc, nhưng việc nào cũng có quy trình"},
 					{Khoa: "trangchu.dv.dan", Nhan: "Đoạn dẫn", Dai: true,
 						Mac: "Bấm vào từng mục để xem chi tiết: làm gì, mất bao lâu, bảo hành bao lâu."},
+					{Khoa: "trangchu.dv.noi-bat", Nhan: "Nhãn việc nổi bật", Mac: "Nhiều khách chọn"},
 					{Khoa: "trangchu.dv.khac-h3", Nhan: "Ô cuối lưới — tiêu đề", Mac: "Không thấy việc của mình?"},
 					{Khoa: "trangchu.dv.khac-chip", Nhan: "Ô cuối lưới — nhãn tròn", Mac: "Hỏi trước"},
 					{Khoa: "trangchu.dv.khac-chu", Nhan: "Ô cuối lưới — mô tả", Dai: true,
@@ -218,7 +247,8 @@ var CayND = []TrangND{
 					{Khoa: "trangchu.qt.b2-so", Nhan: "Bước 2 — số", Mac: "BƯỚC 2"},
 					{Khoa: "trangchu.qt.b2-ten", Nhan: "Bước 2 — tên", Mac: "Gửi vợt và khám"},
 					{Khoa: "trangchu.qt.b2-chu", Nhan: "Bước 2 — mô tả", Dai: true,
-						Mac: "Thấy ổn thì anh/chị gửi tới hoặc mang tới. Em gõ mặt, soi mép, kiểm tra cán — khám xong là có giá ngay."},
+						Mac:   "Thấy ổn thì anh/chị gửi tới hoặc mang tới. Em gõ mặt, soi mép, kiểm tra cán — khám xong là có giá ngay.",
+						MacOn: "Thấy ổn thì anh/chị đặt đơn, ghi mã lên kiện rồi gửi tới trạm. Em gõ mặt, soi mép, kiểm tra cán — khám xong là có giá ngay."},
 					{Khoa: "trangchu.qt.b3-so", Nhan: "Bước 3 — số", Mac: "BƯỚC 3"},
 					{Khoa: "trangchu.qt.b3-ten", Nhan: "Bước 3 — tên", Mac: "Chốt giá rồi mới làm"},
 					{Khoa: "trangchu.qt.b3-chu", Nhan: "Bước 3 — mô tả", Dai: true,
@@ -267,7 +297,8 @@ var CayND = []TrangND{
 					{Khoa: "trangchu.canh.1-nut", Nhan: "Thẻ bên phải 1 — nút", Mac: "Tra cứu đơn"},
 					{Khoa: "trangchu.canh.2-h3", Nhan: "Thẻ bên phải 2 — tiêu đề", Mac: "Muốn biết giá?"},
 					{Khoa: "trangchu.canh.2-chu", Nhan: "Thẻ bên phải 2 — mô tả", Dai: true,
-						Mac: "Mang vợt tới trạm là khám ngay trước mặt và có giá trong buổi. Nhắn trước một câu để em xếp lịch, khỏi phải ngồi chờ."},
+						Mac:   "Mang vợt tới trạm là khám ngay trước mặt và có giá trong buổi. Nhắn trước một câu để em xếp lịch, khỏi phải ngồi chờ.",
+						MacOn: "Bảng việc có giá khởi điểm của từng món. Số chốt thì phải khám tận tay mới có — vợt tới nơi là em báo ngay trong ngày."},
 					{Khoa: "trangchu.canh.2-nut", Nhan: "Thẻ bên phải 2 — nút", Mac: "Danh sách dịch vụ"},
 				},
 			},
@@ -297,6 +328,16 @@ var CayND = []TrangND{
 					{Khoa: "dichvu.hoi.chan", Nhan: "Dòng chân ô", Mac: "Trả lời trong ngày"},
 				},
 			},
+			{
+				Ten: "Khối việc trạm không nhận",
+				Muc: []MucND{
+					{Khoa: "dichvu.tuchoi.nhan", Nhan: "Nhãn nhỏ", Mac: "Không nhận"},
+					{Khoa: "dichvu.tuchoi.h2", Nhan: "Tiêu đề", Mac: "Có ca em nói thẳng là không sửa được"},
+					{Khoa: "dichvu.tuchoi.chu", Nhan: "Đoạn dẫn", Dai: true,
+						Mac: "Nói trước cho đỡ mất công đóng gói gửi đi. Tên việc và lý do ở dưới lấy từ bảng giá, sửa ở mục Dịch vụ."},
+					{Khoa: "dichvu.tuchoi.link", Nhan: "Chữ trên link sang bài", Mac: "Vì sao, và cách tự kiểm tra ở nhà →"},
+				},
+			},
 		},
 	},
 	{
@@ -309,15 +350,19 @@ var CayND = []TrangND{
 				Muc: []MucND{
 					{Khoa: "dichvumot.quay-lai", Nhan: "Link quay lại", Mac: "← Tất cả dịch vụ"},
 					{Khoa: "dichvumot.dieu-kien", Nhan: "Chữ đứng trước điều kiện nhận", Mac: "Điều kiện nhận:"},
+					{Khoa: "dichvumot.tuchoi.chip", Nhan: "Nhãn trên trang ca không nhận", Mac: "Trạm không nhận việc này"},
+					{Khoa: "dichvumot.tuchoi.viSao", Nhan: "Chữ đứng trước lý do không nhận", Mac: "Lý do:"},
 				},
 			},
 			{
 				Ten: "Dải ba con số",
 				Muc: []MucND{
 					{Khoa: "dichvumot.so.1-n", Nhan: "Ô 1 — nhãn", Mac: "Thời gian làm"},
-					{Khoa: "dichvumot.so.1-t", Nhan: "Ô 1 — chú thích", Mac: "ngày kể từ lúc chốt giá"},
+					{Khoa: "dichvumot.so.1-dv", Nhan: "Ô 1 — đơn vị đi sau số", Mac: "ngày"},
+					{Khoa: "dichvumot.so.1-t", Nhan: "Ô 1 — chú thích", Mac: "kể từ lúc chốt giá"},
 					{Khoa: "dichvumot.so.2-n", Nhan: "Ô 2 — nhãn", Mac: "Bảo hành"},
-					{Khoa: "dichvumot.so.2-t", Nhan: "Ô 2 — chú thích", Mac: "tháng, tính từ ngày giao vợt"},
+					{Khoa: "dichvumot.so.2-dv", Nhan: "Ô 2 — đơn vị đi sau số", Mac: "tháng"},
+					{Khoa: "dichvumot.so.2-t", Nhan: "Ô 2 — chú thích", Mac: "tính từ ngày giao vợt"},
 					{Khoa: "dichvumot.so.3-n", Nhan: "Ô 3 — nhãn", Mac: "Tăng cân tối đa"},
 					{Khoa: "dichvumot.so.3-t", Nhan: "Ô 3 — chú thích", Mac: "vượt mức này thì không lấy tiền công"},
 				},
@@ -342,6 +387,8 @@ var CayND = []TrangND{
 			{
 				Ten: "Thẻ bên phải",
 				Muc: []MucND{
+					{Khoa: "dichvumot.gia.chu", Nhan: "Dòng nhỏ dưới con số giá", Dai: true,
+						Mac: "Đây là giá sàn. Khám vợt xong trạm báo con số chính thức — anh/chị chốt rồi thợ mới làm."},
 					{Khoa: "dichvumot.gui.h3", Nhan: "Tiêu đề thẻ", Mac: "Gửi vợt cho trạm"},
 					{Khoa: "dichvumot.gui.chu", Nhan: "Mô tả", Dai: true,
 						Mac: "Chụp chỗ hỏng gửi trước — em xem ảnh rồi trả lời có nhận hay không, trong ngày."},
@@ -402,13 +449,16 @@ var CayND = []TrangND{
 				Ten: "Hai đường đưa vợt tới trạm",
 				Muc: []MucND{
 					{Khoa: "quytrinh.duong.nhan", Nhan: "Nhãn nhỏ", Mac: "Đưa vợt tới trạm"},
-					{Khoa: "quytrinh.duong.h2", Nhan: "Tiêu đề mục", Mac: "Hai đường, chọn đường nào cũng khám như nhau"},
+					{Khoa: "quytrinh.duong.h2", Nhan: "Tiêu đề mục",
+						Mac:   "Hai đường, chọn đường nào cũng khám như nhau",
+						MacOn: "Đặt trên web rồi gửi đồ tới — hoặc mang tới tận nơi"},
 					{Khoa: "quytrinh.duong.den-h3", Nhan: "Đường 1 — tiêu đề", Mac: "Đến tận nơi, khám tại chỗ"},
 					{Khoa: "quytrinh.duong.den-chu", Nhan: "Đường 1 — mô tả", Dai: true,
 						Mac: "Anh/chị mang vợt tới trạm thì khám ngay trước mặt: gõ mặt, soi mép, chỉ tận tay chỗ hỏng nằm ở đâu. Có giá luôn trong buổi, khỏi phải chờ. Nhắn trước một câu để em xếp lịch, đỡ tới lúc thợ đang bận tay giữa một ca khác."},
 					{Khoa: "quytrinh.duong.gui-h3", Nhan: "Đường 2 — tiêu đề", Mac: "Gửi vợt từ xa"},
 					{Khoa: "quytrinh.duong.gui-chu", Nhan: "Đường 2 — mô tả", Dai: true,
-						Mac: "Bọc vợt bằng xốp hơi, cho vào hộp cứng. Ghi mã yêu cầu lên ngoài hộp. Vợt về tới nơi là em khám và báo giá trong ngày, kèm ảnh chụp chỗ hỏng để anh/chị thấy đúng thứ em thấy."},
+						Mac:   "Bọc vợt bằng xốp hơi, cho vào hộp cứng. Ghi mã yêu cầu lên ngoài hộp. Vợt về tới nơi là em khám và báo giá trong ngày, kèm ảnh chụp chỗ hỏng để anh/chị thấy đúng thứ em thấy.",
+						MacOn: "Đặt đơn trên web trước để lấy mã. Bọc vợt bằng xốp hơi, cho vào hộp cứng, **ghi mã đơn lên ngoài hộp** — không có mã thì kiện tới nơi trạm không biết của ai. Vợt về tới nơi là em khám và báo giá trong ngày, kèm ảnh chụp chỗ hỏng."},
 				},
 			},
 			{
@@ -418,7 +468,8 @@ var CayND = []TrangND{
 					{Khoa: "quytrinh.ship.chu-1", Nhan: "Đoạn 1 — {nguong} là mức miễn phí chiều về, sửa số đó ở mục Ngưỡng", Dai: true,
 						Mac: "Anh/chị chịu phí gửi vợt tới trạm. Chiều gửi trả cũng vậy — trừ khi đơn từ `{nguong}` trở lên, lúc đó trạm chịu chiều về."},
 					{Khoa: "quytrinh.ship.chu-2", Nhan: "Đoạn 2", Dai: true,
-						Mac: "Mang tới tận nơi thì không có khoản này. Tiền khám vợt và tư vấn không tính, kể cả khi khám xong anh/chị quyết định không sửa."},
+						Mac:   "Mang tới tận nơi thì không có khoản này. Tiền khám vợt và tư vấn không tính, kể cả khi khám xong anh/chị quyết định không sửa.",
+						MacOn: "Tiền khám vợt và tư vấn không tính, kể cả khi khám xong anh/chị quyết định không sửa — lúc đó trạm chỉ thu đúng phí gửi vợt về."},
 				},
 			},
 			{
@@ -443,7 +494,9 @@ var CayND = []TrangND{
 				Ten: "Đầu trang",
 				Muc: []MucND{
 					{Khoa: "vechungtoi.nhan", Nhan: "Nhãn nhỏ", Mac: "Về chúng tôi"},
-					{Khoa: "vechungtoi.h1", Nhan: "Tiêu đề", Mac: "Trạm có địa chỉ thật, anh/chị ghé xem được"},
+					{Khoa: "vechungtoi.h1", Nhan: "Tiêu đề",
+						Mac:   "Trạm có địa chỉ thật, anh/chị ghé xem được",
+						MacOn: "Trạm có địa chỉ thật, không phải một tài khoản trên mạng"},
 					{Khoa: "vechungtoi.dan", Nhan: "Đoạn dẫn", Dai: true,
 						Mac: "Sửa vợt là nghề gửi đồ đi rồi chờ. Nên trước khi anh/chị gửi cây vợt vài triệu cho một người lạ trên mạng, đây là chỗ trạm ngồi và những gì có trong đó."},
 				},
@@ -451,14 +504,16 @@ var CayND = []TrangND{
 			{
 				Ten: "Trạm ở đâu",
 				Muc: []MucND{
-					{Khoa: "vechungtoi.o.nhan", Nhan: "Nhãn nhỏ", Mac: "Địa chỉ"},
-					{Khoa: "vechungtoi.o.h2", Nhan: "Tiêu đề mục", Mac: "Trạm ở đây"},
+					{Khoa: "vechungtoi.o.nhan", Nhan: "Nhãn nhỏ", Mac: "Địa chỉ", MacOn: "Địa chỉ nhận hàng"},
+					{Khoa: "vechungtoi.o.h2", Nhan: "Tiêu đề mục", Mac: "Trạm ở đây", MacOn: "Gửi vợt về đây"},
 					{Khoa: "vechungtoi.o.chua-co", Nhan: "Câu hiện khi chưa điền địa chỉ ở /qt/lien-he", Dai: true,
-						Mac: "Địa chỉ đang cập nhật — anh/chị nhắn cho trạm để lấy chỉ đường."},
-					{Khoa: "vechungtoi.o.gio-nhan", Nhan: "Nhãn dòng giờ mở cửa", Mac: "Mở cửa"},
+						Mac:   "Địa chỉ đang cập nhật — anh/chị nhắn cho trạm để lấy chỉ đường.",
+						MacOn: "Địa chỉ nhận hàng đang cập nhật — anh/chị nhắn cho trạm để biết gửi vợt tới đâu."},
+					{Khoa: "vechungtoi.o.gio-nhan", Nhan: "Nhãn dòng giờ mở cửa", Mac: "Mở cửa", MacOn: "Giờ nhận hàng"},
 					{Khoa: "vechungtoi.o.chi-duong", Nhan: "Nút mở bản đồ", Mac: "Chỉ đường trên Google Maps"},
 					{Khoa: "vechungtoi.o.chu", Nhan: "Câu dưới địa chỉ", Dai: true,
-						Mac: "Ghé trực tiếp thì khám tại chỗ, anh/chị đứng xem thợ mở vợt luôn. Ở xa thì gửi chuyển phát cũng được — quy trình y hệt, chỉ khác là khám qua ảnh trước."},
+						Mac:   "Ghé trực tiếp thì khám tại chỗ, anh/chị đứng xem thợ mở vợt luôn. Ở xa thì gửi chuyển phát cũng được — quy trình y hệt, chỉ khác là khám qua ảnh trước.",
+						MacOn: "Đây cũng là địa chỉ anh/chị gửi đồ tới — ghi kèm tên và số điện thoại của trạm ở mục liên hệ. Muốn ghé xem tận nơi thì cứ ghé, nhắn trước một câu để trạm có người ở nhà."},
 				},
 			},
 			{
@@ -473,6 +528,48 @@ var CayND = []TrangND{
 				},
 			},
 			{
+				// Khối chào hàng duy nhất của trang này. Mọi câu ở đây phải
+				// chỉ được ra bằng chứng nằm sẵn trên site — hồ sơ ca, ngưỡng
+				// cân ở /gioi-thieu, hai ca từ chối ở /dich-vu, dòng vệ sinh
+				// giá 0 ở bảng giá. Đừng thêm số năm kinh nghiệm hay số khách
+				// vào đây: /gioi-thieu đang nói thẳng "trạm mới mở", khách bấm
+				// một cái là thấy hai trang cãi nhau.
+				Ten: "Vì sao chọn trạm",
+				Muc: []MucND{
+					{Khoa: "vechungtoi.vs.nhan", Nhan: "Nhãn nhỏ", Mac: "Vì sao chọn trạm"},
+					{Khoa: "vechungtoi.vs.h2", Nhan: "Tiêu đề mục",
+						Mac: "Trạm nhỏ, nhưng làm nghề đến nơi đến chốn"},
+					{Khoa: "vechungtoi.vs.dan", Nhan: "Đoạn dẫn", Dai: true,
+						Mac:   "Sửa vợt ở Việt Nam phần lớn vẫn là nghề truyền miệng: mang tới, để đấy, vài hôm sau nhận về, hỏng chỗ nào cũng chẳng ai ghi lại. Trạm làm khác hẳn. Và cái khác ấy không nằm ở lời quảng cáo — nó nằm trong bốn thứ dưới đây, thứ nào anh/chị cũng tự kiểm tra được.",
+						MacOn: "Sửa vợt ở Việt Nam phần lớn vẫn là nghề truyền miệng: gửi đi, để đấy, vài hôm sau nhận về, hỏng chỗ nào cũng chẳng ai ghi lại. Trạm làm khác hẳn. Và cái khác ấy không nằm ở lời quảng cáo — nó nằm trong bốn thứ dưới đây, thứ nào anh/chị cũng tự kiểm tra được."},
+
+					{Khoa: "vechungtoi.vs.1-ten", Nhan: "Thẻ 1 — tên",
+						Mac: "Mỗi ca một hồ sơ, không làm theo trí nhớ"},
+					{Khoa: "vechungtoi.vs.1-chu", Nhan: "Thẻ 1 — mô tả", Dai: true,
+						Mac: "Mỗi loại hỏng có một quy trình viết sẵn, làm đúng từng bước chứ không tùy tay. Cân trước, cân sau, ảnh trước, ảnh sau đều lưu vào đơn. Ca nào làm chưa đạt thì nằm lại trong hồ sơ để lần sau không lặp lại."},
+
+					{Khoa: "vechungtoi.vs.2-ten", Nhan: "Thẻ 2 — tên",
+						Mac: "Vượt ngưỡng cân là không lấy tiền công"},
+					{Khoa: "vechungtoi.vs.2-chu", Nhan: "Thẻ 2 — mô tả", Dai: true,
+						Mac: "Vợt nặng thêm là một cây vợt khác, đánh không còn quen tay. Nên trạm tự đặt trần tăng cân và tự phạt mình nếu vượt. Con số ấy ghi ở [trang giới thiệu](/gioi-thieu), và anh/chị soi được bằng đúng một cái cân nhà bếp."},
+
+					{Khoa: "vechungtoi.vs.3-ten", Nhan: "Thẻ 3 — tên",
+						Mac: "Có ca trạm không nhận, dù anh/chị trả tiền"},
+					{Khoa: "vechungtoi.vs.3-chu", Nhan: "Thẻ 3 — mô tả", Dai: true,
+						Mac: "Nứt ở tâm mặt vợt, hay lõi tổ ong đã sập, thì trạm nói không và nói rõ vì sao. Làm cho nó trông lành lặn thì vẫn làm được — nhưng cây vợt ấy gãy giữa trận. Tiền công đó trạm không lấy."},
+
+					{Khoa: "vechungtoi.vs.4-ten", Nhan: "Thẻ 4 — tên",
+						Mac: "Nhắn tin là gặp đúng người cầm cây vợt"},
+					{Khoa: "vechungtoi.vs.4-chu", Nhan: "Thẻ 4 — mô tả", Dai: true,
+						Mac: "Không tổng đài, không nhân viên đọc kịch bản. Người trả lời tin nhắn cũng là người mở cây vợt ra, nên anh/chị hỏi sâu tới đâu cũng có câu trả lời thật tới đó."},
+
+					{Khoa: "vechungtoi.vs.chot", Nhan: "Câu chốt dưới bốn thẻ", Dai: true,
+						Mac:   "Và ca nào trạm cũng vệ sinh vợt miễn phí trước khi trả — cây vợt về tay anh/chị phải sạch hơn lúc mang đến. Gửi ảnh chỗ hỏng là trạm xem rồi trả lời có nhận được hay không, trước cả chuyện giá.",
+						MacOn: "Và ca nào trạm cũng vệ sinh vợt miễn phí trước khi gửi về — cây vợt về tay anh/chị phải sạch hơn lúc gửi đi. Gửi ảnh chỗ hỏng là trạm xem rồi trả lời có nhận được hay không, trước cả chuyện giá."},
+					{Khoa: "vechungtoi.vs.nut", Nhan: "Nút sang trang giới thiệu", Mac: "Đọc cách trạm làm việc"},
+				},
+			},
+			{
 				Ten: "Chốt trang",
 				Muc: []MucND{
 					{Khoa: "vechungtoi.chot.h2", Nhan: "Tiêu đề", Mac: "Xem thêm"},
@@ -483,50 +580,79 @@ var CayND = []TrangND{
 		},
 	},
 	{
-		Ma:   "app",
-		Ten:  "App trên điện thoại",
-		MoTa: "Màn hình hiện ra khi khách mở app từ icon trên màn hình chính, cộng lời mời cài hiện ở mọi trang web. App chỉ có việc làm được với cây vợt — người bấm icon là đang muốn làm gì đó, không phải ngồi đọc.",
+		Ma:    "app",
+		Ten:   "App trên điện thoại",
+		Rieng: true, // sửa ở /qt/app, không hiện tab ở /qt/noi-dung
+		MoTa:  "Màn hình hiện ra khi khách mở app từ icon trên màn hình chính, cộng lời mời cài hiện ở mọi trang web. App chỉ có việc làm được với cây vợt — người bấm icon là đang muốn làm gì đó, không phải ngồi đọc.",
 		Nhom: []NhomND{
 			{
 				Ten: "Màn hình app",
 				Muc: []MucND{
-					{Khoa: "app.hero.h1", Nhan: "Dòng chữ to nhất màn app — nói app này làm nghề gì",
-						Mac: "Sửa vợt pickleball"},
-					{Khoa: "app.hero.chu", Nhan: "Câu dưới dòng chữ to", Dai: true,
-						Mac: "Nứt mặt, bong lõi, gãy cán, tróc sơn — bấm **Khám vợt** gửi ảnh chỗ hỏng, trạm xem rồi nói làm được hay không."},
+					{Khoa: "app.bia.chi-duong", Nhan: "Bảng hiệu — chữ trên địa chỉ ở góc phải", Mac: "Chỉ đường"},
+					{Khoa: "app.bia.nhan", Nhan: "Bảng hiệu — viên nhãn bên phải tên trạm, để trống thì ẩn hẳn",
+						Mac: "Nhận sửa vợt & giày toàn quốc"},
 					{Khoa: "app.luoi.h2", Nhan: "Tiêu đề trên lưới việc", Mac: "Trạm làm được gì"},
 					{Khoa: "app.o-khac", Nhan: "Ô cuối lưới — tên", Mac: "Việc khác"},
 					{Khoa: "app.o-khac-phu", Nhan: "Ô cuối lưới — dòng nhỏ", Mac: "Khám vợt"},
 					{Khoa: "app.trong", Nhan: "Câu hiện khi chưa mở bán việc nào", Dai: true,
 						Mac: "Trạm đang xếp lại bảng việc. Anh/chị cứ gửi ảnh chỗ hỏng, trạm xem rồi trả lời."},
-					{Khoa: "app.tra.h2", Nhan: "Ô tra đơn ngay trang chủ — tiêu đề", Mac: "Vợt đang ở trạm?"},
-					{Khoa: "app.tra.chu", Nhan: "Ô tra đơn ngay trang chủ — câu giải thích", Dai: true,
-						Mac: "Gõ mã trên phiếu, hoặc mã trạm gửi lại sau khi anh/chị gửi ảnh."},
 				},
 			},
 			{
-				Ten: "Cần sửa thì làm thế nào",
+				Ten: "Banner đầu màn hình app",
 				Muc: []MucND{
-					{Khoa: "app.lam.h2", Nhan: "Tiêu đề mục", Mac: "Cần sửa thì làm thế nào"},
-					{Khoa: "app.lam.b1", Nhan: "Bước 1 — tên", Mac: "Chụp chỗ hỏng gửi cho trạm"},
-					{Khoa: "app.lam.b1-chu", Nhan: "Bước 1 — câu giải thích", Mac: "Ảnh rõ chỗ nứt, vỡ, bong. Trạm xem rồi nói ngay là làm được hay không."},
-					{Khoa: "app.lam.b2", Nhan: "Bước 2 — tên", Mac: "Gửi vợt tới, trạm khám và báo giá"},
-					{Khoa: "app.lam.b2-chu", Nhan: "Bước 2 — câu giải thích", Mac: "Mang tới tận nơi hoặc gửi chuyển phát. Khám xong mới có giá chắc chắn."},
-					{Khoa: "app.lam.b3", Nhan: "Bước 3 — tên", Mac: "Anh/chị chốt giá rồi thợ mới mở keo"},
-					{Khoa: "app.lam.b3-chu", Nhan: "Bước 3 — câu giải thích", Mac: "Không đồng ý thì trạm gửi vợt về nguyên trạng, không mất phí sửa."},
-					{Khoa: "app.lam.nut", Nhan: "Nút chính", Mac: "Khám vợt"},
-					{Khoa: "app.lam.nut-2", Nhan: "Nút phụ", Mac: "Xem quy trình đầy đủ"},
+					// Xuống dòng ở đây là xuống dòng thật trên banner (CSS để
+					// white-space: pre-line). Hai nghề là hai việc riêng, đọc
+					// thành hai dòng thì mắt bắt được cả hai; nhồi một dòng thì
+					// trình duyệt tự ngắt ở đâu tuỳ bề ngang máy — trên 390px nó
+					// ngắt giữa "Thay đế giày" và "thể thao", thành ra dòng hai
+					// là một mẩu cụt không có nghĩa.
+					{Khoa: "app.banner.tieu-de", Nhan: "Dòng lớn — mỗi dòng gõ xuống là một dòng trên banner", Dai: true,
+						Mac: "Sửa vợt Pickleball\nThay đế giày thể thao"},
+					{Khoa: "app.banner.chu", Nhan: "Dòng nhỏ dưới — màn hình thấp thì ẩn đi", Dai: true,
+						Mac: "Khám xong báo giá — chốt rồi thợ mới làm."},
 				},
 			},
 			{
-				Ten: "Khối liên hệ trong app",
+				Ten: "Khuyến mãi — khối ở màn hình đầu app",
 				Muc: []MucND{
-					{Khoa: "app.lh.h2", Nhan: "Tiêu đề mục", Mac: "Gọi cho trạm"},
-					{Khoa: "app.lh.zalo", Nhan: "Nút Zalo", Mac: "Nhắn Zalo"},
-					{Khoa: "app.lh.dia-chi", Nhan: "Nhãn dòng địa chỉ", Mac: "Địa chỉ"},
-					{Khoa: "app.lh.gio", Nhan: "Nhãn dòng giờ mở cửa", Mac: "Mở cửa"},
-					{Khoa: "app.lh.chua-co", Nhan: "Câu hiện khi chưa điền số lẫn Zalo ở /qt/lien-he", Dai: true,
-						Mac: "Số liên hệ đang cập nhật — anh/chị gửi ảnh vợt, trạm sẽ nhắn lại."},
+					{Khoa: "app.km.h2", Nhan: "Tiêu đề khối", Mac: "Đang có"},
+					{Khoa: "app.km.nhan", Nhan: "Huy hiệu bên trái — vài ký tự thôi", Mac: "MỚI"},
+					{Khoa: "app.km.ten", Nhan: "Tên chương trình — ĐỂ TRỐNG là cả khối biến mất", Mac: ""},
+					{Khoa: "app.km.han", Nhan: "Dòng nhỏ: hạn, điều kiện", Mac: ""},
+				},
+			},
+			{
+				Ten: "Giá — hiện trên ô việc và trong trang từng dịch vụ",
+				Muc: []MucND{
+					{Khoa: "app.gia.h2", Nhan: "Nhãn đứng trước con số", Mac: "Giá tham khảo"},
+					{Khoa: "app.gia.tu", Nhan: "Chữ đứng trước con số", Mac: "từ"},
+					{Khoa: "app.gia.den", Nhan: "Chữ nối hai đầu khoảng giá", Mac: "đến"},
+					{Khoa: "app.gia.mien-phi", Nhan: "Việc trạm không thu tiền", Mac: "Miễn phí"},
+					{Khoa: "app.gia.bao-rieng", Nhan: "Việc phải xem vợt mới có giá", Mac: "Xem vợt rồi báo"},
+					{Khoa: "app.gia.ngan-hoi", Nhan: "Như trên nhưng in trong ô việc ở app — ô hẹp, để 2-3 chữ", Mac: "Báo sau"},
+					{Khoa: "app.gia.tuy-the", Dai: true,
+						Nhan: "Câu dưới lưới việc — chỉ hiện khi có việc chưa niêm yết giá cứng",
+						Mac:  "Một số giá phụ thuộc vào tình trạng vợt. Khám xong trạm báo giá chính xác."},
+				},
+			},
+			{
+				Ten: "Cam kết của trạm — hiện ở /app/quy-trinh",
+				Muc: []MucND{
+					{Khoa: "app.cs.h2", Nhan: "Tiêu đề khối", Mac: "Trạm cam kết"},
+					{Khoa: "app.cs.1", Nhan: "Cam kết 1 — tên", Mac: "Bảo hành sau sửa"},
+					{Khoa: "app.cs.1-chu", Nhan: "Cam kết 1 — chi tiết", Dai: true,
+						Mac: "Chỗ trạm vừa làm mà hỏng lại vì tay thợ thì trạm làm lại, không tính thêm tiền."},
+					{Khoa: "app.cs.2", Nhan: "Cam kết 2 — tên", Mac: "Hẹn ngày trả rõ"},
+					{Khoa: "app.cs.2-chu", Nhan: "Cam kết 2 — chi tiết", Dai: true,
+						Mac: "Nhận vợt là có ngày lấy. Chậm thì trạm báo trước chứ không để anh/chị chờ rồi hỏi."},
+					{Khoa: "app.cs.3", Nhan: "Cam kết 3 — tên", Mac: "Giao nhận tận nhà"},
+					{Khoa: "app.cs.3-chu", Nhan: "Cam kết 3 — chi tiết", Dai: true,
+						Mac:   "Không tiện mang tới thì trạm nhận và trả tại nhà. Đơn đủ lớn trạm chịu phí gửi trả.",
+						MacOn: "Sửa xong trạm gửi về tận nhà. Đơn đủ lớn trạm chịu phí gửi trả."},
+					{Khoa: "app.cs.4", Nhan: "Cam kết 4 — tên", Mac: "Không sửa được thì trả nguyên trạng"},
+					{Khoa: "app.cs.4-chu", Nhan: "Cam kết 4 — chi tiết", Dai: true,
+						Mac: "Khám xong thấy không cứu được, trạm gửi vợt về đúng như lúc nhận, không mất phí sửa."},
 				},
 			},
 			{
@@ -534,10 +660,11 @@ var CayND = []TrangND{
 				Muc: []MucND{
 					{Khoa: "app.nut.trang-chu", Nhan: "Nút 1 — về màn hình app", Mac: "Trang chủ"},
 					{Khoa: "app.nut.tra-cuu", Nhan: "Nút 2 — tra cứu đơn", Mac: "Tra đơn"},
-					{Khoa: "app.nut.lien-he", Nhan: "Nút giữa nhô lên — bấm là gọi", Mac: "Liên hệ"},
+					{Khoa: "app.nut.lien-he", Nhan: "Nút giữa nhô lên — chữ hiện khi chưa điền số lẫn Zalo", Mac: "Liên hệ"},
+					{Khoa: "app.lh.goi", Nhan: "Nút giữa — dòng gọi điện trong bảng bật lên", Mac: "Gọi điện"},
+					{Khoa: "app.nut.zalo", Nhan: "Nút giữa — dòng Zalo trong bảng bật lên", Mac: "Zalo"},
 					{Khoa: "app.nut.gui-anh", Nhan: "Nút 4, cũng là lối tắt khi giữ lâu vào icon app", Mac: "Khám vợt"},
-					{Khoa: "app.nut.zalo", Nhan: "Nút 5 khi đã điền Zalo", Mac: "Zalo"},
-					{Khoa: "app.nut.quy-trinh", Nhan: "Nút 5 khi chưa có Zalo", Mac: "Quy trình"},
+					{Khoa: "app.nut.quy-trinh", Nhan: "Nút 5", Mac: "Quy trình"},
 				},
 			},
 			{
@@ -674,6 +801,95 @@ var CayND = []TrangND{
 		},
 	},
 	{
+		Ma:   "cua-hang",
+		Ten:  "Cửa hàng",
+		MoTa: "Trang đặt sửa từ xa. Chỉ hiện khi site chạy bản Online và đã có địa chỉ trạm.",
+		Nhom: []NhomND{
+			{
+				Ten: "Mở đầu",
+				Muc: []MucND{
+					{Khoa: "cuahang.mo.tieu-de", Nhan: "Tiêu đề trang", Mac: "Đặt sửa online"},
+					{Khoa: "cuahang.mo.dan", Nhan: "Câu dẫn", Dai: true,
+						Mac: "Chọn món và việc cần làm, rồi gửi đồ tới. Khám xong trạm báo giá, anh/chị chốt thì thợ mới làm."},
+				},
+			},
+			{
+				Ten: "Các bước",
+				Muc: []MucND{
+					{Khoa: "cuahang.buoc.mon", Nhan: "Bước 1 — tên", Mac: "Anh/chị gửi gì?"},
+					{Khoa: "cuahang.buoc.goi", Nhan: "Bước 2 — tên", Mac: "Cần làm gì?"},
+					{Khoa: "cuahang.buoc.tinh-trang", Nhan: "Bước 3 — tên", Mac: "Tình trạng hiện tại"},
+					{Khoa: "cuahang.buoc.nguoi-nhan", Nhan: "Bước 4 — tên", Mac: "Nhận lại ở đâu"},
+					{Khoa: "cuahang.buoc.gia-tu", Nhan: "Nhãn đứng trước giá", Mac: "Giá từ"},
+					{Khoa: "cuahang.buoc.bao-gia-rieng", Nhan: "Nhãn cho việc phải xem mới báo giá", Mac: "Xem món rồi báo giá"},
+					{Khoa: "cuahang.buoc.gia-nhac", Nhan: "Câu nhắc dưới bảng giá", Dai: true,
+						Mac: "Đây là giá khởi điểm. Giá chốt báo sau khi thợ khám, và anh/chị duyệt rồi thợ mới làm."},
+					{Khoa: "cuahang.buoc.anh-nhac", Nhan: "Câu nhắc gửi ảnh", Dai: true,
+						Mac: "Chụp giúp trạm chỗ hỏng, chụp gần và đủ sáng. Có ảnh thì thợ đoán được việc trước khi hàng tới."},
+					{Khoa: "cuahang.buoc.nut", Nhan: "Nút gửi đơn", Mac: "Đặt sửa"},
+				},
+			},
+			{
+				Ten: "Màn kết — sau khi đặt xong",
+				Muc: []MucND{
+					{Khoa: "cuahang.xong.tieu-de", Nhan: "Tiêu đề", Mac: "Đã nhận đơn. Giờ gửi đồ tới nhé"},
+					{Khoa: "cuahang.xong.ma-nhan", Nhan: "Nhãn trên ô mã đơn", Mac: "Mã đơn"},
+					{Khoa: "cuahang.xong.ghi-ma", Nhan: "Câu nhắc ghi mã lên kiện", Dai: true,
+						Mac: "**Ghi mã đơn lên kiện hàng** — hoặc kẹp một mẩu giấy có mã vào trong. Không có mã thì kiện tới nơi trạm không biết của ai."},
+					{Khoa: "cuahang.xong.gui-toi", Nhan: "Tiêu đề khối địa chỉ", Mac: "Gửi tới"},
+					{Khoa: "cuahang.xong.dong-goi-nhan", Nhan: "Tiêu đề khối đóng gói", Mac: "Đóng gói"},
+					{Khoa: "cuahang.xong.dong-goi", Nhan: "Hướng dẫn đóng gói", Dai: true,
+						Mac: "Bọc vợt bằng xốp hơi hoặc khăn dày, kỹ nhất ở cán và viền. Cho vào hộp cứng, chèn kín để món không xê dịch trong hộp. Giày thì buộc dây lại, nhét giấy vào mũi cho giữ phom."},
+					{Khoa: "cuahang.xong.theo-doi", Nhan: "Tiêu đề khối tra cứu", Mac: "Theo dõi đơn"},
+					{Khoa: "cuahang.xong.tra-cuu", Nhan: "Câu nhắc lưu link tra cứu", Dai: true,
+						Mac: "Lưu lại đường dẫn này. Mọi cập nhật của đơn hiện ở đó, không cần đăng nhập."},
+					{Khoa: "cuahang.xong.chep", Nhan: "Nút chép vào bộ nhớ tạm", Mac: "Chép"},
+				},
+			},
+			{
+				Ten: "Khi trạm chưa nhận món đó",
+				Muc: []MucND{
+					{Khoa: "cuahang.tuchoi.giay-kieu", Nhan: "Từ chối — kiểu giày", Dai: true,
+						Mac: "Trạm mới thay đế cho giày chạy bộ và giày đi lại. Kiểu khác anh/chị nhắn trước để trạm xem ảnh đã, đừng gửi hàng đi vội."},
+					{Khoa: "cuahang.tuchoi.duoi-nguong", Nhan: "Từ chối — món rẻ hơn hai chiều ship", Dai: true,
+						Mac: "Món này rẻ hơn tiền ship hai chiều cộng công sửa. Gửi đi là anh/chị lỗ. Trạm chỉ nhận gửi từ"},
+				},
+			},
+			{
+				Ten: "Ô báo mã vận đơn",
+				Muc: []MucND{
+					{Khoa: "cuahang.vandon.tieu-de", Nhan: "Tiêu đề ô", Mac: "Đã gửi hàng rồi?"},
+					{Khoa: "cuahang.vandon.dan", Nhan: "Câu dẫn", Dai: true,
+						Mac: "Dán mã vận đơn vào đây để trạm biết kiện đang trên đường. Chưa gửi thì để trống cũng được."},
+					{Khoa: "cuahang.vandon.nut", Nhan: "Nút lưu", Mac: "Lưu mã vận đơn"},
+					{Khoa: "cuahang.vandon.ve", Nhan: "Nhãn mã vận đơn trạm gửi về", Mac: "Mã vận đơn gửi về"},
+				},
+			},
+			{
+				Ten: "Trả tiền sau khi sửa xong",
+				Muc: []MucND{
+					{Khoa: "cuahang.tra.tieu-de", Nhan: "Tiêu đề khối", Mac: "Thanh toán"},
+					{Khoa: "cuahang.tra.free-ship", Nhan: "Báo được miễn phí gửi về", Dai: true,
+						Mac: "Đơn này trạm chịu phí gửi trả, anh/chị chỉ trả tiền sửa."},
+					{Khoa: "cuahang.tra.qr", Nhan: "Tiêu đề cách 1 — chuyển khoản", Mac: "Chuyển khoản"},
+					{Khoa: "cuahang.tra.qr-nhac", Nhan: "Nhắc khi chuyển khoản", Dai: true,
+						Mac: "Nội dung chuyển khoản phải có **mã đơn** ở trên. Ghi đúng thì tiền vào là trạm đối chiếu được ngay, không phải nhắn hỏi lại."},
+					{Khoa: "cuahang.tra.cod", Nhan: "Tiêu đề cách 2 — trả khi nhận", Mac: "Trả khi nhận hàng"},
+					{Khoa: "cuahang.tra.cod-nhac", Nhan: "Nhắc khi trả COD", Dai: true,
+						Mac: "Trạm gửi hàng thu hộ, anh/chị trả tiền cho bên giao rồi mới nhận. Tiền ship về tính thêm theo bảng giá của hãng vận chuyển."},
+				},
+			},
+			{
+				Ten: "Khi cửa hàng đóng",
+				Muc: []MucND{
+					{Khoa: "cuahang.dong.tieu-de", Nhan: "Tiêu đề", Mac: "Tạm chưa nhận đơn online"},
+					{Khoa: "cuahang.dong.than", Nhan: "Nội dung", Dai: true,
+						Mac: "Anh/chị nhắn Zalo giúp trạm, hoặc gọi trực tiếp. Trạm vẫn nhận sửa bình thường."},
+				},
+			},
+		},
+	},
+	{
 		Ma:   "tracuu",
 		Ten:  "Trang tra cứu",
 		MoTa: "Khách gõ mã để xem vợt đang ở bước nào. Chữ trạng thái đơn (Đang sửa, Đã xong…) sửa ở chỗ khác.",
@@ -782,9 +998,9 @@ var CayND = []TrangND{
 					{Khoa: "lienhe.lh.dt", Nhan: "Nhãn điện thoại", Mac: "Điện thoại"},
 					{Khoa: "lienhe.lh.zalo", Nhan: "Nhãn Zalo", Mac: "Zalo"},
 					{Khoa: "lienhe.lh.email", Nhan: "Nhãn email", Mac: "Email"},
-					{Khoa: "lienhe.lh.fb", Nhan: "Nhãn Facebook", Mac: "Facebook"},
-					{Khoa: "lienhe.lh.dia-chi", Nhan: "Nhãn địa chỉ", Mac: "Địa chỉ"},
-					{Khoa: "lienhe.lh.gio", Nhan: "Nhãn giờ làm việc", Mac: "Giờ làm việc"},
+					{Khoa: "lienhe.lh.mxh", Nhan: "Nhãn hàng mạng xã hội", Mac: "Mạng xã hội"},
+					{Khoa: "lienhe.lh.dia-chi", Nhan: "Nhãn địa chỉ", Mac: "Địa chỉ", MacOn: "Gửi vợt tới"},
+					{Khoa: "lienhe.lh.gio", Nhan: "Nhãn giờ làm việc", Mac: "Giờ làm việc", MacOn: "Giờ nhận hàng"},
 					{Khoa: "lienhe.trong", Nhan: "Câu hiện khi chưa điền thông tin liên hệ nào", Dai: true,
 						Mac: "Số điện thoại và địa chỉ trạm đang cập nhật. Trong lúc chờ, anh/chị để lại số ở form bên — em gọi lại."},
 				},
@@ -795,6 +1011,38 @@ var CayND = []TrangND{
 					{Khoa: "lienhe.don.h3", Nhan: "Tiêu đề thẻ", Mac: "Đơn đang sửa"},
 					{Khoa: "lienhe.don.chu", Nhan: "Mô tả", Dai: true,
 						Mac: "Tra bằng mã đơn trên phiếu và 4 số cuối điện thoại, không cần nhắn hỏi."},
+				},
+			},
+		},
+	},
+	{
+		Ma:   "cauhoi",
+		Ten:  "Trang câu hỏi thường gặp",
+		MoTa: "Chỉ phần khung của trang. Từng câu hỏi và câu trả lời nằm ở /qt/cau-hoi, thêm bớt được, không sửa ở đây.",
+		Nhom: []NhomND{
+			{
+				Ten: "Đầu trang",
+				Muc: []MucND{
+					{Khoa: "cauhoi.nhan", Nhan: "Nhãn nhỏ", Mac: "Hỏi đáp"},
+					{Khoa: "cauhoi.h1", Nhan: "Tiêu đề lớn", Mac: "Câu hỏi thường gặp"},
+					{Khoa: "cauhoi.dan", Nhan: "Đoạn dẫn", Dai: true,
+						Mac: "Mấy câu khách hay hỏi nhất, trả lời sẵn ở đây. Không thấy câu của mình thì nhắn, em trả lời trong ngày."},
+				},
+			},
+			{
+				Ten: "Khi chưa có câu nào",
+				Muc: []MucND{
+					{Khoa: "cauhoi.trong", Nhan: "Câu hiện khi danh sách còn rỗng", Dai: true,
+						Mac: "Chưa có câu hỏi nào được đăng. Cứ nhắn thẳng, em trả lời rồi đưa lên đây cho người sau đỡ phải hỏi lại."},
+				},
+			},
+			{
+				Ten: "Thẻ chốt trang",
+				Muc: []MucND{
+					{Khoa: "cauhoi.chot.h3", Nhan: "Tiêu đề thẻ", Mac: "Còn câu chưa có ở đây?"},
+					{Khoa: "cauhoi.chot.chu", Nhan: "Mô tả", Dai: true,
+						Mac: "Gửi ảnh chỗ hỏng, em xem rồi nói thẳng làm được hay không và mất mấy ngày."},
+					{Khoa: "cauhoi.chot.nut", Nhan: "Chữ trên nút", Mac: "Gửi ảnh hỏi trước"},
 				},
 			},
 		},

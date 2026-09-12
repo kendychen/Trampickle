@@ -26,6 +26,12 @@ func dungKhoTienThu(t *testing.T) {
 	donMu.Lock()
 	cuDonDs := donDs
 	donMu.Unlock()
+	doiTacMu.Lock()
+	cuDoiTac := doiTacDs
+	doiTacMu.Unlock()
+	cauHoiMu.Lock()
+	cuCauHoi := cauHoiDs
+	cauHoiMu.Unlock()
 
 	t.Cleanup(func() {
 		Root = cuRoot
@@ -41,6 +47,12 @@ func dungKhoTienThu(t *testing.T) {
 		donMu.Lock()
 		donDs = cuDonDs
 		donMu.Unlock()
+		doiTacMu.Lock()
+		doiTacDs = cuDoiTac
+		doiTacMu.Unlock()
+		cauHoiMu.Lock()
+		cauHoiDs = cuCauHoi
+		cauHoiMu.Unlock()
 	})
 
 	Root = t.TempDir()
@@ -52,6 +64,14 @@ func dungKhoTienThu(t *testing.T) {
 	donMu.Lock()
 	donDs = map[string]*Don{}
 	donMu.Unlock()
+	// NapDoiTac giữ nguyên danh sách khi không có file, nên phải dọn tay:
+	// trạm thử nào cũng phải bắt đầu bằng danh sách tiệm rỗng.
+	doiTacMu.Lock()
+	doiTacDs = nil
+	doiTacMu.Unlock()
+	cauHoiMu.Lock()
+	cauHoiDs = nil
+	cauHoiMu.Unlock()
 	if err := NapKho(); err != nil {
 		t.Fatal(err)
 	}

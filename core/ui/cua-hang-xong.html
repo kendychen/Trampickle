@@ -1,0 +1,59 @@
+{{define "cua-hang-xong.html"}}
+{{template "html-dau" .}}
+
+<main class="la-cua-hang">
+<div class="khung doc-lon">
+
+  <h1>{{nd "cuahang.xong.tieu-de"}}</h1>
+
+  <section class="ch-ma">
+    <p class="ch-ma-nhan">{{nd "cuahang.xong.ma-nhan"}}</p>
+    <p class="ch-ma-so" data-chep="{{.Don.Ma}}">{{.Don.Ma}}</p>
+    <button class="nut nut-vien ch-nut-chep" type="button" data-chep-nguon=".ch-ma-so" hidden>{{nd "cuahang.xong.chep"}}</button>
+    <div class="ch-nhac">{{ndm "cuahang.xong.ghi-ma"}}</div>
+  </section>
+
+  <section class="ch-o">
+    <h2>{{nd "cuahang.xong.gui-toi"}}</h2>
+    <p class="ch-dia-chi" data-chep="{{.DiaChi}}">{{.DiaChi}}</p>
+    <button class="nut nut-vien ch-nut-chep" type="button" data-chep-nguon=".ch-dia-chi" hidden>{{nd "cuahang.xong.chep"}}</button>
+    <p>{{.Don.KhachTen}} — {{.Don.KhachLienHe}}</p>
+    {{if .GioLam}}<p class="ch-gio">{{.GioLam}}</p>{{end}}
+  </section>
+
+  <section class="ch-o">
+    <h2>{{nd "cuahang.xong.dong-goi-nhan"}}</h2>
+    {{ndm "cuahang.xong.dong-goi"}}
+  </section>
+
+  <section class="ch-o">
+    <h2>{{nd "cuahang.xong.theo-doi"}}</h2>
+    <p><a href="{{.LinkTra}}">{{.LinkTra}}</a></p>
+    <div class="ch-nhac">{{ndm "cuahang.xong.tra-cuu"}}</div>
+  </section>
+
+</div>
+</main>
+
+<script nonce="{{.Nonce}}">
+// Nút chép chỉ hiện khi trình duyệt có clipboard. Trình duyệt không có thì
+// nút ở yên trong bóng tối — chữ vẫn bôi đen chép tay được, không mất gì.
+(function () {
+  if (!navigator.clipboard) return;
+  document.querySelectorAll('.ch-nut-chep').forEach(function (nut) {
+    var nguon = document.querySelector(nut.getAttribute('data-chep-nguon'));
+    if (!nguon) return;
+    nut.hidden = false;
+    nut.addEventListener('click', function () {
+      navigator.clipboard.writeText(nguon.getAttribute('data-chep')).then(function () {
+        var cu = nut.textContent;
+        nut.textContent = 'Đã chép';
+        setTimeout(function () { nut.textContent = cu; }, 1500);
+      });
+    });
+  });
+})();
+</script>
+
+{{template "html-chan" .}}
+{{end}}

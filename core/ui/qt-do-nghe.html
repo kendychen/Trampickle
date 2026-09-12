@@ -1,0 +1,151 @@
+{{define "qt-do-nghe.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang">
+  <h1>Đồ nghề</h1>
+  <div class="phai"><a class="nut nut-vien" href="/qt/tien">Sổ tiền</a></div>
+</div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<div class="luoi-so" style="margin-bottom:22px">
+  <div class="o-so"><div class="v" style="font-size:19px">{{tien .TongQuan.DaChi}}</div><div class="t">đã chi, đã duyệt trong sổ</div></div>
+  {{if .TongQuan.ChoDuyet}}
+  <div class="o-so canh-bao"><div class="v" style="font-size:19px">{{tien .TongQuan.ChoDuyet}}</div><div class="t">chờ duyệt ở sổ tiền</div></div>
+  {{end}}
+  <div class="o-so"><div class="v" style="font-size:19px">{{tien .TongQuan.ConPhaiSam}}</div><div class="t">còn phải sắm ({{.TongQuan.SoConThieu}} món)</div></div>
+  <div class="o-so {{if .TongQuan.SoCanGap}}canh-bao{{end}}"><div class="v" style="font-size:19px">{{tien .TongQuan.Dot1ConThieu}}</div><div class="t">riêng đợt 1 còn thiếu</div></div>
+</div>
+
+{{if .TongQuan.SoCanGap}}
+<div class="bao bao-loi" style="margin-bottom:18px">
+  Còn <b>{{.TongQuan.SoCanGap}}</b> món bắt buộc chưa có. Thiếu mấy món này thì chưa nhận hàng của khách được.
+</div>
+{{end}}
+
+{{if .ChuaKhai}}
+<div class="the trong">
+  <b>Chưa khai món nào</b>
+  Danh sách đồ nghề trống thì không biết còn phải sắm những gì.
+  <div style="margin-top:12px" class="nho">Thêm món đầu tiên ở khối cuối trang.</div>
+</div>
+{{end}}
+
+<form method="get" action="/qt/do-nghe" class="the-nhom" style="margin-bottom:18px">
+  <div class="noi" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+    <label>Nghề
+      <select name="nghe" style="min-width:150px">
+        <option value="">Tất cả</option>
+        {{range .CacNghe}}<option value="{{.Ma}}" {{if eq $.Nghe .Ma}}selected{{end}}>{{.Ten}}</option>{{end}}
+      </select>
+    </label>
+    <label>Trạng thái
+      <select name="tt" style="min-width:150px">
+        <option value="">Tất cả</option>
+        {{range .CacTT}}<option value="{{.Ma}}" {{if eq $.TrangThai .Ma}}selected{{end}}>{{.Ten}}</option>{{end}}
+      </select>
+    </label>
+    <button type="submit" class="nut nut-vien">Lọc</button>
+    <span class="nho mo">Lọc theo một nghề thì món dùng chung vẫn hiện — thiếu cái cân là cả hai nghề đứng.</span>
+    <div class="nho mo" style="flex-basis:100%;margin:0">Đánh dấu <b>Đã mua</b> thì sổ tiền dựng một khoản đầu tư <b>chờ duyệt</b>, sang <a href="/qt/tien">Sổ tiền</a> duyệt mới vào báo cáo. <b>Đã có sẵn</b> là món không tốn tiền, không sinh khoản nào.</div>
+  </div>
+</form>
+
+{{range .Bang}}
+<div class="the-nhom">
+  <h3>Đợt {{.Dot}} — {{.TenNhom}}</h3>
+  <div class="cuon">
+    <table class="bang bang-the">
+      <thead>
+        <tr>
+          <th style="min-width:220px">Món</th>
+          <th class="p" style="width:120px">Giá dự kiến</th>
+          <th style="width:150px">Trạng thái</th>
+          <th style="min-width:280px">Đánh dấu</th>
+        </tr>
+      </thead>
+      <tbody>
+      {{range .Mon}}
+        <tr>
+          <td>
+            <b>{{.Ten}}</b>
+            {{if .CanGap}}<span class="chip chip-tuchoi">bắt buộc</span>{{end}}
+            {{if .QuyCach}}<div class="nho">{{.QuyCach}}</div>{{end}}
+            {{if .DungDe}}<div class="nho mo">{{.DungDe}}</div>{{end}}
+            {{if .GhiChu}}<div class="nho mo">{{.GhiChu}}</div>{{end}}
+            <div class="nho mo so">{{.Ma}} · {{.TenNghe}}</div>
+          </td>
+          <td data-n="Giá dự kiến" class="p so">{{if .GiaDuKien}}{{tien .GiaDuKien}}{{else}}—{{end}}</td>
+          <td data-n="Trạng thái">
+            <div>
+              {{.TenTrangThai}}
+              {{if eq .TrangThai "da_mua"}}
+                <div class="nho">{{ngaydep .NgayMua}} · {{tien .GiaThuc}}</div>
+                {{if .NguonMua}}<div class="nho mo">{{.NguonMua}}</div>{{end}}
+                {{if .MaKhoan}}<div class="nho mo so">{{.MaKhoan}}</div>{{end}}
+              {{end}}
+            </div>
+          </td>
+          <td data-n="Đánh dấu">
+            <form method="post" action="/qt/do-nghe/trang-thai" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+              <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+              <input type="hidden" name="ma" value="{{.Ma}}">
+              <input type="hidden" name="ve_nghe" value="{{$.Nghe}}">
+              <input type="hidden" name="ve_tt" value="{{$.TrangThai}}">
+              <select name="trang_thai" style="width:145px">
+                {{$mon := .}}
+                {{range $.CacTT}}<option value="{{.Ma}}" {{if eq $mon.TrangThai .Ma}}selected{{end}}>{{.Ten}}</option>{{end}}
+              </select>
+              <input name="ngay_mua" type="date" value="{{if .NgayMua}}{{.NgayMua}}{{else}}{{$.HomNay}}{{end}}" style="width:155px">
+              <input name="gia_thuc" inputmode="numeric" placeholder="{{if .GiaDuKien}}{{.GiaDuKien}}{{else}}tiền thật{{end}}" value="{{if .GiaThuc}}{{.GiaThuc}}{{end}}" style="width:110px">
+              <input name="nguon_mua" maxlength="120" placeholder="mua ở đâu" value="{{.NguonMua}}" style="width:130px">
+              <button type="submit" class="nut nut-vien">Ghi</button>
+            </form>
+          </td>
+        </tr>
+      {{end}}
+      </tbody>
+    </table>
+  </div>
+</div>
+{{end}}
+
+<div class="the-nhom">
+  <h3>Thêm món mới</h3>
+  <div class="noi doc" style="padding-bottom:0">
+    <p class="nho mo" style="margin:0">
+      Danh sách dựng sẵn chắc chắn thiếu. Làm nghề vài tháng sẽ phát sinh món
+      không ai liệt kê trước được — thêm vào đây.
+      Thứ <b>dùng hết thì mua tiếp</b> (keo, nhám, grip) không thuộc trang này,
+      nó là vật tư, khai ở <a href="/qt/kho/vat-tu">danh mục vật tư</a>.
+    </p>
+  </div>
+  <form method="post" action="/qt/do-nghe/luu">
+    <input type="hidden" name="_csrf" value="{{.CSRF}}">
+    <input type="hidden" name="ve_nghe" value="{{.Nghe}}">
+    <input type="hidden" name="ve_tt" value="{{.TrangThai}}">
+    <div class="noi" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+      <label>Tên món<input name="ten" maxlength="120" required style="min-width:220px"></label>
+      <label>Nghề
+        <select name="nghe">{{range .CacNghe}}<option value="{{.Ma}}">{{.Ten}}</option>{{end}}</select>
+      </label>
+      <label>Nhóm
+        <select name="nhom">{{range .CacNhom}}<option value="{{.Ma}}">{{.Ten}}</option>{{end}}</select>
+      </label>
+      <label>Đợt
+        <select name="dot"><option value="1">1 — mở cửa được</option><option value="2">2 — ca khó</option><option value="3">3 — nhanh đẹp hơn</option></select>
+      </label>
+      <label>Giá dự kiến<input name="gia_du_kien" inputmode="numeric" style="width:130px"></label>
+      <label>Bắt buộc?
+        <select name="bat_buoc"><option value="0">Không</option><option value="1">Có</option></select>
+      </label>
+      <label>Quy cách<input name="quy_cach" maxlength="200" style="min-width:200px"></label>
+      <label>Dùng để<input name="dung_de" maxlength="200" style="min-width:200px"></label>
+      <button type="submit" class="nut nut-chinh">Thêm</button>
+    </div>
+  </form>
+</div>
+
+{{template "qt-chan" .}}
+{{end}}

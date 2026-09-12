@@ -16,7 +16,7 @@
       <input type="hidden" name="_csrf" value="{{$.CSRF}}">
       <label>Chép từ app ngân hàng, mỗi giao dịch một dòng
         <span class="hd">Kéo chọn cả bảng rồi dán thẳng vào. Cần có ngày, số tiền, và nội dung chuyển khoản.</span>
-        <textarea name="sao_ke" rows="10" style="font-family:'JetBrains Mono',monospace;font-size:13px" placeholder="05/09/2026  +350.000  TV2609001 NGUYEN VAN A chuyen tien">{{.Text}}</textarea>
+        <textarea name="sao_ke" rows="10" style="font-family:'Roboto Mono',monospace;font-size:13px" placeholder="05/09/2026  +350.000  TV2609001 NGUYEN VAN A chuyen tien">{{.Text}}</textarea>
       </label>
       <div class="hang-nut"><button type="submit">Đọc thử</button></div>
     </form>
@@ -33,7 +33,7 @@
   <form method="post" action="/qt/tien/sao-ke/ghi">
     <input type="hidden" name="_csrf" value="{{$.CSRF}}">
     <div class="cuon">
-      <table class="bang">
+      <table class="bang bang-the">
         <thead>
           <tr>
             <th style="width:52px">Ghi</th><th style="width:130px">Ngày</th>
@@ -44,16 +44,16 @@
         <tbody>
         {{range $i, $d := .Dong}}
           <tr {{if $d.DaGhi}}class="mo"{{end}}>
-            <td>
+            <td data-n="Ghi">
               <input type="checkbox" name="chon" value="{{$i}}" {{if $d.Chon}}checked{{end}} {{if $d.DaGhi}}disabled{{end}}>
             </td>
-            <td><input type="date" name="ngay" value="{{$d.Ngay}}" style="width:100%"></td>
-            <td><input name="so_tien" inputmode="numeric" value="{{oso $d.SoTien}}" style="width:100%"></td>
-            <td>
+            <td data-n="Ngày"><input type="date" name="ngay" value="{{$d.Ngay}}" style="width:100%"></td>
+            <td data-n="Số tiền"><input name="so_tien" inputmode="numeric" value="{{oso $d.SoTien}}" style="width:100%"></td>
+            <td data-n="Đơn">
               <input name="ma_don" maxlength="20" value="{{$d.MaDon}}" placeholder="TV-…" style="width:100%">
               {{if $d.TenKhach}}<div class="nho mo">{{$d.TenKhach}}{{if $d.ConNo}} · nợ {{tien $d.ConNo}}{{end}}</div>{{end}}
             </td>
-            <td class="nho">
+            <td data-n="Dòng sao kê" class="nho">
               <div class="so mo" style="font-size:12px">{{$d.NoiDung}}</div>
               {{if $d.DaGhi}}<span class="chip chip-trung">đã có trong sổ</span>
               {{else if $d.ChuaRo}}<span class="chip chip-cho">cần xem lại</span>

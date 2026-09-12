@@ -1,0 +1,115 @@
+{{/* Tem dán lên đồ. Trang ĐỨNG MỘT MÌNH như qt-hoadon.html: không dải đầu,
+     không menu, không css.html — css.html vẽ cho màn hình, còn tờ này ra
+     máy in nhiệt. Mực đen trên nền trắng, không theo màu giao diện.
+
+     Hai khổ chung một trang: cuộn tem 50×30mm (mặc định) và A4 xếp 24 tem
+     một tờ để cắt tay (?kho=a4). Vì sao 50×30 và vì sao không có QR: xem
+     đầu core/tem.go. */}}
+{{define "qt-tem.html"}}<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="{{iconURL}}" type="{{iconMIME}}">
+<title>{{.TieuDe}} — {{.Brand.Ten}}</title>
+<style>
+  :root { --muc: #000; --mo: #444; --vien: #c8ccd4; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 18px;
+    background: #eceef2; color: var(--muc);
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+
+  .thanh {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    margin-bottom: 16px;
+  }
+  .thanh button, .thanh a {
+    font: inherit; font-size: 14px; padding: 8px 14px; cursor: pointer;
+    border: 1px solid var(--vien); border-radius: 8px;
+    background: #fff; color: var(--muc); text-decoration: none;
+  }
+  .thanh button { background: var(--muc); color: #fff; border-color: var(--muc); }
+  .thanh a.dang { background: var(--muc); color: #fff; border-color: var(--muc); }
+  .thanh .ghi { font-size: 13px; color: var(--mo); margin-left: auto; }
+
+  /* Một tem. Kích thước cố định bằng mm ở cả hai khổ: thứ ra giấy phải
+     đúng bằng thứ trên màn hình, nếu không thợ cắt lệch cả tờ. */
+  .to { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tem {
+    width: 50mm; height: 30mm; padding: 2mm 2.4mm;
+    background: #fff; color: #000; overflow: hidden;
+    border: 1px solid var(--vien);
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  {{if .LaA4}}
+  .to { display: grid; grid-template-columns: repeat(3, 66mm); gap: 0; }
+  .tem { width: 66mm; height: 35mm; border: 1px dashed var(--vien); padding: 3mm; }
+  {{end}}
+
+  /* Mọi dòng đều cắt bằng ba chấm chứ không xuống dòng: tem cao 30mm, thêm
+     một dòng là đẩy hẹn trả ra khỏi giấy. */
+  .tem > div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ma {
+    font: 700 15pt/1.05 "Segoe UI Semibold", "Segoe UI", Arial, sans-serif;
+    letter-spacing: .3px;
+  }
+  .khach { font-size: 9.5pt; font-weight: 600; }
+  .mon { font-size: 9pt; color: #222; }
+  .hen { font-size: 9.5pt; font-weight: 700; }
+  .hen span { font-weight: 400; color: #333; }
+  .trong { font-size: 9pt; color: #555; }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .thanh { display: none; }
+    .to { gap: 0; }
+    .tem { border: 0; }
+    {{if .LaA4}}
+    .tem { border: 1px dashed #bbb; }
+    {{else}}
+    /* Cuộn tem: mỗi tem đúng một trang giấy. */
+    .tem { page-break-after: always; break-after: page; }
+    .tem:last-child { page-break-after: auto; break-after: auto; }
+    {{end}}
+  }
+  {{if .LaA4}}
+  @page { size: A4 portrait; margin: 6mm; }
+  {{else}}
+  @page { size: 50mm 30mm; margin: 0; }
+  {{end}}
+</style>
+</head>
+<body>
+
+<div class="thanh">
+  <button type="button" id="in">In {{len .Tem}} tem</button>
+  <a href="{{.Duong}}?kho=tem{{.Truy}}" {{if not .LaA4}}class="dang"{{end}}>Cuộn tem 50×30mm</a>
+  <a href="{{.Duong}}?kho=a4{{.Truy}}" {{if .LaA4}}class="dang"{{end}}>Giấy A4 · 24 tem/tờ</a>
+  {{if .VeDon}}<a href="{{.VeDon}}">← Về đơn</a>{{end}}
+  <span class="ghi">
+    {{if .LaA4}}Cắt theo nét đứt. Trong hộp thoại in nhớ tắt "vừa khít trang" để đúng kích thước.
+    {{else}}Chọn máy in tem, khổ 50×30mm, tỷ lệ 100%.{{end}}
+  </span>
+</div>
+
+<div class="to">
+{{range .Tem}}
+  <div class="tem">
+    <div class="ma">{{.Ma}}</div>
+    <div class="khach">{{.Khach}}{{if .So}} · {{.So}}{{end}}</div>
+    <div class="mon">{{if .Mon}}{{.Mon}}{{else}}<span class="trong">chưa ghi món</span>{{end}}</div>
+    <div class="hen">{{if .HenTra}}Hẹn trả {{.HenTra}}{{else}}<span>Chưa hẹn ngày trả</span>{{end}}</div>
+  </div>
+{{end}}
+</div>
+
+<script nonce="{{.Nonce}}">
+  document.getElementById('in').addEventListener('click', function () { window.print(); });
+</script>
+</body>
+</html>
+{{end}}

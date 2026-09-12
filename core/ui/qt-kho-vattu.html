@@ -21,7 +21,7 @@
   <form method="post" action="/qt/kho/vat-tu">
     <input type="hidden" name="_csrf" value="{{$.CSRF}}">
     <div class="cuon">
-      <table class="bang">
+      <table class="bang bang-the">
         <thead>
           <tr>
             <th style="min-width:200px">Tên</th><th style="width:110px">Đơn vị</th>
@@ -32,16 +32,16 @@
         <tbody>
           {{range .VatTu}}
           <tr>
-            <td>
+            <td data-n="Tên">
               <input type="hidden" name="ma" value="{{.Ma}}">
               <input name="ten" maxlength="120" value="{{.Ten}}" style="width:100%">
               <div class="nho mo so">{{.Ma}}</div>
             </td>
-            <td><input name="don_vi" maxlength="20" value="{{.DonVi}}" style="width:100%"></td>
-            <td><input name="ton_toi_thieu" inputmode="decimal" value="{{if .TonToiThieu}}{{sl .TonToiThieu}}{{end}}" style="width:100%"></td>
-            <td><input name="nha_cung_cap" maxlength="120" value="{{.NhaCungCap}}" style="width:100%"></td>
-            <td><input name="ghi_chu" maxlength="200" value="{{.GhiChu}}" style="width:100%"></td>
-            <td>
+            <td data-n="Đơn vị"><input name="don_vi" maxlength="20" value="{{.DonVi}}" style="width:100%"></td>
+            <td data-n="Tối thiểu"><input name="ton_toi_thieu" inputmode="decimal" value="{{if .TonToiThieu}}{{sl .TonToiThieu}}{{end}}" style="width:100%"></td>
+            <td data-n="Nhà cung cấp"><input name="nha_cung_cap" maxlength="120" value="{{.NhaCungCap}}" style="width:100%"></td>
+            <td data-n="Ghi chú"><input name="ghi_chu" maxlength="200" value="{{.GhiChu}}" style="width:100%"></td>
+            <td data-n="Dùng nữa?">
               <select name="ngung" style="width:100%">
                 <option value="0" {{if not .Ngung}}selected{{end}}>Đang dùng</option>
                 <option value="1" {{if .Ngung}}selected{{end}}>Ngừng</option>
@@ -51,12 +51,12 @@
           {{end}}
           {{range lap 3}}
           <tr>
-            <td><input type="hidden" name="ma" value=""><input name="ten" maxlength="120" placeholder="thêm vật tư mới" style="width:100%"></td>
-            <td><input name="don_vi" maxlength="20" placeholder="mét, cuộn, cái" style="width:100%"></td>
-            <td><input name="ton_toi_thieu" inputmode="decimal" style="width:100%"></td>
-            <td><input name="nha_cung_cap" maxlength="120" style="width:100%"></td>
-            <td><input name="ghi_chu" maxlength="200" style="width:100%"></td>
-            <td>
+            <td data-n="Tên"><input type="hidden" name="ma" value=""><input name="ten" maxlength="120" placeholder="thêm vật tư mới" style="width:100%"></td>
+            <td data-n="Đơn vị"><input name="don_vi" maxlength="20" placeholder="mét, cuộn, cái" style="width:100%"></td>
+            <td data-n="Tối thiểu"><input name="ton_toi_thieu" inputmode="decimal" style="width:100%"></td>
+            <td data-n="Nhà cung cấp"><input name="nha_cung_cap" maxlength="120" style="width:100%"></td>
+            <td data-n="Ghi chú"><input name="ghi_chu" maxlength="200" style="width:100%"></td>
+            <td data-n="Dùng nữa?">
               <select name="ngung" style="width:100%">
                 <option value="0" selected>Đang dùng</option>
                 <option value="1">Ngừng</option>

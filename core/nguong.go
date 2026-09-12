@@ -55,6 +55,16 @@ type ONguong struct {
 	Web bool
 	So  string // giá trị đang dùng, dạng để đổ vào ô nhập
 	Dep string // cùng giá trị, dạng người đọc
+	// Toi: trần hợp lệ, chỉ nhóm ngưỡng nội bộ (core/nguongtram.go) dùng tới.
+	// 0 đọc là 100 — phần lớn ô ở đó là phần trăm.
+	Toi int
+}
+
+func (o ONguong) ToiDa() int {
+	if o.Toi <= 0 {
+		return 100
+	}
+	return o.Toi
 }
 
 // Thứ tự ở đây là thứ tự hiện trên trang. Nhóm khách đọc được lên trước.
@@ -324,6 +334,14 @@ func hQtNguong(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		doi, err := SuaNguong(moi)
+		// Hai kho ngưỡng, hai file: sáu số kia đi vào bảng giá vì Python
+		// cũng đọc, mấy số này ở data/ vì chỉ Go dùng — xem đầu
+		// core/nguongtram.go. Với người dùng vẫn là một cái form.
+		doiTram, errTram := SuaNguongTram(nhanFormNguongTram(r))
+		doi = append(doi, doiTram...)
+		if err == nil {
+			err = errTram
+		}
 		switch {
 		case err != nil:
 			d.Loi = err.Error()
@@ -342,6 +360,7 @@ func hQtNguong(w http.ResponseWriter, r *http.Request) {
 			d.NoiBo = append(d.NoiBo, o)
 		}
 	}
+	d.NoiBo = append(d.NoiBo, DanhSachNguongTram()...)
 	d.Tep = CFG.DuongDan.BangGia
 	render(w, "qt-nguong.html", d)
 }

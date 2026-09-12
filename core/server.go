@@ -26,7 +26,6 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -53,7 +52,6 @@ func InitTemplates() error {
 		"slo":         soLuongO,
 		"ptram":       phanTram,
 		"batdau":      strings.HasPrefix,
-		"nhom":        tenNhom,
 		"tenvt":       TenVatTu,
 		"tennhomtien": TenNhomTien,
 		"json":        toJSON,
@@ -78,28 +76,62 @@ func InitTemplates() error {
 		// Logo/biểu tượng tab: rỗng nghĩa là chưa tải bản riêng, template
 		// dựng SVG nhúng sẵn. Để hàm chứ không nhét vào Chung, vì mọi trang
 		// đều cần mà không phải handler nào cũng đi qua chung().
-		"logoURL":  logoURL,
-		"iconURL":  iconURL,
-		"iconMIME": iconMIME,
+		"logoURL":   logoURL,
+		"iconURL":   iconURL,
+		"iconQt":    duongIconQt,
+		"iconQtPNG": duongIconQtPNG,
+		"iconTouch": iconTouch,
+		"iconMIME":  iconMIME,
 		// Màu nhấn của giao diện đang bật, cho <meta name="theme-color"> —
 		// thanh trạng thái của điện thoại lấy màu từ đấy.
 		"mauNhan": mauNhanTheme,
+		// Bản của app quản lý: dải đầu trang /qt chạy nền tối, thanh trạng
+		// thái phải tối theo, không dùng chung màu với app khách.
+		"mauNhanQt": mauNhanQtTheme,
 		// Số điện thoại bỏ dấu cách, để nhét vào href="tel:".
 		"soGoi": soGoi,
+		// Giá sàn của một việc, cho khối giá trong app.
+		"giaSan": giaSan,
+		// Dòng giá in trên ô việc ở lưới, và cờ để biết có cần câu chú thích
+		// "một số giá phụ thuộc tình trạng vợt" dưới lưới hay không.
+		"giaKhach":  giaKhach,
+		"giaNgan":   giaNgan,
+		"giaTuyThe": coGiaTheoTinhTrang,
+		"giaTran":   giaTran,
+		"tientron":  tienTron,
+		// Cửa hàng đang mở hay không, để nav biết có treo lối vào /cua-hang.
+		// Hỏi ở đây thay vì nhét cờ vào Chung: mọi trang đều có nav, và
+		// không trang nào khác cần biết chuyện này.
+		"cuaHangMo": CuaHangMo,
+		// Đường tới tệp CSS ngoài, tên mang mã băm nội dung. Xem core/css.go.
+		"cssURL": cssURL,
+		// Việc này đã có bài "vì sao hỏng / tự kiểm tra / cách hạn chế" chưa.
+		// Chỉ để trang /qt/dich-vu đánh dấu việc nào còn thiếu chữ.
+		"coBaiDV": func(ma string) bool { return strings.TrimSpace(BaiDichVu(ma)) != "" },
+		// Xẻ "10–15 g tùy vợt" thành ba mảnh để dải số in được con số to,
+		// đơn vị nhỏ, phần đuôi xuống dòng chú thích. Xem tachSo.
+		"tachSo": tachSo,
 	}
 	t, err := template.New("").Funcs(fm).ParseFS(uiFS, "ui/*.html")
 	if err != nil {
 		return err
 	}
 	tpl = t
-	return nil
+	// CSS dựng ngay tại đây: mọi trang gọi cssURL, mà hàm đó chỉ có giá trị
+	// sau khi mẫu đã nạp. Xem core/css.go.
+	return dungCSS()
 }
 
 // hFavicon trả thẳng tệp trong ui đã nhúng. Bản favicon có sẵn nền than —
 // tab trình duyệt sáng hay tối là tuỳ máy người xem, để nền trong suốt thì
 // bộ đồ nghề màu steel biến mất trên tab nền sáng.
+//
+// Đang thử bản khối (favicon-4d.svg): nền vuông đặc, không bo góc, vì
+// manifest khai tệp này cho cả "any" lẫn "maskable" — Android tự cắt góc
+// theo hình của máy, bo sẵn là hở bốn góc. Muốn quay lại bản phẳng thì đổi
+// đúng dòng dưới về "ui/favicon.svg", tệp cũ vẫn còn nguyên.
 func hFavicon(w http.ResponseWriter, r *http.Request) {
-	b, err := uiFS.ReadFile("ui/favicon.svg")
+	b, err := uiFS.ReadFile("ui/favicon-4d.svg")
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -135,7 +167,63 @@ func hAnhNen(w http.ResponseWriter, r *http.Request) {
 	w.Write(b)
 }
 
+// hFont trả tệp chữ đã nhúng trong binary. Trước đây ba họ chữ tải thẳng từ
+// fonts.googleapis.com; bỏ CDN đi thì mỗi lượt xem trang không còn báo cho
+// Google biết khách của trạm là ai, và trang không phải chờ hai vòng DNS+TLS
+// tới tên miền lạ trước khi có chữ.
+//
+// Tên tệp lọc qua tenFontSach chứ không ghép thẳng vào đường dẫn: đọc từ FS
+// nhúng thì vốn đã không có đường thoát ra ngoài thư mục, nhưng người đọc sau
+// không phải dừng lại tự chứng minh điều đó.
+func hFont(w http.ResponseWriter, r *http.Request) {
+	ten := r.PathValue("ten")
+	if !tenFontSach(ten) {
+		http.NotFound(w, r)
+		return
+	}
+	b, err := uiFS.ReadFile("ui/font/" + ten)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	w.Header().Set("Content-Type", "font/woff2")
+	// Chữ nằm trong binary, đổi được là phải build lại. Một năm, bất biến:
+	// tên tệp đổi theo nội dung mỗi lần đổi font nên không sợ cache cũ.
+	w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+	w.Write(b)
+}
+
+// tenFontSach: chỉ chữ thường, số, gạch ngang, đuôi .woff2. Không dấu chấm
+// nào khác nên không có ".." lọt qua.
+func tenFontSach(ten string) bool {
+	if !strings.HasSuffix(ten, ".woff2") || len(ten) > 64 {
+		return false
+	}
+	for _, c := range ten[:len(ten)-6] {
+		if !(c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '-') {
+			return false
+		}
+	}
+	return len(ten) > 6
+}
+
 // dinhDangTien: 150000 -> "150.000đ". Dấu chấm ngăn nghìn, kiểu Việt Nam.
+// giaSan — giá niêm yết của một việc ở giai đoạn đang chạy. Trả -1 khi không
+// có số để in (ô giá bỏ trống, hoặc việc thuộc loại phải xem vợt rồi mới báo).
+//
+// Đây là ĐỌC, không phải tính. Khoá gia: trong vanhanh/bang-gia.yaml là con số
+// Kendy gõ tay ở /qt/dich-vu; giá vốn nằm ở hai khoá khác là vat_tu và
+// gio_cong. Luật "Go không được suy ra giá bán" cấm cộng hai khoá kia lại
+// thành giá — việc đó vẫn của riêng src/quote.py. In lại con số đã có sẵn thì
+// không đụng luật đó. Xem đoạn đầu core/config.go.
+func giaSan(dv DichVu) int {
+	i := GiaiDoan - 1
+	if i < 0 || i >= len(dv.Gia) || dv.Gia[i] == nil {
+		return -1
+	}
+	return *dv.Gia[i]
+}
+
 func dinhDangTien(n int) string {
 	s := fmt.Sprintf("%d", n)
 	am := ""
@@ -186,6 +274,97 @@ func giaHienThi(d DichVu) string {
 	return dinhDangTien(*p)
 }
 
+// giaTran là đầu trên của khoảng giá ở giai đoạn hiện tại, -1 = không có.
+// Cùng dạng trả về với giaSan để hai con số đọc chung một kiểu trong template.
+func giaTran(dv DichVu) int {
+	p := dv.GiaDenTheoGiaiDoan(GiaiDoan)
+	if p == nil {
+		return -1
+	}
+	return *p
+}
+
+// tienTron: con số không có chữ "đ" đằng sau, cho đầu dưới của một khoảng —
+// "từ 100.000 đến 150.000đ" đọc trôi hơn khi chữ "đ" chỉ xuất hiện một lần.
+func tienTron(n int) string { return strings.TrimSuffix(dinhDangTien(n), "đ") }
+
+// giaKhach dựng dòng giá in ngay trên ô việc ở lưới, để khách biết tầm tiền
+// mà không phải bấm vào từng việc.
+//
+// Bốn dạng, không gộp: có khoảng thì "từ 100.000 đến 150.000đ"; chỉ có sàn
+// thì "từ 100.000đ"; 0 là việc trạm không thu tiền; chưa niêm yết thì ra câu
+// mời gửi ảnh. Việc chưa mở bán ở giai đoạn này trả về RỖNG — ô vẫn hiện
+// trong lưới nhưng không treo con số nào, vì không có số nào để treo.
+//
+// Chữ đi kèm lấy qua ND() chứ không gõ thẳng: mọi chữ khách đọc đều phải sửa
+// được ở /qt/noi-dung. Con số thì vẫn chỉ là đọc lại cái đã gõ trong bảng giá.
+func giaKhach(d DichVu) string {
+	p := d.GiaTheoGiaiDoan(GiaiDoan)
+	if p == nil {
+		if d.BaoGiaRieng {
+			return ND("app.gia.bao-rieng")
+		}
+		return ""
+	}
+	if *p == 0 {
+		return ND("app.gia.mien-phi")
+	}
+	if den := d.GiaDenTheoGiaiDoan(GiaiDoan); den != nil && *den > *p {
+		return ND("app.gia.tu") + " " + tienTron(*p) +
+			" " + ND("app.gia.den") + " " + dinhDangTien(*den)
+	}
+	return ND("app.gia.tu") + " " + dinhDangTien(*p)
+}
+
+// tienNgan rút "100.000đ" thành "100k". CHỈ rút khi con số chia hết cho 1000
+// — không làm tròn, vì làm tròn là bịa ra một con số chưa ai gõ vào bảng giá.
+// Số lẻ thì trả nguyên dạng dài, ô có hẹp thì để CSS cắt.
+func tienNgan(n int) string {
+	if n == 0 || n%1000 != 0 {
+		return dinhDangTien(n)
+	}
+	return tienTron(n/1000) + "k"
+}
+
+// giaNgan là giaKhach bản cho lưới app. Ô ở đó rộng chừng 78px trên máy 360px;
+// "từ 100.000 đến 150.000đ" là 23 ký tự, nhét vào đấy thì hoặc xuống ba dòng
+// hoặc bị cắt cụt giữa con số — cụt giữa con số là đọc ra giá sai.
+//
+// Nên bản này bỏ chữ "từ" ở dạng khoảng và đổi sang đơn vị nghìn: "100–150k".
+// Gạch nối không đi qua ND() vì nó là dấu, không phải chữ để sửa.
+func giaNgan(d DichVu) string {
+	p := d.GiaTheoGiaiDoan(GiaiDoan)
+	if p == nil {
+		if d.BaoGiaRieng {
+			return ND("app.gia.ngan-hoi")
+		}
+		return ""
+	}
+	if *p == 0 {
+		return ND("app.gia.mien-phi")
+	}
+	if den := d.GiaDenTheoGiaiDoan(GiaiDoan); den != nil && *den > *p {
+		return tienNgan(*p) + "–" + tienNgan(*den)
+	}
+	return ND("app.gia.tu") + " " + tienNgan(*p)
+}
+
+// coGiaTheoTinhTrang: trong lưới có ít nhất một việc chưa niêm yết giá, hoặc
+// một việc niêm yết cả khoảng. Chỉ khi ấy mới treo câu "một số giá phụ thuộc
+// vào tình trạng vợt" dưới lưới — bảng toàn giá cứng mà vẫn treo câu ấy là
+// tự gieo nghi ngờ vào chỗ không có gì để nghi.
+func coGiaTheoTinhTrang(ds []DichVu) bool {
+	for _, d := range ds {
+		if d.GiaTheoGiaiDoan(GiaiDoan) == nil && d.BaoGiaRieng {
+			return true
+		}
+		if d.GiaDenTheoGiaiDoan(GiaiDoan) != nil {
+			return true
+		}
+	}
+	return false
+}
+
 // oSo đổ số vào ô input: 0 thì để ô trống thay vì bắt người ta xoá số 0.
 func oSo(v any) string {
 	switch n := v.(type) {
@@ -226,17 +405,10 @@ func giaSo(d DichVu) int {
 	return *p
 }
 
-func tenNhom(n string) string {
-	switch n {
-	case "A":
-		return "Sửa cơ bản"
-	case "B":
-		return "Sửa kết cấu"
-	case "C":
-		return "Gia công ngoài"
-	}
-	return n
-}
+// Không có tenNhom nữa: nhóm A/B/C là cách trạm tự xếp việc để tính lãi và
+// lọc bảng giá, không phải thứ khách cần đọc. Riêng nhóm C ra chữ "Gia công
+// ngoài" — nói thẳng với khách rằng trạm không tự làm món đó. Nhóm vẫn còn
+// trong bảng giá và vẫn dùng ở cuahang.go, chỉ là thôi in ra trang khách.
 
 func toJSON(v any) template.JS {
 	b, _ := json.Marshal(v)
@@ -304,18 +476,35 @@ func (g *gioiHan) choPhep(ip string, soLan int, trong time.Duration) bool {
 // --- Khung dữ liệu chung cho mọi trang -------------------------------
 
 type Chung struct {
-	Brand      ThuongHieu
-	LienHe     LienHe
-	Trang      string // để nav biết đang ở đâu
-	TieuDe     string
-	MoTa       string // <meta name=description>
-	Canonical  string // URL chuẩn, để Google không coi IP và tên miền là hai trang
-	NguoiDung  NguoiDung
-	DaDangNhap bool
-	CongKhai   bool
-	GiaiDoan   int
-	Theme      string // giao diện đang bật, chọn ở /qt/giao-dien
-	LopThan    string // lớp cho <body>: theme + nền tối nếu trang đó tối
+	Brand     ThuongHieu
+	LienHe    LienHe
+	Trang     string // để nav biết đang ở đâu
+	TieuDe    string
+	MoTa      string // <meta name=description>
+	Canonical string // URL chuẩn, để Google không coi IP và tên miền là hai trang
+	// Duong: r.URL.Path của lượt tải này. Khối JSON-LD cần nó để dựng đường
+	// dẫn "Trang chủ › Bài viết › …" và để biết trang này có cho bot đọc hay
+	// không — xem core/jsonld.go.
+	Duong string
+	// Ảnh hiện ra khi dán link vào Facebook, Zalo, Messenger. Thiếu nó thì mấy
+	// chỗ đó vẽ một ô xám trơn — link không ảnh gần như không ai bấm, mà đăng
+	// bài lên group là đường chính để người ta biết tới trạm.
+	AnhChiaSe string
+	// Bề ngang/cao chỉ khai khi biết chắc (tấm mặc định trong binary). Ảnh bìa
+	// bài viết do Kendy tải lên, cỡ nào cũng có, khai bừa thì Facebook cắt sai.
+	AnhRong int
+	AnhCao  int
+	// "website" cho trang thường, "article" cho trang bài viết.
+	LoaiOG      string
+	NgayDang    string // ngày đăng bài, cho article:published_time
+	NgayCapNhat string // ngày sửa gần nhất
+	NguoiDung   NguoiDung
+	DaDangNhap  bool
+	CongKhai    bool
+	GiaiDoan    int
+	// NoiBat: công tắc dv_noi_bat. Ở Chung chứ không ở riêng trang chủ vì
+	// mẫu chân trang lẫn mẫu app đều dùng chung khối này.
+	NoiBat bool
 	// Nonce cho <script> nội tuyến. CSP chặn mọi script không mang nonce
 	// đúng của lượt tải trang đó — xem core/middleware.go.
 	Nonce string
@@ -328,7 +517,8 @@ type Chung struct {
 var tieuDeTrang = map[string]string{
 	"chu":           "Sửa vợt Pickleball",
 	"vot":           "Danh mục vợt",
-	"cai-dat":       "Khóa API & model",
+	"giay":          "Danh mục giày",
+	"cai-dat":       "Khóa API & thông báo",
 	"nhat-ky":       "Nhật ký",
 	"2fa":           "Xác thực hai bước",
 	"gioi-thieu":    "Giới thiệu",
@@ -337,11 +527,14 @@ var tieuDeTrang = map[string]string{
 	"dich-vu":       "Dịch vụ",
 	"dich-vu-qt":    "Bảng dịch vụ",
 	"lien-he-qt":    "Liên hệ",
+	"cau-hoi-qt":    "Câu hỏi thường gặp",
 	"bai-viet":      "Bài viết",
 	"quy-trinh":     "Quy trình nhận và trả vợt",
 	"lien-he":       "Liên hệ",
+	"cau-hoi":       "Câu hỏi thường gặp",
 	"chinh-sach":    "Chính sách bảo mật",
 	"tra-cuu":       "Tra cứu đơn sửa",
+	"cua-hang":      "Đặt sửa online",
 	"dang-nhap":     "Đăng nhập",
 	"don":           "Đơn sửa",
 	"don-moi":       "Tạo đơn mới",
@@ -349,19 +542,26 @@ var tieuDeTrang = map[string]string{
 	"thong-ke":      "Thống kê",
 	"nguoi-dung":    "Tài khoản",
 	"mat-khau":      "Đổi mật khẩu",
-	"giao-dien":     "Giao diện",
+	"giao-dien":     "Logo và biểu tượng",
 	"anh-trang-chu": "Ảnh trang chủ",
+	"app-qt":        "App trên điện thoại",
 	"bai-viet-qt":   "Bài viết",
-	"giao-trinh":    "Giáo trình",
+	"giao-trinh":    "Tài liệu nội bộ",
 	"noi-dung":      "Chữ trên trang",
 	"agent":         "Trợ lý kỹ thuật",
 	"kho":           "Kho vật tư",
+	"do-nghe":       "Đồ nghề",
 	"kho-phieu":     "Phiếu kho",
 	"kho-vat-tu":    "Danh mục vật tư",
 	"tien":          "Sổ thu chi",
 	"tien-dinh-ky":  "Khoản định kỳ",
 	"tien-sao-ke":   "Dán sao kê",
 }
+
+// AnhChiaSeMacDinh: tấm 1200×630 nhúng trong binary, dùng cho mọi trang chưa
+// có ảnh riêng. Đổi ảnh là phải build lại — đúng ý đồ: đây là bộ mặt của trạm
+// trên mọi link được dán đi, không nên sửa nhầm từ trong admin.
+const AnhChiaSeMacDinh = "/anh-gd/og-chia-se.jpg"
 
 // Mô tả cho ô snippet của Google. Trang nào không có ở đây thì để trống —
 // Google tự trích một đoạn trong bài, còn hơn là nhét đại một câu chung
@@ -374,13 +574,13 @@ var moTaTrang = map[string]string{
 	"ve-chung-toi": "Địa chỉ trạm, giờ mở cửa và ảnh chỗ làm việc — ghé xem trực tiếp hoặc gửi chuyển phát đều được.",
 	"lien-he":      "Gửi ảnh hoặc video chỗ hỏng, trạm xem rồi nhận xét trong ngày là làm được hay không và mất mấy ngày. Vợt Pickleball và giày đều nhận.",
 	"bai-viet":     "Bài viết về sửa vợt Pickleball: các kiểu hỏng thường gặp, cách xử lý, và những thứ nên biết trước khi mang vợt đi sửa.",
+	"cau-hoi":      "Sửa mất bao lâu, giá bao nhiêu, có bảo hành không, ở tỉnh gửi vợt được không — mấy câu khách hay hỏi nhất, trả lời sẵn một chỗ.",
 	"tra-cuu":      "Tra tình trạng đơn sửa bằng mã đơn trên phiếu, hoặc mã yêu cầu sau khi gửi ảnh, cùng 4 số cuối điện thoại.",
 	"app":          "Các việc trạm nhận làm với vợt Pickleball, gọn trong một màn hình. Cài lên màn hình chính rồi mở như một app.",
 }
 
 func chung(r *http.Request, trang string) Chung {
 	nd, ok := NguoiDangNhap(r)
-	theme := ThemeHienTai()
 	return Chung{
 		Brand:      CFG.ThuongHieu,
 		LienHe:     LienHeHienTai(),
@@ -388,12 +588,16 @@ func chung(r *http.Request, trang string) Chung {
 		TieuDe:     tieuDeTrang[trang],
 		MoTa:       moTaTrang[trang],
 		Canonical:  goc(r) + r.URL.Path,
+		Duong:      r.URL.Path,
+		AnhChiaSe:  goc(r) + AnhChiaSeMacDinh,
+		AnhRong:    1200,
+		AnhCao:     630,
+		LoaiOG:     "website",
 		NguoiDung:  nd,
 		DaDangNhap: ok,
 		CongKhai:   CongKhai,
 		GiaiDoan:   GiaiDoan,
-		Theme:      theme,
-		LopThan:    lopThan(trang, theme),
+		NoiBat:     DvNoiBatBat(),
 		Nonce:      nonceCua(r),
 		CSRF:       tokenCSRF(r),
 	}
@@ -451,10 +655,7 @@ func hGioiThieu(w http.ResponseWriter, r *http.Request) {
 // thứ hai trước, và câu ấy phải trả lời được trong ba giây.
 func hVeChungToi(w http.ResponseWriter, r *http.Request) {
 	c := chung(r, "ve-chung-toi")
-	bando := ""
-	if d := strings.TrimSpace(c.LienHe.DiaChi); d != "" {
-		bando = "https://www.google.com/maps/search/?api=1&query=" + url.QueryEscape(d)
-	}
+	bando := c.LienHe.BanDo()
 	render(w, "vechungtoi.html", struct {
 		Chung
 		Anh   []AnhHero
@@ -484,23 +685,50 @@ func hDichVuMot(w http.ResponseWriter, r *http.Request) {
 	// danh sách khi lưu, mà template bên dưới còn đang đọc dv.
 	ds := DichVuTatCa()
 	for i := range ds {
-		if ds[i].Ma == ma && ds[i].DaMo(GiaiDoan) {
+		// !An: tắt một việc phải tắt cả trang giá riêng của nó, không chỉ cái
+		// ô trong lưới. Link cũ còn nằm trong Google, trong tin nhắn đã gửi —
+		// để trang sống thì khách vẫn đọc được giá thứ trạm đang không nhận.
+		if ds[i].Ma == ma && !ds[i].An && ds[i].DaMo(GiaiDoan) {
 			dv = &ds[i]
 			break
 		}
 	}
 	if dv == nil {
+		// Không phải việc đang bán. Còn một cửa nữa: hai ca trạm từ chối. Chúng
+		// không có giá, không có quy trình, nên đi template riêng — và chỉ mở
+		// trang khi đã có bài, chứ một trang chỉ có mỗi câu "không nhận" thì
+		// không đáng để khách bấm vào.
+		if kb, ok := TimKhongBan(ma); ok {
+			if md := BaiDichVu(kb.Ma); strings.TrimSpace(md) != "" {
+				c := chung(r, "dich-vu")
+				c.TieuDe = kb.Ten
+				render(w, "dichvu-tuchoi.html", struct {
+					Chung
+					KB   KhongBan
+					Than template.HTML
+					Khac []DichVu
+				}{c, kb, MarkdownBai(md), DichVuDangBan(GiaiDoan)})
+				return
+			}
+		}
 		http.NotFound(w, r)
 		return
 	}
 	c := chung(r, "dich-vu")
 	c.TieuDe = dv.Ten
+	// Bài của việc này (data/dich-vu-bai/<MA>.md). Việc chưa có bài thì Than
+	// rỗng và template bỏ hẳn khối chữ đi — trang quay về đúng bản cũ.
+	var than template.HTML
+	if md := BaiDichVu(dv.Ma); strings.TrimSpace(md) != "" {
+		than = MarkdownBai(md)
+	}
 	render(w, mauTheoVo(r, "dichvu-mot.html", "app-dichvu.html"), struct {
 		Chung
 		DV     DichVu
+		Than   template.HTML
 		Khac   []DichVu
 		Nguong Nguong
-	}{c, *dv, DichVuDangBan(GiaiDoan), NguongHienTai()})
+	}{c, *dv, than, DichVuDangBan(GiaiDoan), NguongHienTai()})
 }
 
 func hLienHe(w http.ResponseWriter, r *http.Request) {
@@ -508,6 +736,13 @@ func hLienHe(w http.ResponseWriter, r *http.Request) {
 		Chung
 		Nguong Nguong
 	}{chung(r, "lien-he"), NguongHienTai()})
+}
+
+func hCauHoi(w http.ResponseWriter, r *http.Request) {
+	render(w, "cauhoi.html", struct {
+		Chung
+		CauHoi []CauHoi
+	}{chung(r, "cau-hoi"), CauHoiHien()})
 }
 
 func hChinhSach(w http.ResponseWriter, r *http.Request) {
@@ -788,9 +1023,26 @@ func hTraCuu(w http.ResponseWriter, r *http.Request) {
 		Don       *Don
 		YeuCau    *yeuCauKhach
 		Loi       string
+		khoiTra
 	}
 	mau := mauTheoVo(r, "tracuu.html", "app-tracuu.html")
 	d := dl{Chung: chung(r, "tra-cuu")}
+
+	// Mở bằng token: đường dẫn màn kết của cửa hàng đưa cho khách. Token 8 ký
+	// tự ngẫu nhiên, cùng cửa đã dùng cho ảnh đơn (hAnhDonChoKhach). Không
+	// giới hạn tần suất ở đây: token không dò được như mã đơn theo số thứ tự.
+	if tok := r.PathValue("token"); tok != "" {
+		if don, ok := LayDonTheoToken(tok); ok {
+			d.Don = don
+			d.Ma = don.Ma
+		} else {
+			d.Loi = "Đường dẫn này không còn đúng. Anh/chị tra bằng mã đơn và 4 số cuối điện thoại giúp em."
+		}
+		d.khoiTra = dungKhoiTra(d.Don)
+		render(w, mau, d)
+		return
+	}
+
 	if r.Method == http.MethodPost {
 		// Tra cứu cũng phải chặn: mã đơn theo số thứ tự, không giới hạn thì
 		// dò được. 12 lần/giờ đủ cho người thật, không đủ cho script.
@@ -811,6 +1063,7 @@ func hTraCuu(w http.ResponseWriter, r *http.Request) {
 			d.Loi = "Không tìm thấy đơn hay yêu cầu nào khớp mã và số điện thoại này."
 		}
 	}
+	d.khoiTra = dungKhoiTra(d.Don)
 	render(w, mau, d)
 }
 
@@ -1067,10 +1320,12 @@ func NewMux(public bool) *http.ServeMux {
 	mux.HandleFunc("GET /bai-viet", hBaiVietList)
 	mux.HandleFunc("GET /bai-viet/{slug}", hBaiVietMot)
 	mux.HandleFunc("GET /anh-trang-chu/{ten}", hAnhTrangChu)
+	mux.HandleFunc("GET /app-video/{ten}", hAppVideo)
 	mux.HandleFunc("GET /bai-viet-anh/{ten}", hAnhBaiViet)
 	mux.HandleFunc("GET /sitemap.xml", hSitemap)
 	mux.HandleFunc("GET /robots.txt", hRobots)
 	mux.HandleFunc("GET /favicon.svg", hFavicon)
+	mux.HandleFunc("GET /icon.png", hIconApp)
 	// App cài lên màn hình chính. Xem core/pwa.go — cả ba đường này chỉ có
 	// tác dụng khi site chạy https.
 	mux.HandleFunc("GET /app", hApp)
@@ -1079,16 +1334,29 @@ func NewMux(public bool) *http.ServeMux {
 	mux.HandleFunc("GET /logo", phucVuLogo(loaiLogo))
 	mux.HandleFunc("GET /bieu-tuong", phucVuLogo(loaiIcon))
 	mux.HandleFunc("GET /anh-gd/{ten}", hAnhNen)
+	mux.HandleFunc("GET /tinh/{ten}", hCSS)
+	mux.HandleFunc("GET /font/{ten}", hFont)
 	mux.HandleFunc("GET /lien-he", hLienHe)
+	mux.HandleFunc("GET /cau-hoi", hCauHoi)
 	mux.HandleFunc("GET /chinh-sach", hChinhSach)
 	mux.HandleFunc("POST /gui-yeu-cau", hGuiYeuCau)
+	// Cửa hàng: đăng ký lúc nào cũng có, đóng/mở quyết định trong handler.
+	// Bỏ route khi tại xưởng thì đổi chế độ phải khởi động lại mux — và link
+	// đã phát ra ngoài sẽ trả 404 trắng thay vì một lời giải thích.
+	mux.HandleFunc("GET /cua-hang", hCuaHang)
+	mux.HandleFunc("POST /cua-hang", hCuaHangGui)
 	mux.HandleFunc("GET /tra-cuu", hTraCuu)
 	mux.HandleFunc("POST /tra-cuu", hTraCuu)
+	// Đường dẫn mang token, cửa hàng đưa cho khách ở màn kết.
+	mux.HandleFunc("GET /tra-cuu/{token}", hTraCuu)
+	mux.HandleFunc("POST /tra-cuu/{token}/hinh-thuc-tra", hChonHinhThucTra)
+	mux.HandleFunc("POST /tra-cuu/{token}/van-don", hKhachBaoVanDon)
 
 	// Bản app của ba trang khách hay dùng nhất. Cùng handler, cùng dữ liệu,
 	// khác cái vỏ — xem mauTheoVo trong pwa.go.
 	mux.HandleFunc("GET /app/tra-cuu", hTraCuu)
 	mux.HandleFunc("POST /app/tra-cuu", hTraCuu)
+	mux.HandleFunc("GET /app/tra-cuu/{token}", hTraCuu)
 	mux.HandleFunc("GET /app/quy-trinh", hQuyTrinh)
 	mux.HandleFunc("GET /app/gui-anh", hAppGuiAnh)
 	// Trang soi máy, không có đường dẫn nào trỏ tới. Mở tay khi cần biết máy
@@ -1097,6 +1365,8 @@ func NewMux(public bool) *http.ServeMux {
 	mux.HandleFunc("GET /app/dich-vu/{ma}", hDichVuMot)
 	mux.HandleFunc("POST /app/gui-anh", hGuiYeuCau)
 	mux.HandleFunc("GET /don-anh/{token}/{ten}", hAnhDonChoKhach)
+	// Hoá đơn khách tự mở, cùng cửa token như trang tra cứu — xem core/hoadon.go.
+	mux.HandleFunc("GET /hoa-don/{token}", hHoaDonChoKhach)
 
 	// Đăng nhập.
 	mux.HandleFunc("GET /dang-nhap", hDangNhap)

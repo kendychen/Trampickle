@@ -62,6 +62,16 @@ func main() {
 	if err := core.NapLienHe(); err != nil {
 		fmt.Fprintln(os.Stderr, "Cảnh báo liên hệ:", err)
 	}
+	// Danh sách tiệm gia công ngoài ở data/doi-tac.yaml. Chưa có file thì
+	// danh sách rỗng — đơn vẫn chạy, chỉ là chưa gửi đi đâu được.
+	if err := core.NapDoiTac(); err != nil {
+		fmt.Fprintln(os.Stderr, "Cảnh báo đối tác:", err)
+	}
+	// Cấu hình màn app (ảnh banner, đợt khuyến mãi, icon động) ở data/app.yaml.
+	// Chưa có file thì chạy bằng mặc định trong code, nên chỉ cảnh báo.
+	if err := core.NapAppCauHinh(); err != nil {
+		fmt.Fprintln(os.Stderr, "Cảnh báo cấu hình app:", err)
+	}
 	// Logo/biểu tượng tab tải lên nằm ở data/logo/. Không có thì đầu trang
 	// dùng SVG nhúng trong binary, nên đây cũng chỉ là cảnh báo.
 	if err := core.NapLogo(); err != nil {

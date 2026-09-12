@@ -1,0 +1,34 @@
+{{/* Màn "mất mạng" của app quản lý. Service worker giữ một bản trong kho nên
+     trang này phải tĩnh tuyệt đối — không đơn, không số, không tên người
+     dùng. Bản khách xem trong kho có thể cũ hàng tuần; chữ ở đây thì tuần nào
+     cũng đúng.
+
+     Không dùng vỏ "qt-dau": vỏ ấy có menu 25 mục, mà mất mạng thì bấm mục nào
+     cũng không đi đâu được. Một dòng nói rõ chuyện gì đang xảy ra và một nút
+     thử lại là đủ. */}}
+{{define "qt-matmang.html"}}<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Mất mạng — Quản lý {{.Brand.Ten}}</title>
+<link rel="icon" href="{{iconQt}}" type="image/svg+xml">
+<meta name="theme-color" content="{{mauNhanQt}}">
+<link rel="stylesheet" href="{{cssURL}}">
+</head>
+<body>
+<div class="mm">
+  <div class="the mm-o">
+    <div class="mm-bt">{{template "bt-vien"}}</div>
+    <h1>Máy đang không có mạng</h1>
+    <p>Trang quản lý đọc thẳng từ trạm, không giữ bản sao trong điện thoại —
+       số đơn và số tiền phải là số thật lúc này, chứ không phải số của lần
+       vào trước.</p>
+    <p class="mo">Bật lại Wi-Fi hoặc 4G rồi bấm thử lại.</p>
+    <a class="nut nut-chinh" href="/qt/don-vot">Thử lại</a>
+  </div>
+</div>
+</body>
+</html>
+{{end}}

@@ -20,9 +20,16 @@
     <h3>Phần máy tìm kiếm đọc</h3>
     <div class="noi doc">
       <label>Tiêu đề
-        <span class="hd">Vừa là dòng chữ to đầu bài, vừa là tên tab trình duyệt.
-          Dài chừng 55–65 ký tự thì Google hiện đủ, dài hơn thì bị cắt đuôi.</span>
+        <span class="hd">Dòng chữ to in trên đầu bài. Viết cho người đọc, dài bao
+          nhiêu cũng được — ô dưới mới là bản Google hiện.</span>
         <input name="tieu_de" value="{{.Bai.TieuDe}}" maxlength="200" required>
+      </label>
+
+      <label>Tiêu đề rút gọn cho Google
+        <span class="hd">Google cắt tiêu đề ở khoảng 60 ký tự, mà tên trạm còn ăn
+          mất 14 ký tự nữa. Gõ bản ngắn ≤ 46 ký tự, từ khoá đứng trước. Để trống
+          thì lấy nguyên tiêu đề trên và chịu bị cắt đuôi.</span>
+        <input name="tieu_de_seo" value="{{.Bai.TieuDeSEO}}" maxlength="120">
       </label>
 
       <label>Đường dẫn
@@ -30,7 +37,7 @@
           gạch nối. Đổi đường dẫn của bài đã đăng là đổi luôn địa chỉ khách đã lưu
           và Google đã đánh chỉ mục — chỉ đổi khi thật cần.</span>
         <input name="slug" value="{{.Bai.Slug}}" maxlength="80" pattern="[a-z0-9-]+" required
-               style="font-family:'JetBrains Mono',monospace">
+               style="font-family:'Roboto Mono',monospace">
       </label>
 
       <label>Mô tả cho Google
@@ -71,7 +78,7 @@
       <div class="soan-2cot">
         <div>
           <textarea name="than" id="o-than" rows="30" spellcheck="false"
-                    style="font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.7">{{.Bai.Than}}</textarea>
+                    style="font-family:'Roboto Mono',monospace;font-size:13.5px;line-height:1.7">{{.Bai.Than}}</textarea>
           <div class="hang" style="gap:10px;margin-top:12px">
             <button type="button" id="nut-xem" class="phu" style="flex:0 0 auto">Xem thử</button>
             <button type="submit" style="flex:0 0 auto">Lưu bài</button>

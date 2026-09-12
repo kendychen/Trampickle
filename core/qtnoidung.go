@@ -18,6 +18,9 @@ type ndMucQt struct {
 	MucND
 	GiaTri string
 	DaSua  bool
+	// CoBanRieng: khoá này có chữ riêng cho bản Online. Sai thì sửa ô này là
+	// sửa cả hai bản — phải nói trước.
+	CoBanRieng bool
 }
 
 type ndNhomQt struct {
@@ -39,6 +42,9 @@ type dlQtND struct {
 	Nhom []ndNhomQt
 	// SoDoi: tổng số khoá đã đổi trên toàn site, hiện ở đầu trang.
 	SoDoi int
+	// LaOnline: đang sửa bản nào. Không nói ra thì Kendy gõ xong không biết
+	// mình vừa sửa cho bản nào.
+	LaOnline bool
 }
 
 func timTrangND(ma string) (TrangND, bool) {
@@ -48,6 +54,17 @@ func timTrangND(ma string) (TrangND, bool) {
 		}
 	}
 	return TrangND{}, false
+}
+
+// timTrangNDChung như timTrangND nhưng chặn mấy trang đã có màn riêng. Trang
+// /qt/noi-dung dùng bản này: gõ thẳng /qt/noi-dung/app vào thanh địa chỉ cũng
+// không mở ra được, để không có hai chỗ sửa cùng một câu.
+func timTrangNDChung(ma string) (TrangND, bool) {
+	t, co := timTrangND(ma)
+	if !co || t.Rieng {
+		return TrangND{}, false
+	}
+	return t, true
 }
 
 // veND quay lại đúng tab vừa làm việc. ma phải là mã đã kiểm, vì nó đi thẳng
@@ -71,17 +88,21 @@ func hQtND(w http.ResponseWriter, r *http.Request) {
 	if ma == "" {
 		ma = CayND[0].Ma
 	}
-	t, co := timTrangND(ma)
+	t, co := timTrangNDChung(ma)
 	if !co {
 		http.NotFound(w, r)
 		return
 	}
 
 	d := dlQtND{dlQt: dlQt{Chung: chung(r, "noi-dung")}}
+	d.LaOnline = LaOnline()
 	d.OK = r.URL.Query().Get("ok")
 	d.Loi = r.URL.Query().Get("loi")
 	d.Hien = t
 	for _, x := range CayND {
+		if x.Rieng {
+			continue
+		}
 		so := SoDaSuaND(x)
 		d.SoDoi += so
 		d.Tab = append(d.Tab, ndTabQt{Ma: x.Ma, Ten: x.Ten, So: so, Day: x.Ma == ma})
@@ -89,7 +110,12 @@ func hQtND(w http.ResponseWriter, r *http.Request) {
 	for _, n := range t.Nhom {
 		nh := ndNhomQt{Ten: n.Ten}
 		for _, m := range n.Muc {
-			nh.Muc = append(nh.Muc, ndMucQt{MucND: m, GiaTri: ND(m.Khoa), DaSua: DaSuaND(m.Khoa)})
+			nh.Muc = append(nh.Muc, ndMucQt{
+				MucND:      m,
+				GiaTri:     ND(m.Khoa),
+				DaSua:      DaSuaND(m.Khoa),
+				CoBanRieng: CoBanOnline(m.Khoa),
+			})
 		}
 		d.Nhom = append(d.Nhom, nh)
 	}
@@ -102,7 +128,7 @@ func hQtNDLuu(w http.ResponseWriter, r *http.Request) {
 		veND(w, r, "", "", "Nội dung quá dài")
 		return
 	}
-	t, co := timTrangND(r.FormValue("ma"))
+	t, co := timTrangNDChung(r.FormValue("ma"))
 	if !co {
 		http.NotFound(w, r)
 		return
@@ -111,7 +137,9 @@ func hQtNDLuu(w http.ResponseWriter, r *http.Request) {
 	for _, n := range t.Nhom {
 		for _, m := range n.Muc {
 			if v, gui := r.Form["k."+m.Khoa]; gui {
-				moi[m.Khoa] = v[0]
+				// Tên ô trong form là khoá GỐC; khoá được ghi là khoá của bản
+				// đang bật. Form không cần biết có hai chế độ.
+				moi[KhoaTheoCheDo(m.Khoa)] = v[0]
 			}
 		}
 	}
@@ -125,7 +153,7 @@ func hQtNDLuu(w http.ResponseWriter, r *http.Request) {
 func hQtNDKhoiPhuc(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, 16*1024)
 	r.ParseForm()
-	t, co := timTrangND(r.FormValue("ma"))
+	t, co := timTrangNDChung(r.FormValue("ma"))
 	if !co {
 		http.NotFound(w, r)
 		return
@@ -135,7 +163,7 @@ func hQtNDKhoiPhuc(w http.ResponseWriter, r *http.Request) {
 		veND(w, r, t.Ma, "", "Không có khoá "+khoa)
 		return
 	}
-	if err := KhoiPhucND(khoa); err != nil {
+	if err := KhoiPhucND(KhoaTheoCheDo(khoa)); err != nil {
 		veND(w, r, t.Ma, "", err.Error())
 		return
 	}

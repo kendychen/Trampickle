@@ -1,20 +1,26 @@
 package core
 
-// Màn đọc và sửa giáo trình dạy nghề trong khu quản trị.
+// Màn đọc và sửa tài liệu nội bộ trong khu quản trị: giáo trình dạy nghề,
+// danh mục, checklist, quy trình.
 //
-// Giáo trình là tài liệu NỘI BỘ. Nó nằm trong vanhanh/, không route nào đưa
+// Toàn bộ là tài liệu NỘI BỘ. Chúng nằm trong vanhanh/, không route nào đưa
 // ra web khách, và màn này bọc canLaChu. Cố tình KHÔNG đăng sang
 // data/bai-viet/: kho đó công khai, mà quy trình sửa, vật tư và giá vốn là
 // thứ đối thủ muốn nhất.
 //
-// Danh sách bài không quét thư mục mà lấy từ tai_lieu_nap trong config, lọc
-// theo tiền tố vanhanh/giao-trinh/. Hai cái lợi: màn này hiện đúng những bài
-// Trợ lý kỹ thuật thật sự đọc — quét thư mục thì màn hình sẽ khoe cả bài
-// agent không thấy — và chính danh sách ấy là whitelist, nên đường dẫn gõ
-// trên trình duyệt không đi ra ngoài thư mục được.
+// Danh sách không quét thư mục mà lấy từ tai_lieu_nap trong config, lọc theo
+// tiền tố vanhanh/. Hai cái lợi: màn này hiện đúng những tệp Trợ lý kỹ thuật
+// thật sự đọc — quét thư mục thì màn hình sẽ khoe cả tệp agent không thấy —
+// và chính danh sách ấy là whitelist, nên đường dẫn gõ trên trình duyệt không
+// đi ra ngoài thư mục được.
+//
+// Ma là phần sau "vanhanh/", tức giữ nguyên cả thư mục con. Không cắt riêng
+// từng tiền tố (vanhanh/ hoặc vanhanh/giao-trinh/) tuỳ tệp: cắt kiểu đó thì
+// vanhanh/x.md và vanhanh/giao-trinh/x.md ra cùng một Ma, mà timBaiGiaoTrinh
+// trả về cái khớp đầu tiên — đó là một lỗ thủng trong whitelist.
 //
 // Sửa xong KHÔNG cần khởi động lại: nhánh nhồi-thẳng của agent đọc tệp mỗi
-// lần hỏi. Chỉ thêm bớt bài trong config mới phải restart.
+// lần hỏi. Chỉ thêm bớt tệp trong config mới phải restart.
 //
 // Ô soạn là <textarea> markdown trần, cùng lý do đã chốt ở qtbaiviet.go, và
 // nút Xem thử cũng dựng ở server bằng đúng trình dựng của trang bài viết.
@@ -28,9 +34,9 @@ import (
 	"strings"
 )
 
-// Tiền tố cố định. Bài nào trong tai_lieu_nap không bắt đầu bằng chuỗi này
-// thì không phải giáo trình và không hiện ở đây.
-const giaoTrinhGoc = "vanhanh/giao-trinh/"
+// Tiền tố cố định. Tệp nào trong tai_lieu_nap không bắt đầu bằng chuỗi này
+// thì không phải tài liệu nội bộ và không hiện ở đây.
+const taiLieuGoc = "vanhanh/"
 
 // Bài dài nhất hiện là 15 KB. 512 KB là chỗ thở, đồng thời chặn người dán
 // nhầm cả cuốn sách vào một ô.
@@ -38,22 +44,31 @@ const giaoTrinhToiDaByte = 512 << 10
 
 // Tên phần cho dễ đọc. Thư mục không có trong bảng thì hiện nguyên tên.
 var tenPhanGT = map[string]string{
-	"":             "Chung",
-	"01-nen-tang":  "1 · Nền tảng",
-	"02-quy-trinh": "2 · Quy trình",
-	"03-ca-sua":    "3 · Các ca sửa",
-	"04-lam-nghe":  "4 · Làm nghề",
+	"":                        "Danh mục · quy trình · checklist",
+	"giao-trinh":              "Giáo trình · Chung",
+	"giao-trinh/01-nen-tang":  "Giáo trình · 1 · Nền tảng",
+	"giao-trinh/02-quy-trinh": "Giáo trình · 2 · Quy trình",
+	"giao-trinh/03-ca-sua":    "Giáo trình · 3 · Các ca sửa",
+	"giao-trinh/04-lam-nghe":  "Giáo trình · 4 · Làm nghề",
+}
+
+// Tệp sinh ra từ nơi khác thì chỉ được đọc. Sửa thẳng ở đây là mất trắng ở
+// lần sinh sau, mà người sửa lại tưởng đã lưu xong.
+var lyDoChiDoc = map[string]string{
+	"vanhanh/danh-muc-vot.md":  "sinh từ data/vot.yaml, sửa ở đây sẽ mất khi chạy lại scripts/print_paddles.py. Muốn đổi thì sửa vot.yaml rồi sinh lại.",
+	"vanhanh/danh-muc-giay.md": "sinh từ data/giay.yaml, sửa ở đây sẽ mất khi chạy lại scripts/print_shoes.py. Muốn đổi thì sửa giay.yaml rồi sinh lại. Bảng thợ tra ở /qt/giay cũng đọc thẳng file YAML đó.",
 }
 
 type BaiGiaoTrinh struct {
 	Tep       string // đường dẫn tương đối gốc repo
-	Ma        string // phần sau giaoTrinhGoc, dùng trong URL
-	Phan      string // thư mục con, "" nếu nằm ngay gốc
+	Ma        string // phần sau taiLieuGoc, dùng trong URL
+	Phan      string // thư mục con, "" nếu nằm ngay vanhanh/
 	TenPhan   string // tên phần đã làm đẹp
 	Ten       string // dòng "# ..." đầu tệp
 	TrangThai string // 🟨 NHÁP / ✅ XONG / ⬜ CHƯA CÓ, đọc từ đầu bài
 	Byte      int64
-	Thieu     bool // có trong config nhưng không có tệp
+	Thieu     bool   // có trong config nhưng không có tệp
+	ChiDoc    string // khác rỗng = chỉ đọc, chuỗi là lý do
 }
 
 type NhomGiaoTrinh struct {
@@ -69,15 +84,15 @@ type dlQtGT struct {
 	SoBai int
 }
 
-// DsGiaoTrinh đọc danh sách bài từ config, giữ nguyên thứ tự đã khai.
+// DsGiaoTrinh đọc danh sách tài liệu từ config, giữ nguyên thứ tự đã khai.
 func DsGiaoTrinh() []BaiGiaoTrinh {
 	var ds []BaiGiaoTrinh
 	for _, rel := range CFG.DuongDan.TaiLieuNap {
-		if !strings.HasPrefix(rel, giaoTrinhGoc) {
+		if !strings.HasPrefix(rel, taiLieuGoc) {
 			continue
 		}
-		ma := strings.TrimPrefix(rel, giaoTrinhGoc)
-		b := BaiGiaoTrinh{Tep: rel, Ma: ma, Phan: path.Dir(ma)}
+		ma := strings.TrimPrefix(rel, taiLieuGoc)
+		b := BaiGiaoTrinh{Tep: rel, Ma: ma, Phan: path.Dir(ma), ChiDoc: lyDoChiDoc[rel]}
 		if b.Phan == "." {
 			b.Phan = ""
 		}
@@ -212,9 +227,16 @@ func hQtGTLuu(w http.ResponseWriter, r *http.Request) {
 	}
 	ve := "/qt/giao-trinh/bai/" + bai.Ma
 
+	// Template đã giấu nút Lưu ở tệp chỉ đọc, nhưng giấu nút không phải là
+	// chặn: POST gõ tay vẫn tới được đây.
+	if bai.ChiDoc != "" {
+		veGiaoTrinh(w, r, ve, "", "Tệp chỉ đọc — "+bai.ChiDoc)
+		return
+	}
+
 	than := strings.ReplaceAll(r.FormValue("than"), "\r\n", "\n")
-	// Lưu bài rỗng là xoá trắng một bài giáo trình bằng một cú bấm nhầm.
-	// Muốn bỏ bài thì bỏ khỏi tai_lieu_nap, không phải xoá ruột.
+	// Lưu bài rỗng là xoá trắng một tài liệu bằng một cú bấm nhầm.
+	// Muốn bỏ tệp thì bỏ khỏi tai_lieu_nap, không phải xoá ruột.
 	if strings.TrimSpace(than) == "" {
 		veGiaoTrinh(w, r, ve, "", "Bài trống — muốn bỏ bài thì bỏ khỏi tai_lieu_nap trong config")
 		return

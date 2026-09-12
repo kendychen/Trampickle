@@ -45,6 +45,13 @@ var hinhChoPhep = map[string]string{
 	"vung-hong": "Các vùng hay hỏng trên vợt",
 	"can":       "Bản vẽ cán vợt và cổ vợt",
 	"de-giay":   "Mặt cắt hai tầng đế giày",
+	"vien":      "Mặt cắt mép vợt: nẹp viền, keo hai mặt, chỗ bong",
+	"lead-tape": "Ba vị trí dán chì trên mặt vợt",
+	"nham":      "Mặt cắt bề mặt: bên còn nhám, bên đã mòn lì",
+	"ve-sinh":   "Mặt vợt nửa bẩn nửa sạch",
+	"am-vao":    "Ba đường ẩm đi vào cây vợt",
+	"bo-anh":    "Bốn khung ảnh cần chụp khi gửi ảnh vợt hỏng",
+	"dong-goi":  "Mặt cắt thùng đóng gói vợt gửi đi tỉnh",
 }
 
 // bangThe dựng bảng thay thế cho các khoá {…}. Chỉ vài con số mà bài viết

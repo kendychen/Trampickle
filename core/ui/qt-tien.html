@@ -81,15 +81,15 @@
   {{range .ChoDuyet}}<form method="post" action="/qt/tien/duyet" id="duyet-{{.Ma}}">
     <input type="hidden" name="_csrf" value="{{$.CSRF}}"><input type="hidden" name="ma" value="{{.Ma}}"></form>{{end}}
   <div class="cuon">
-    <table class="bang">
+    <table class="bang bang-the">
       <thead><tr><th>Việc</th><th>Nhóm</th><th style="width:150px">Ngày trả</th><th style="width:150px">Số tiền</th><th style="width:110px"></th></tr></thead>
       <tbody>
       {{range .ChoDuyet}}
         <tr>
           <td>{{.DienGiai}}{{if .MaPhieu}} <a class="nho so" href="/qt/kho/phieu/{{.MaPhieu}}">{{.MaPhieu}}</a>{{end}}</td>
-          <td class="nho mo">{{.TenNhom}}</td>
-          <td><input type="date" name="ngay" value="{{.Ngay}}" form="duyet-{{.Ma}}" style="width:100%"></td>
-          <td><input name="so_tien" inputmode="numeric" value="{{oso .SoTien}}" form="duyet-{{.Ma}}" style="width:100%"></td>
+          <td data-n="Nhóm" class="nho mo">{{.TenNhom}}</td>
+          <td data-n="Ngày trả"><input type="date" name="ngay" value="{{.Ngay}}" form="duyet-{{.Ma}}" style="width:100%"></td>
+          <td data-n="Số tiền"><input name="so_tien" inputmode="numeric" value="{{oso .SoTien}}" form="duyet-{{.Ma}}" style="width:100%"></td>
           <td><button type="submit" form="duyet-{{.Ma}}" class="nut-nho">Đã trả</button></td>
         </tr>
       {{end}}
@@ -116,13 +116,13 @@
       </div>
       {{if .Khoan}}
       <div class="cuon">
-        <table class="bang">
+        <table class="bang bang-the">
           <thead><tr><th>Ngày</th><th>Nội dung</th><th>Nhóm</th><th class="p">Thu</th><th class="p">Chi</th><th></th></tr></thead>
           <tbody>
           {{range .Khoan}}
             <tr {{if .ChoDuyet}}class="mo"{{end}}>
-              <td class="nho mo">{{ngaydep .Ngay}}</td>
-              <td>
+              <td data-n="Ngày" class="nho mo">{{ngaydep .Ngay}}</td>
+              <td data-n="Nội dung">
                 {{.DienGiai}}
                 {{if .ChoDuyet}}<span class="chip chip-cho">chờ xác nhận</span>{{end}}
                 <div class="nho mo">
@@ -131,9 +131,9 @@
                   {{if .TenPhuongThuc}}{{.TenPhuongThuc}} · {{end}}{{.Nguoi}}
                 </div>
               </td>
-              <td class="nho mo">{{.TenNhom}}</td>
-              <td class="p">{{if .LaThu}}{{tien .SoTien}}{{end}}</td>
-              <td class="p">{{if not .LaThu}}{{tien .SoTien}}{{end}}</td>
+              <td data-n="Nhóm" class="nho mo">{{.TenNhom}}</td>
+              <td data-n="Thu" class="p">{{if .LaThu}}{{tien .SoTien}}{{end}}</td>
+              <td data-n="Chi" class="p">{{if not .LaThu}}{{tien .SoTien}}{{end}}</td>
               <td>
                 {{if not .MaPhieu}}
                 <form method="post" action="/qt/tien/xoa" onsubmit="return confirm('Xoá khoản này khỏi sổ?')">
@@ -156,7 +156,7 @@
     <div class="the-nhom">
       <h3>Từng tháng</h3>
       <div class="cuon">
-        <table class="bang">
+        <table class="bang bang-the">
           <thead>
             <tr><th>Tháng</th><th class="p">Thu</th><th class="p">Chi vận hành</th><th class="p">Lãi</th><th class="p">Đầu tư</th><th class="p">Luỹ kế lãi</th><th class="p">Luỹ kế đầu tư</th></tr>
           </thead>
@@ -164,12 +164,12 @@
             {{range .BaoCao}}
             <tr>
               <td><a href="/qt/tien?thang={{.Thang}}">{{thangDep .Thang}}</a></td>
-              <td class="p">{{tien .Thu}}</td>
-              <td class="p">{{tien .ChiVanHanh}}</td>
-              <td class="p {{if .Lo}}chip chip-tuchoi{{end}}">{{tien .Lai}}</td>
-              <td class="p mo">{{if .DauTu}}{{tien .DauTu}}{{else}}—{{end}}</td>
-              <td class="p">{{tien .LuyKeLai}}</td>
-              <td class="p mo">{{tien .LuyKeDauTu}}</td>
+              <td data-n="Thu" class="p">{{tien .Thu}}</td>
+              <td data-n="Chi vận hành" class="p">{{tien .ChiVanHanh}}</td>
+              <td data-n="Lãi" class="p {{if .Lo}}chip chip-tuchoi{{end}}">{{tien .Lai}}</td>
+              <td data-n="Đầu tư" class="p mo">{{if .DauTu}}{{tien .DauTu}}{{else}}—{{end}}</td>
+              <td data-n="Luỹ kế lãi" class="p">{{tien .LuyKeLai}}</td>
+              <td data-n="Luỹ kế đầu tư" class="p mo">{{tien .LuyKeDauTu}}</td>
             </tr>
             {{else}}
             <tr><td colspan="7" class="mo">Chưa có tháng nào có số.</td></tr>

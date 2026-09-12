@@ -279,6 +279,8 @@ func hQtSaoKeGhi(w http.ResponseWriter, r *http.Request) {
 	}
 	ghi, bo := 0, 0
 	var loiCuoi string
+	var daKhop []string
+	tongKhop := 0
 	for i := range r.Form["ma_don"] {
 		if !chon[itoa(i)] {
 			continue
@@ -310,7 +312,13 @@ func hQtSaoKeGhi(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 		ghi++
+		daKhop = append(daKhop, don.Ma+" · "+dinhDangTien(st)+" · "+gonMotDong(don.KhachTen))
+		tongKhop += st
 	}
+	// Báo sau khi đã ghi xong cả lô: một tin cho cả lần đối soát, không phải
+	// một tin cho mỗi dòng sao kê.
+	BaoKhachChuyenKhoan(daKhop, tongKhop)
+
 	tb := "Đã ghi " + itoa(ghi) + " khoản thu"
 	if bo > 0 {
 		tb += ", bỏ qua " + itoa(bo) + " dòng"

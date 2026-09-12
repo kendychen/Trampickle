@@ -4,11 +4,26 @@
      ấy chữ đẩy phần việc thật xuống dưới nếp gấp. Ở đây chỉ có việc làm được
      với cây vợt, và một thanh dưới đáy để gọi.
 
-     Thứ tự khối xếp theo hai loại người mở app. Người chưa gửi vợt hỏi "trạm
-     làm được việc của tôi không" — lưới việc trả lời. Người đã gửi rồi mở app
-     ngày mấy lượt chỉ để hỏi "xong chưa" — thẻ đơn máy nhớ giùm nằm ngay trên
-     cùng trả lời họ trong một lần chạm, và ô tra đơn ở dưới lo cho lượt đầu
-     tiên khi máy chưa nhớ gì. */}}
+     Thứ tự khối theo đúng thứ tự câu hỏi trong đầu người mở app: trạm này
+     làm gì (banner) → làm được việc gì (lưới) → hôm nay có gì lợi (khuyến
+     mãi). Giá nằm ở trang từng việc, cam kết nằm ở /app/quy-trinh — bấm vào
+     là tới, không nhồi hết vào một màn.
+
+     TRANG NÀY KHÔNG CUỘN. Mọi khối phải nằm lọt trong một màn hình, giữa
+     bảng hiệu và thanh đáy. Hệ quả kéo theo, đừng vô tình gỡ:
+       - Banner một khối, không băng vuốt ngang; ẩn được, và tắt/bật ảnh
+         được, nên đừng có luật nào giả định là nó luôn có mặt.
+       - Không có bảng giá ở đây; giá nằm trong trang từng việc.
+       - Không có cam kết ở đây; cam kết nằm ở /app/quy-trinh.
+       - Khối khuyến mãi tắt được ở /qt/app, và tự tắt khi hết đợt.
+       - Khối ba bước "Cần sửa thì làm thế nào" bỏ hẳn — nội dung ấy đã có
+         đủ và kỹ hơn ở /app/quy-trinh.
+     Thêm bất cứ khối nào vào đây là trang cuộn trở lại. Muốn thêm thì phải
+     bớt chỗ khác.
+
+     Không còn khối gấp "Vợt đang ở trạm?" và "Gọi cho trạm": thanh dưới đáy
+     đã có nút Tra đơn, và nút giữa in thẳng số thật — bấm là hiện cả gọi lẫn
+     Zalo. */}}
 <html lang="vi">
 <head>
 <meta charset="utf-8">
@@ -18,166 +33,270 @@
 <meta name="robots" content="noindex">
 <link rel="icon" href="{{iconURL}}" type="{{iconMIME}}">
 {{template "pwa-dau" .}}
-{{template "css" .}}
+<link rel="stylesheet" href="{{cssURL}}">
 </head>
-<body class="{{.LopThan}} la-app">
+<body class="la-app man-1">
 
-{{/* Bảng hiệu, không phải thanh điều hướng. Trang con của app mới cần thanh
-     dính trên đỉnh với nút lùi; ở màn hình đầu thì cái dính trên đỉnh chỉ ăn
-     mất một dải màn hình suốt lúc cuộn, mà đường về đã có sẵn nút Trang chủ
-     dưới thanh đáy. Đổi lại, chỗ này được rộng: logo, tên trạm cỡ lớn, dòng
-     nghề — ba thứ xếp giữa thành một tấm biển, khách mở app ra nhìn phát
-     biết mình đang ở đâu. */}}
+{{/* Bảng hiệu, không phải thanh điều hướng: trang con của app mới cần thanh
+     dính trên đỉnh với nút lùi, còn ở màn hình đầu thì cái dính trên đỉnh chỉ
+     ăn mất một dải màn hình suốt lúc cuộn. Xếp ngang chứ không xếp giữa như
+     bản trước — băng ảnh ngay dưới cần chỗ, mà logo nằm giữa thì đẩy nó xuống
+     gần hết một màn hình. */}}
 <header class="app-bia">
   <a class="app-bia-lk" href="/app">
-    {{template "logo-o-dau"}}
-    <b class="app-bia-ten">{{.Brand.Ten}}</b>
-    {{if .Brand.DongMoTa}}<span class="app-bia-mo">{{.Brand.DongMoTa}}</span>{{end}}
+    {{/* Khối XẾP DỌC: dấu hiệu ở trên, chữ T-PIC ở dưới. Bản NGANG co xuống
+         cỡ này thì chữ T-PIC còn cao 6 điểm ảnh, đọc không ra; xếp dọc thì
+         chữ được trọn bề ngang của khối nên cao 11 điểm vẫn đủ chỗ.
+         Ở màn hình đơn (man-1) cả hình lẫn chữ co theo svh — xem css.html. */}}
+    {{template "logo-4d-o-dau"}}
+    {{/* Chỉ tên trạm, KHÔNG có dòng mô tả dưới tên như ngoài web. Dòng ấy nói
+         đúng cái banner ngay dưới đang nói to hơn — hai lần cùng một câu cách
+         nhau 40 điểm ảnh thì câu ở trên chỉ ăn chỗ. Ngoài web vẫn giữ (chân
+         trang, thẻ og:image:alt) vì ở đấy không có banner. */}}
+    <span class="app-bia-chu">
+      <b class="app-bia-ten">{{.Brand.Ten}}</b>
+    </span>
   </a>
+
+  {{/* Nhãn "Nhận sửa vợt toàn quốc", đứng bên phải tên trạm ngay hàng trên
+       cùng. Đây là câu chặn đầu của người ở tỉnh — "xa thế này có nhận
+       không" — nên nó phải nằm trong tầm mắt lúc app vừa mở, trước cả khi
+       khách đọc tới banner.
+
+       Nằm ngoài .app-bia-lk chứ không trong đó: cả khối logo là một cái link
+       về /app, mà nhãn thì không dẫn đi đâu cả. Chiều cao bảng hiệu do logo
+       42px quyết định, viên nhãn cao chừng 22px nên KHÔNG cộng thêm một điểm
+       ảnh nào — /app cấm cuộn.
+
+       Để trống ô ở /qt/app là nhãn biến mất hẳn. */}}
+  {{if nd "app.bia.nhan"}}<span class="app-bia-nhan">{{nd "app.bia.nhan"}}</span>{{end}}
+
+  {{/* Mạng xã hội, xếp 2×2 giữa logo và địa chỉ.
+
+       Vì sao ở đây chứ không ở nút giữa thanh đáy: nút ấy là nút GỌI, in số
+       thật ra dưới chân nó. Nhét bốn cái link xem video vào chỗ khách bấm để
+       gọi thợ là làm hỏng đúng cái nút quan trọng nhất màn hình.
+
+       Vì sao 2×2 chứ không một hàng ngang: hàng ngang bốn cái rộng ~70px, mà
+       nửa phải bảng hiệu đã có khối địa chỉ ăn tới 44% bề ngang — cộng lại
+       thì khối logo còn chưa đầy 130px và tên trạm bị cắt. Khối vuông ~50px
+       vẫn thấp hơn chiều cao sẵn có của bảng hiệu nên KHÔNG thêm một điểm
+       ảnh chiều cao nào: /app cấm cuộn.
+
+       Chưa điền cái nào ở /qt/lien-he thì không hiện gì. */}}
+  {{with .LienHe.MangXaHoi}}
+  <div class="app-bia-mxh">
+    {{range .}}<a href="{{.URL}}" target="_blank" rel="noopener me" title="{{.Ten}}" aria-label="{{.Ten}}">{{template "bt-mxh" .Ma}}</a>{{end}}
+  </div>
+  {{end}}
+
 </header>
 
 <main class="app-than">
 
+  {{/* Địa chỉ. Trước đây mở app lên không có đường nào biết trạm ở đâu: năm
+       nút dưới đáy không nút nào nói chỗ, còn ba trang web có địa chỉ (/,
+       /lien-he, /ve-chung-toi) đều không có bản app nên khách vào từ icon
+       không bao giờ gặp. Muốn biết mang vợt tới đâu thì phải gọi điện hỏi —
+       mà đó đúng là câu khách hỏi trước khi gọi.
+
+       Một dải riêng chứ không nhét vào góc phải bảng hiệu như bản trước. Ở
+       trên ấy nó ăn 48% bề ngang, đẩy tên trạm và dòng mô tả vào một cột hẹp
+       đến mức cả hai cùng bị cắt — hai thứ tranh nhau một hàng thì không thứ
+       nào đọc trọn. Xuống đây thì mỗi thứ được cả chiều ngang: bảng hiệu là
+       bảng hiệu, địa chỉ là địa chỉ.
+
+       Dải này KHÔNG cộng thêm chiều cao cho màn hình cấm cuộn: banner ngay
+       dưới là phần co giãn duy nhất (flex:1), nó tự nhả ra đúng phần dải này
+       chiếm. Xem khối "Banner: phần co giãn duy nhất" trong css.html.
+
+       Chưa điền địa chỉ ở /qt/lien-he thì không hiện gì — thà trống còn hơn
+       một cái ghim bấm vào ra bản đồ rỗng. */}}
+  {{if .LienHe.BanDo}}
+  <a class="app-cho" href="{{.LienHe.BanDo}}" target="_blank" rel="noopener"
+     title="{{.LienHe.DiaChi}}">
+    {{template "bt-ghim"}}
+    <span class="app-cho-chu">{{.LienHe.DiaChi}}</span>
+    <span class="app-cho-nhan">{{nd "app.bia.chi-duong"}}</span>
+  </a>
+  {{end}}
+
+  {{/* Đứng NGAY dưới địa chỉ, không phải trong banner: khách vừa đọc xong
+       "Số 69 Đại Linh" và cái nút CHỈ ĐƯỜNG là lúc duy nhất câu này còn kịp
+       có ích. Nhét vào banner thì nó nằm trên địa chỉ, đọc trước khi biết có
+       địa chỉ nên chẳng ngăn được ai.
+
+       Không phá luật một màn không cuộn: banner ngay dưới là phần flex:1 duy
+       nhất, nó nhả ra đúng phần dải này ăn. Đã đo lại ở 390x844, 360x640 và
+       360x500 — cả ba vẫn scrollHeight == innerHeight. */}}
+  {{template "tb-chua-mo"}}
+
+  {{/* Banner. MẶC ĐỊNH là chữ + bản vẽ, không phải ảnh chụp.
+
+       Trước đây chỗ này lấy đại tấm đầu trong /qt/anh-trang-chu và bỏ đi vì
+       hai cái sai: ảnh ngang cắt vào khe cao 60-130px thì còn một vệt màu
+       không đọc ra gì, và một tấm ảnh bất kỳ chỉ nói "trạm có làm việc" chứ
+       không nói trạm làm gì cho khách. Bản vẽ + hai dòng chữ nói thẳng, nặng
+       vài KB, sắc ở mọi cỡ màn.
+
+       Nay ảnh quay lại nhưng theo lối khác: Kendy CHỌN đúng một tấm ở /qt/app,
+       biết trước nó bị cắt thế nào, và có lớp phủ tối chỉnh được để chữ luôn
+       đọc được trên ảnh sáng. Không chọn thì vẫn là bản vẽ — mặc định không
+       đổi. Cả banner cũng ẩn được hẳn, lúc ấy lưới việc nở ra chiếm chỗ.
+
+       Và nay có mức thứ ba: một clip MP4 tải lên ở /qt/app chạy làm nền, câm
+       và lặp. Tấm ảnh không mất việc — nó thành khung đứng trong lúc clip
+       chưa tải xong và bản thay thế khi máy khách chặn tự phát.
+
+       Chữ, ảnh và video đều sửa ở /qt/app.
+
+       Không đặt tỉ lệ cứng: banner nuốt nốt phần chiều cao còn thừa của màn
+       (flex: 1 trong css.html). Máy cao thì banner nở ra, máy thấp thì co
+       lại, chữ bên dưới không bao giờ bị đẩy khỏi màn. */}}
+  {{/* Ba mức, video thắng ảnh, ảnh thắng bản vẽ. Lớp phủ tối (.co-anh) dùng
+       chung cho cả video lẫn ảnh: chữ nằm đè lên cả hai, và cái làm chữ khó
+       đọc là độ sáng của khung hình chứ không phải nó đứng hay nó chạy.
+
+       Video CÂM và LẶP, tự chạy: đây là nền, không phải clip để xem. Không
+       câm thì trình duyệt chặn tự phát — mọi trình duyệt di động đều vậy, và
+       đúng ra là thế: app mở lên mà tự kêu thành tiếng giữa sân là thứ khách
+       tắt ngay.
+
+       playsinline là bắt buộc cho iPhone. Thiếu nó thì Safari bung video ra
+       toàn màn hình khi bắt đầu chạy — khách mở app lên thấy một cái clip
+       chiếm cả màn, không thấy lưới việc đâu.
+
+       poster là tấm ảnh banner đang chọn. Nó làm hai việc: lấp khung trong
+       lúc clip chưa tải xong, và đứng thay hẳn khi máy từ chối tự phát (chế
+       độ tiết kiệm pin của iOS làm đúng thế). Chưa chọn ảnh thì nền gradient
+       volt lộ ra — vẫn đọc được chữ, chỉ không có hình.
+
+       preload="auto": clip này là thứ đầu tiên khách nhìn thấy, tải chậm một
+       nhịp là thấy ngay. Trần dung lượng ở /qt/app đã chặn chuyện tải nặng.
+
+       Không có nút điều khiển, không bắt được sự kiện chạm: pointer-events
+       tắt trong CSS, nên chạm vào banner không bật ra thanh play của trình
+       duyệt. */}}
+  {{if not .App.AnBanner}}
+  <div class="app-bang1{{if or .App.BannerURL .App.BannerVideoURL}} co-anh{{end}}{{if .App.BannerVideoURL}} co-video{{end}}"
+       {{if or .App.BannerURL .App.BannerVideoURL}}style="{{if .App.BannerURL}}--anh:url('{{.App.BannerURL}}');{{end}}--toi:{{.App.BannerToi}}%"{{end}}>
+    {{if .App.BannerVideoURL}}
+    <video class="app-bang1-video" autoplay muted loop playsinline preload="auto"
+           aria-hidden="true" tabindex="-1"
+           {{if .App.BannerURL}}poster="{{.App.BannerURL}}"{{end}}>
+      <source src="{{.App.BannerVideoURL}}" type="video/mp4">
+    </video>
+    {{end}}
+    <div class="app-bang1-chu">
+      <b>{{nd "app.banner.tieu-de"}}</b>
+      <span class="app-bang1-phu">{{nd "app.banner.chu"}}</span>
+    </div>
+    {{if not (or .App.BannerURL .App.BannerVideoURL)}}
+    <div class="app-bang1-hinh" aria-hidden="true">{{template "hinh-vot-hero"}}</div>
+    {{end}}
+  </div>
+  {{end}}
+
   {{/* Đơn đã tra ở màn tra cứu, đọc từ chính máy này. Ẩn sẵn: chưa có gì thì
-       JS không mở, và máy tắt JS cũng không thấy một thẻ rỗng. Không tự nhảy
-       sang trang tra cứu như màn tra đơn vẫn làm — vào app mà bị đá đi ngay
-       thì người muốn xem bảng việc không kịp thấy gì. */}}
-  <div class="app-luu" id="nha-luu" hidden>
-    <button type="button" class="app-luu-mo" id="nha-mo">
+       JS không mở, và máy tắt JS cũng không thấy một thẻ rỗng. Là một form
+       thật gửi thẳng sang /app/tra-cuu — trước đây nó mượn form của khối gấp
+       "Vợt đang ở trạm?", mà khối ấy bỏ rồi nên phải tự đứng. */}}
+  <form class="app-luu" id="nha-luu" method="post" action="/app/tra-cuu" hidden>
+    <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+    <input type="hidden" name="ma" id="nha-ma">
+    <input type="hidden" name="dien_thoai" id="nha-dt">
+    <button type="submit" class="app-luu-mo" id="nha-mo">
       {{template "bt-tim"}}
       <span>{{nd "app.tra.luu-nhan"}}<b class="so" id="nha-luu-ma"></b></span>
     </button>
     <button type="button" class="app-luu-quen" id="nha-quen">{{nd "app.tra.quen"}}</button>
-  </div>
+  </form>
 
-  {{/* Câu đầu tiên khách đọc khi mở app. Tên thương hiệu trên đầu trang là
-       tên riêng, không nói ra nghề; dòng này nói thẳng trạm làm gì với cây
-       vợt, để người mới cài xong bấm vào là biết mình đang đứng ở đâu. */}}
-  <section class="app-hero">
-    <h1>{{nd "app.hero.h1"}}</h1>
-    <p class="app-hero-chu">{{ndd "app.hero.chu"}}</p>
-  </section>
-
-  {{/* Nhãn nhóm, không phải tiêu đề mục. Câu dẫn dưới nó đã bỏ: tấm hero
-       ngay trên vừa nói xong trạm làm gì, nhắc lại lần nữa cách đó ba dòng
-       thì thành hai đoạn văn chồng nhau, mà lưới việc thì bị đẩy khuất. */}}
-  <div class="app-nhan-nhom">{{nd "app.luoi.h2"}}</div>
-
-  {{/* Lưới bốn cột, mỗi ô một hình vuông màu với tên việc bên dưới — đúng
-       dáng màn hình chính điện thoại, thứ khách đã quen quét mắt hàng ngày.
+  {{/* Lưới việc: hình vuông màu, tên việc bên dưới — đúng dáng màn hình chính
+       điện thoại, thứ khách đã quen quét mắt hàng ngày.
 
        Đã thử bản chỉ có hình, không chữ: không đọc nổi. Bốn việc đông khách
        nhất — dán viền, thay viền, vá mặt, tách lớp — đều là bốn cái hỏng của
        cùng một cây vợt, nên vẽ nét mảnh một màu thì bốn ô cạnh nhau chỉ khác
-       nhau vài nét 1.6px, khách phải bấm thử từng ô mới biết. Nay hình có
-       nền pastel riêng từng việc, thân vợt tô đặc, chỗ hỏng tô cam (xem khối
-       btm-* trong hinh.html), còn chữ 11px dưới hình là câu xác nhận cho ô
-       nào hình vẽ vẫn chưa nói hết. Hình dẫn, chữ chốt. */}}
-  <div class="app-luoi app-luoi-nho">
-    {{range .DichVu}}
-    <a class="app-o" href="/app/dich-vu/{{.Ma}}" title="{{.Ten}}">
-      <span class="app-bt">{{template "bt-dv-mau" .Ma}}</span>
-      <span class="app-ten">{{.Ten}}</span>
+       nhau vài nét 1.6px. Nên mỗi việc giữ một màu ô riêng, thân vợt tô
+       đặc màu kem, chỗ hỏng tô lime (khối btm-* trong hinh.html).
+
+       Màu ô không lấy tuỳ ý: mười hai ô cùng một độ chói, chỉ khác góc màu,
+       nên đọc ra một bộ chứ không phải mười hai hình dán lượm về. Độ chói ấy
+       chọn ở 0.13 vì hai đầu kéo ngược nhau — nét kem cần nổi trên ô (4.9:1)
+       còn ô cần nổi trên thẻ (5.0:1). Bản pastel trước kia sáng quá, đo trên
+       thẻ gần trắng chỉ được 1.12–1.20:1, tức mắt không thấy ô đâu; bản một
+       tông Forest thì ngược lại, tám ô thành tám ô đen như nhau.
+
+       Hình dẫn, chữ chốt. */}}
+  <section class="app-muc app-muc-luoi">
+    <h2 class="app-muc-ten">{{nd "app.luoi.h2"}}</h2>
+    <div class="app-luoi app-luoi-nho" id="luoi-viec"
+         data-dong="{{.App.IconDong}}" data-nhip="{{.App.IconNhip}}">
+      {{/* Nổi bật: cùng một ô, thêm vành và một ngôi sao góc phải trên. Không
+           nhấc lên đầu lưới — thứ tự việc ở app phải khớp với ngoài web, khách
+           đi hai đường vào cùng một trạm.
+
+           Ở web mỗi việc còn kèm chip chữ "Nhiều khách chọn"; ở đây thì không,
+           vì ô app cao có 60-90px và chữ đã bị kẹp còn hai dòng. Nhồi thêm một
+           dòng chữ nữa là tên việc mất chỗ. Ngôi sao nằm đè lên góc, không ăn
+           một điểm ảnh nào của ô. */}}
+      {{range .DichVu}}
+      {{$noi := and $.NoiBat .NoiBat}}
+      <a class="app-o{{if $noi}} app-o-noi{{end}}" href="/app/dich-vu/{{.Ma}}"
+         title="{{.Ten}}{{if $noi}} — {{nd "trangchu.dv.noi-bat"}}{{end}}">
+        {{if $noi}}<span class="app-o-sao">{{template "bt-sao"}}</span>{{end}}
+        <span class="app-bt">{{template "bt-dv-mau" .Ma}}</span>
+        <span class="app-ten">{{.Ten}}</span>
+        {{/* Giá ngay trên ô: Kendy chốt khách phải biết tầm tiền mà không
+             phải bấm vào từng việc. Một dòng, không xuống hàng — ô app cao
+             có 60-90px, dòng thứ hai là tên việc mất chỗ.
+
+             giaNgan chứ không giaKhach: ô rộng chừng 78px, bản dài không
+             vừa. Bấm vào việc là thấy lại con số đầy đủ. */}}
+        {{with giaNgan .}}<span class="app-o-gia">{{.}}</span>{{end}}
+      </a>
+      {{end}}
+
+      {{/* Ô cuối, không phải dịch vụ: khách quét hết lưới mà không thấy việc
+           của mình thì đang đứng đúng chỗ cần hỏi. */}}
+      <a class="app-o app-o-hoi" href="/app/gui-anh"
+         title="{{nd "app.o-khac"}} — {{nd "app.o-khac-phu"}}">
+        <span class="app-bt">{{template "btm-hoi"}}</span>
+        <span class="app-ten">{{nd "app.o-khac"}}</span>
+      </a>
+    </div>
+    {{if giaTuyThe .DichVu}}<p class="app-luoi-chu">{{ndd "app.gia.tuy-the"}}</p>{{end}}
+    {{if not .DichVu}}<p class="app-trong">{{ndd "app.trong"}}</p>{{end}}
+  </section>
+
+  {{/* Khuyến mãi. Chỗ này trước là bảng giá rồi tới bốn cam kết; cả hai đã
+       dời đi theo chốt của Kendy:
+         giá   → /app/dich-vu/<mã>, hiện lúc khách bấm đúng việc mình cần.
+         cam kết → /app/quy-trinh, đứng cạnh phần nói cách trạm làm.
+       Không xoá cái nào, chỉ đổi chỗ. Màn hình đầu đổi lại được hơn 200px và
+       một khối nói được thứ hai chỗ kia không nói được: hôm nay có gì lợi.
+
+       Hai cái tắt, phải qua cả hai mới hiện (KMHien trong appcauhinh.go):
+         - "Tên chương trình" ở /qt/app còn trống  → không hiện.
+         - hôm nay ngoài khoảng ngày đã đặt        → không hiện.
+       Cái thứ hai là để hết đợt khối TỰ biến mất. Đợt khuyến mãi nào cũng có
+       ngày kết thúc, mà cái người ta quên chắc chắn nhất là quay lại tắt nó.
+
+       Vì thế bố cục bên dưới phải sống được với cả hai trạng thái: khối này
+       flex:none, phần thừa dồn cho banner và lưới việc. */}}
+  {{if .App.KMHien}}
+  <section class="app-muc app-muc-km">
+    <h2 class="app-muc-ten">{{nd "app.km.h2"}}</h2>
+    <a class="app-km" href="{{.App.KMLink}}">
+      <span class="app-km-huy">{{nd "app.km.nhan"}}</span>
+      <span class="app-km-chu">
+        <b>{{nd "app.km.ten"}}</b>
+        <i>{{nd "app.km.han"}}</i>
+      </span>
     </a>
-    {{end}}
-
-    {{/* Ô cuối, không phải dịch vụ: khách quét hết lưới mà không thấy việc
-         của mình thì đang đứng đúng chỗ cần hỏi. */}}
-    <a class="app-o app-o-hoi" href="/app/gui-anh"
-       title="{{nd "app.o-khac"}} — {{nd "app.o-khac-phu"}}">
-      <span class="app-bt">{{template "btm-hoi"}}</span>
-      <span class="app-ten">{{nd "app.o-khac"}}</span>
-    </a>
-  </div>
-
-  {{if not .DichVu}}<p class="app-trong">{{ndd "app.trong"}}</p>{{end}}
-
-  {{/* Bốn câu hỏi khách hỏi theo đúng thứ tự này: có làm được việc của tôi
-       không → làm thế nào → vợt tôi gửi rồi thì tới đâu → gọi ai. Lưới ở trên
-       trả lời câu một; ba khối dưới trả lời ba câu còn lại, không bắt khách
-       nhảy sang web.
-
-       Ba khối ấy gấp lại thành ba dòng bấm-mở. Mở hết ra là hơn chín trăm
-       điểm ảnh, khách phải cuộn ba lần mới thấy hết màn hình chính; gấp lại
-       thì cả app nằm gọn trong một màn, mà không mất chữ nào — ai cần khối
-       nào thì bấm đúng khối ấy. Dùng <details> của trình duyệt, không JS:
-       máy tắt JavaScript vẫn bấm mở được. Thuộc tính name= cho ba khối cùng
-       một tên nên mở cái này là cái kia tự đóng, màn hình không dài ra;
-       trình duyệt cũ chưa hiểu name= thì mở được nhiều cái, vẫn dùng tốt. */}}
-  <details class="app-gap" name="app-gap">
-    <summary>
-      <span class="app-gap-bt">{{template "bt-sach"}}</span>
-      <span class="app-gap-ten">{{nd "app.lam.h2"}}</span>
-      <span class="app-gap-mui">{{template "bt-xuong"}}</span>
-    </summary>
-    <div class="app-gap-than">
-    <ol class="app-buoc">
-      <li><b>{{nd "app.lam.b1"}}</b><span>{{nd "app.lam.b1-chu"}}</span></li>
-      <li><b>{{nd "app.lam.b2"}}</b><span>{{nd "app.lam.b2-chu"}}</span></li>
-      <li><b>{{nd "app.lam.b3"}}</b><span>{{nd "app.lam.b3-chu"}}</span></li>
-    </ol>
-    <div class="app-nut-hang">
-      <a class="nut nut-chinh" href="/app/gui-anh">{{nd "app.lam.nut"}}</a>
-      <a class="nut nut-vien" href="/app/quy-trinh">{{nd "app.lam.nut-2"}}</a>
-    </div>
-    </div>
-  </details>
-
-  {{/* Ô tra đơn ngay tại đây chứ không chỉ để cái nút sang màn khác: hai ô
-       nhập này là toàn bộ việc của màn tra cứu, chép sang tốn mười dòng mà
-       tiết kiệm cho khách một lượt chạm ở việc họ làm nhiều nhất. Gửi thẳng
-       tới /app/tra-cuu — cùng một handler, cùng một luật chặn dò mã. */}}
-  <details class="app-gap" name="app-gap" id="tra-don">
-    <summary>
-      <span class="app-gap-bt">{{template "bt-tim"}}</span>
-      <span class="app-gap-ten">{{nd "app.tra.h2"}}</span>
-      <span class="app-gap-mui">{{template "bt-xuong"}}</span>
-    </summary>
-    <div class="app-gap-than">
-    <p class="nho mo">{{ndd "app.tra.chu"}}</p>
-    <form method="post" action="/app/tra-cuu" id="nha-form">
-      <input type="hidden" name="_csrf" value="{{$.CSRF}}">
-      <div class="app-tra-doi">
-        <label>{{nd "tracuu.ma-nhan"}}
-          <input name="ma" id="nha-ma" placeholder="{{nd "tracuu.ma-goi-y"}}" maxlength="40"
-                 autocomplete="off" autocapitalize="off" spellcheck="false" required>
-        </label>
-        <label>{{nd "tracuu.dt-nhan"}}
-          <input name="dien_thoai" id="nha-dt" inputmode="numeric" maxlength="12"
-                 autocomplete="off" required>
-        </label>
-      </div>
-      <button class="app-nut-to" type="submit">{{nd "tracuu.nut"}}</button>
-    </form>
-    </div>
-  </details>
-
-  <details class="app-gap" name="app-gap" id="lien-he">
-    <summary>
-      <span class="app-gap-bt">{{template "bt-goi"}}</span>
-      <span class="app-gap-ten">{{nd "app.lh.h2"}}</span>
-      <span class="app-gap-mui">{{template "bt-xuong"}}</span>
-    </summary>
-    <div class="app-gap-than">
-    {{if .LienHe.DienThoai}}
-    <a class="app-so" href="tel:{{soGoi .LienHe.DienThoai}}">{{template "bt-goi"}}<span>{{.LienHe.DienThoai}}</span></a>
-    {{end}}
-    <div class="app-lh-hang">
-      {{if .LienHe.Zalo}}<a class="nut nut-vien" href="https://zalo.me/{{.LienHe.Zalo}}">{{nd "app.lh.zalo"}}</a>{{end}}
-      {{if .LienHe.Facebook}}<a class="nut nut-vien" href="{{.LienHe.Facebook}}">Facebook</a>{{end}}
-    </div>
-    <dl class="app-lh-ds">
-      {{if .LienHe.DiaChi}}<dt>{{nd "app.lh.dia-chi"}}</dt><dd>{{.LienHe.DiaChi}}</dd>{{end}}
-      {{if .LienHe.GioLamVic}}<dt>{{nd "app.lh.gio"}}</dt><dd>{{.LienHe.GioLamVic}}</dd>{{end}}
-    </dl>
-    {{/* Chưa điền số lẫn Zalo thì tiêu đề "Gọi cho trạm" thành lời hứa suông.
-         Đừng để khách đứng trước một mục rỗng: chỉ luôn đường gửi ảnh. */}}
-    {{if and (not .LienHe.DienThoai) (not .LienHe.Zalo)}}
-    <p class="app-trong">{{ndd "app.lh.chua-co"}}</p>
-    <div class="app-nut-hang"><a class="nut nut-chinh" href="/app/gui-anh">{{nd "app.lam.nut"}}</a></div>
-    {{end}}
-    </div>
-  </details>
+  </section>
+  {{end}}
 </main>
 
 {{template "thanh-app" .}}
@@ -188,34 +307,115 @@
 // việc ghi để nguyên cho màn tra cứu: chỉ nó mới biết mã ấy có tra ra thật
 // hay không.
 (function () {
-  var the = document.getElementById('nha-luu');
-  var form = document.getElementById('nha-form');
-  if (!the || !form) { return; }
+  var form = document.getElementById('nha-luu');
+  if (!form) { return; }
 
   var luu = null;
   try { luu = JSON.parse(localStorage.getItem('tram-don') || 'null'); } catch (e) { luu = null; }
   if (!luu || !luu.ma) { return; }
 
   document.getElementById('nha-luu-ma').textContent = luu.ma;
-  the.hidden = false;
+  document.getElementById('nha-ma').value = luu.ma;
+  document.getElementById('nha-dt').value = luu.dt || '';
+  form.hidden = false;
 
-  document.getElementById('nha-mo').addEventListener('click', function () {
-    document.getElementById('nha-ma').value = luu.ma;
-    var dt = document.getElementById('nha-dt');
-    dt.value = luu.dt || '';
-    // Thiếu số điện thoại thì đừng gửi đi cho nó trả về "không tìm thấy" —
-    // dừng ngay ở ô còn thiếu.
-    if (dt.value) { form.submit(); return; }
-    // Ô tra đơn giờ nằm trong khối gấp. Chưa mở khối ra mà đã đẩy con trỏ
-    // vào ô thì khách không thấy mình phải gõ gì ở đâu — mở khối trước.
-    var hop = document.getElementById("tra-don");
-    if (hop) { hop.open = true; }
-    dt.focus();
-  });
+  // Thiếu số điện thoại thì gửi đi chỉ tổ nhận về "không tìm thấy" — đưa
+  // khách sang màn tra cứu gõ nốt thay vì báo lỗi.
+  if (!luu.dt) {
+    var nut = document.getElementById('nha-mo');
+    nut.type = 'button';
+    nut.addEventListener('click', function () { location.href = '/app/tra-cuu'; });
+  }
+
   document.getElementById('nha-quen').addEventListener('click', function () {
     try { localStorage.removeItem('tram-don'); } catch (e) {}
-    the.hidden = true;
+    form.hidden = true;
   });
+})();
+</script>
+
+<script nonce="{{$.Nonce}}">
+// Icon nhúc nhích: MỖI NHỊP MỘT Ô, không phải cả tám cùng nhảy.
+//
+// Tám hình cùng động thì mắt không bám được vào đâu, và sau ba giây nó thành
+// thứ gây khó chịu chứ không phải thứ gợi ý bấm. Một ô một lúc thì mắt đi
+// theo được, và mỗi lần nó dừng ở một ô khác là một lần khách đọc thêm được
+// tên một việc trạm làm.
+//
+// Chạy bằng class + animation của CSS chứ không tự nội suy transform bằng JS:
+// trình duyệt đẩy phần này xuống card đồ hoạ, còn JS mỗi nhịp chỉ đụng vào
+// đúng một phần tử. Máy yếu cũng không giật.
+(function () {
+  var luoi = document.getElementById('luoi-viec');
+  if (!luoi) { return; }
+
+  var kieu = luoi.dataset.dong || 'tat';
+  var nhip = (parseInt(luoi.dataset.nhip, 10) || 3) * 1000;
+  if (kieu === 'tat') { return; }
+
+  // Người đã bảo hệ thống là đừng động thì đừng động. Đây không phải hiệu ứng
+  // trang trí thêm — với một số người nó gây chóng mặt thật.
+  var it = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (it && it.matches) { return; }
+
+  var o = [].slice.call(luoi.querySelectorAll('.app-o .app-bt'));
+  if (o.length < 2) { return; }
+
+  var i = -1;
+  var hen = null;
+
+  function keTiep() {
+    if (kieu === 'ngau-nhien') {
+      // Không lặp lại ô vừa động: bốc trúng ô cũ thì trông như đứng im, mà
+      // với 8 ô thì cứ 8 nhịp lại có một lần như thế.
+      var m = i;
+      while (m === i) { m = Math.floor(Math.random() * o.length); }
+      return m;
+    }
+    return (i + 1) % o.length;
+  }
+
+  function nhun() {
+    i = keTiep();
+    var e = o[i];
+    e.classList.remove('dong');
+    void e.offsetWidth; // ép trình duyệt tính lại, để chạy animation lần nữa
+    e.classList.add('dong');
+  }
+
+  // Gỡ lớp ngay khi animation chạy xong, chứ không để nó nằm lại. Không gỡ
+  // thì sau một vòng cả tám icon đều đeo .dong — nhìn thì vẫn đứng yên
+  // (animation hết là transform trả về giá trị thường), nhưng lúc ấy không
+  // còn cách nào biết icon nào đang động, mà :active lại phải tranh với một
+  // animation đã kết thúc. Giữ đúng một icon đeo lớp tại một thời điểm.
+  luoi.addEventListener('animationend', function (s) {
+    if (s.animationName === 'app-bt-nhun') { s.target.classList.remove('dong'); }
+  });
+
+  function chay() {
+    if (hen) { return; }
+    hen = setInterval(nhun, nhip);
+  }
+
+  function ngung() {
+    clearInterval(hen);
+    hen = null;
+  }
+
+  // App mở suốt ngày trên máy khách. Tab ẩn mà vẫn hẹn giờ là ăn pin không
+  // để làm gì — không ai nhìn thấy cái nhúc nhích ấy cả.
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { ngung(); } else { chay(); }
+  });
+
+  // Chạm vào ô nào thì gỡ class ở ô ấy: hiệu ứng chạm dùng transform trên
+  // cùng phần tử, mà animation đang chạy thì transform của :active thua.
+  luoi.addEventListener('pointerdown', function (s) {
+    var e = s.target.closest ? s.target.closest('.app-bt') : null;
+    if (e) { e.classList.remove('dong'); }
+  }, true);
+
+  if (!document.hidden) { chay(); }
 })();
 </script>
 

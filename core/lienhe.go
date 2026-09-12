@@ -73,6 +73,12 @@ var oLienHe = []struct {
 	{"dia_chi", "Địa chỉ trạm", "Số nhà, đường, phường, quận, thành phố — dòng này hiện ngay ở đầu trang chủ", 200, func(l *LienHe) *string { return &l.DiaChi }},
 	{"gio_lam_viec", "Giờ làm việc", "Ví dụ: 8h – 20h, cả thứ Bảy", 120, func(l *LienHe) *string { return &l.GioLamVic }},
 	{"facebook", "Facebook", "Dán nguyên đường dẫn, phải bắt đầu bằng https://", 200, func(l *LienHe) *string { return &l.Facebook }},
+	{"tiktok", "TikTok", "Đường dẫn trang TikTok, ví dụ https://www.tiktok.com/@trampickle", 200, func(l *LienHe) *string { return &l.TikTok }},
+	{"instagram", "Instagram", "Đường dẫn trang Instagram, để trống thì giấu icon này", 200, func(l *LienHe) *string { return &l.Instagram }},
+	{"youtube", "YouTube", "Đường dẫn kênh YouTube, để trống thì giấu icon này", 200, func(l *LienHe) *string { return &l.YouTube }},
+	{"ngan_hang_ma", "Mã ngân hàng (BIN)", "6 số, ví dụ 970436 là Vietcombank — tra ở vietqr.io/danh-sach-ngan-hang", 10, func(l *LienHe) *string { return &l.NganHangMa }},
+	{"so_tai_khoan", "Số tài khoản", "Số tài khoản nhận tiền của trạm", 30, func(l *LienHe) *string { return &l.SoTaiKhoan }},
+	{"chu_tai_khoan", "Chủ tài khoản", "Tên không dấu, viết hoa, đúng như trên sổ", 60, func(l *LienHe) *string { return &l.ChuTaiKhoan }},
 }
 
 // DatLienHe kiểm rồi ghi. Trả về bản đã chuẩn hoá để trang hiện lại đúng thứ
@@ -89,9 +95,12 @@ func DatLienHe(l LienHe) (LienHe, error) {
 		return l, errors.New("email phải có dấu @")
 	}
 	// Thiếu https:// thì trình duyệt hiểu là đường dẫn trong site và dẫn khách
-	// tới trang trắng của chính mình.
-	if l.Facebook != "" && !strings.HasPrefix(l.Facebook, "http://") && !strings.HasPrefix(l.Facebook, "https://") {
-		return l, errors.New("đường dẫn Facebook phải bắt đầu bằng https://")
+	// tới trang trắng của chính mình. Kiểm cả bốn trang mạng xã hội chứ không
+	// riêng Facebook — chúng vào web theo đúng một đường.
+	for _, t := range l.MangXaHoi() {
+		if !strings.HasPrefix(t.URL, "http://") && !strings.HasPrefix(t.URL, "https://") {
+			return l, fmt.Errorf("đường dẫn %s phải bắt đầu bằng https://", t.Ten)
+		}
 	}
 
 	b, err := yaml.Marshal(l)

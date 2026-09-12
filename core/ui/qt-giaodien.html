@@ -1,46 +1,66 @@
 {{define "qt-giaodien.html"}}
 {{template "qt-dau" .}}
 
-<div class="qt-dau-trang"><h1>Giao diện</h1></div>
+<div class="qt-dau-trang"><h1>Bộ mặt site</h1></div>
 
 {{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
 {{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
 
-<p class="mo" style="max-width:62ch">
-  Đổi mặt tiền của web khách. Không đụng đến nội dung, giá, hay đơn hàng: vẫn
-  đúng từng ấy chữ, từng ấy khối, đúng thứ tự đó. Khác nhau ở màu, ở dáng chữ,
-  và ở cách xếp — mỗi bộ dựng lại toàn bộ trang chủ theo một kiểu riêng, từ
-  tấm đầu trang xuống tới chân trang, nên chiều dài trang cũng khác nhau.
-  Bấm chọn rồi lưu, mở web khách ở tab khác để xem.
-</p>
-
-<form method="post" action="/qt/giao-dien" style="max-width:760px;margin-top:22px">
-  <input type="hidden" name="_csrf" value="{{$.CSRF}}">
-  <div class="chon-gd">
-    {{range .DanhSach}}
-    <label class="gd-o{{if eq .Ma $.DangDung}} dang-dung{{end}}">
-      <input type="radio" name="theme" value="{{.Ma}}" {{if eq .Ma $.DangDung}}checked{{end}}>
-      <span class="gd-mau gd-mau-{{.Ma}}"></span>
-      <span class="gd-chu">
-        <b>{{.Ten}}</b>
-        {{if eq .Ma $.DangDung}}<span class="chip chip-nhan">đang dùng</span>{{end}}
-        <span class="nho mo">{{.MoTa}}</span>
-      </span>
-    </label>
-    {{end}}
+<div class="chon-gd" style="max-width:760px;margin-top:18px">
+  <div class="gd-o" style="display:block">
+    <b>Bản đang chạy</b>
+    <p class="nho mo" style="margin:6px 0 12px">
+      Đổi giọng chữ trên trang khách và bật hay tắt lối vào cửa hàng. Không
+      đổi màu, không đổi logo, không đổi bố cục.
+    </p>
+    <form method="post" action="/qt/giao-dien/che-do">
+      <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+      <label style="display:block;margin-bottom:8px">
+        <input type="radio" name="che_do" value="tai_xuong" {{if not .LaOnline}}checked{{end}}>
+        <b>Tại xưởng</b> — khách mang đồ tới tận nơi.
+      </label>
+      <label style="display:block;margin-bottom:12px">
+        <input type="radio" name="che_do" value="online" {{if .LaOnline}}checked{{end}}>
+        <b>Online</b> — khách gửi đồ tới, nhận lại tận nhà. Bật lối vào cửa hàng.
+      </label>
+      {{if .ThieuDiaChi}}
+      <div class="bao bao-loi" style="margin:0 0 12px">
+        Chưa có địa chỉ trạm. Bật Online bây giờ thì khách không biết gửi đồ
+        đi đâu — <a href="/qt/lien-he">điền địa chỉ</a> trước.
+      </div>
+      {{end}}
+      <button type="submit">Lưu</button>
+    </form>
   </div>
-  <div style="display:flex;gap:12px;align-items:center;margin-top:20px;flex-wrap:wrap">
-    <button type="submit">Dùng giao diện này</button>
-    <a class="nho" href="/" target="_blank">Mở trang khách ở tab khác ↗</a>
+
+  <div class="gd-o" style="display:block">
+    <b>Dịch vụ nổi bật</b>
+    <p class="nho mo" style="margin:6px 0 12px">
+      Tô nổi những việc đã tích ở <a href="/qt/dich-vu">Bảng dịch vụ</a>, ngay
+      trong lưới "Trạm làm được gì" ở trang chủ. Không thêm khối mới, không
+      xếp lại thứ tự — việc được tích vẫn đứng đúng chỗ của nó.
+    </p>
+    <form method="post" action="/qt/giao-dien/noi-bat">
+      <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+      <label style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+        <input type="checkbox" name="noi_bat" value="1" {{if .NoiBatBat}}checked{{end}}>
+        <b>Bật khung nổi bật</b>
+      </label>
+      {{if and .NoiBatBat (eq .SoNoiBat 0)}}
+      <p class="nho mo" style="margin:0 0 12px">
+        Đang bật nhưng chưa tích việc nào, nên trang chủ chưa đổi gì.
+        <a href="/qt/dich-vu">Chọn việc muốn nổi bật</a>.
+      </p>
+      {{else if .NoiBatBat}}
+      <p class="nho mo" style="margin:0 0 12px">Đang tô nổi {{.SoNoiBat}} việc.</p>
+      {{end}}
+      <button type="submit">Lưu</button>
+    </form>
   </div>
-</form>
+</div>
 
-<p class="nho mo" style="margin-top:18px;max-width:62ch">
-  Lựa chọn ghi vào <code>data/giao-dien.yaml</code> và có hiệu lực ngay, không
-  cần chạy lại server. Khách đang mở sẵn trang thì phải tải lại mới thấy.
-</p>
+<h2 style="margin-top:26px">Logo và biểu tượng</h2>
 
-<h2 style="margin-top:38px">Logo và biểu tượng tab</h2>
 <p class="mo" style="max-width:62ch">
   Chưa tải gì thì trang dùng logo T-PIC vẽ sẵn trong code — bản đó tự đổi màu
   theo giao diện đang bật. Tải tệp riêng lên thì màu là màu của tệp, giao diện
@@ -54,11 +74,12 @@
     <b>Logo đầu trang</b>
     <p class="nho mo" style="margin:6px 0 12px">
       Hiện cạnh tên trạm, ở cả trang khách lẫn trang quản lý. Cao 34px, nên
-      dùng bản NGANG; bản vuông sẽ bị thu bé xíu.
+      dùng bản NGANG; bản vuông sẽ bị thu bé xíu. Chưa tải gì thì đầu trang
+      dùng khối T-PIC xếp dọc dưới đây.
     </p>
     <div style="background:#0e1417;border-radius:8px;padding:14px 16px;display:flex;align-items:center;min-height:64px">
       {{if .LogoURL}}<img src="{{.LogoURL}}" alt="Logo đang dùng" style="height:34px;width:auto;max-width:240px">
-      {{else}}{{template "logo-dau"}}{{end}}
+      {{else}}{{template "logo-khoi"}}{{end}}
     </div>
     <p class="nho mo" style="margin:10px 0 0">
       {{if .LogoTen}}Đang dùng tệp <code>data/logo/{{.LogoTen}}</code>.

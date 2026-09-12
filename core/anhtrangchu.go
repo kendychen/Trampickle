@@ -171,9 +171,11 @@ func ThemAnhHero(ten, chuThich string) error {
 }
 
 // DatNoiAnhHero chuyển một tấm sang nơi treo khác. Nơi lạ thì coi như trang
-// chủ, để một tham số hỏng không làm ảnh biến mất khỏi cả hai trang.
+// chủ, để một tham số hỏng không làm ảnh biến mất khỏi cả ba trang.
 func DatNoiAnhHero(ten, noi string) error {
-	if noi != NoiTram {
+	switch noi {
+	case NoiTram, NoiApp:
+	default:
 		noi = ""
 	}
 	anhHeroMu.Lock()

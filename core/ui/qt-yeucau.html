@@ -2,16 +2,20 @@
 {{template "qt-dau" .}}
 
 <div class="qt-dau-trang">
-  <h1>Yêu cầu từ web</h1>
-  <div class="phai"><a class="nut nut-vien" href="/qt/don">Danh sách đơn</a></div>
+  <h1>Quản lý đơn</h1>
 </div>
 
-{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{template "qt-tab-don" .}}
 
-<p class="mo" style="max-width:64ch;margin-bottom:20px">
-  Khách điền form ở trang chủ thì rơi vào đây. Tạo đơn là chép sẵn tên, liên hệ,
-  hãng vợt và mô tả sang đơn mới — đỡ gõ lại số điện thoại, mà gõ sai số thì
-  khách không tra cứu được đơn của mình.
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<p class="mo" style="max-width:68ch;margin-bottom:20px">
+  Khách điền form ở trang chủ thì rơi vào đây, đang xem {{.Ky.Ten}}. Nhận khám là
+  chép sẵn tên, liên hệ, email, hãng, mô tả và <b>cả ảnh khách gửi</b> sang đơn mới
+  — đỡ gõ lại số điện thoại, mà gõ sai số thì khách không tra cứu được đơn của mình.
+  Đơn mở ra ở trạng thái <b>Đang khám qua ảnh</b>: vợt vẫn ở nhà khách, thợ mới chỉ
+  soi ảnh để báo giá.
 </p>
 
 {{if .YeuCau}}
@@ -55,8 +59,18 @@
         {{else if .DaXuLy}}
           <span class="chip chip-trung">Đã bỏ qua</span>
         {{else}}
+          {{/* Hai nút chứ không một: ô "hãng" ngoài web dùng chung cho cả vợt
+               lẫn giày, nên chỉ người đọc mô tả mới biết đây là món gì. Đoán
+               hộ rồi đoán sai thì đơn nằm nhầm loại, mã đơn cũng sai tiền tố
+               và không sửa lại được. */}}
           <form method="post" action="/qt/yeu-cau/{{.Ma}}/tao-don">
-            <input type="hidden" name="_csrf" value="{{$.CSRF}}"><button type="submit">Tạo đơn</button></form>
+            <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+            <input type="hidden" name="loai" value="vot">
+            <button type="submit">Nhận khám → Đơn vợt</button></form>
+          <form method="post" action="/qt/yeu-cau/{{.Ma}}/tao-don">
+            <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+            <input type="hidden" name="loai" value="giay">
+            <button type="submit" class="nut-phu">Nhận khám → Đơn giày</button></form>
           <form method="post" action="/qt/yeu-cau/{{.Ma}}/bo-qua">
             <input type="hidden" name="_csrf" value="{{$.CSRF}}"><button type="submit" class="nut-phu">Bỏ qua</button></form>
         {{end}}
@@ -67,8 +81,9 @@
 </div>
 {{else}}
 <div class="the trong">
-  <b>Chưa có yêu cầu nào</b>
+  <b>Chưa có yêu cầu nào trong {{.Ky.Ten}}</b>
   Khi khách điền form ở trang chủ, tin nhắn sẽ hiện tại đây.
+  {{if not .Ky.KhongGioiHan}}<div style="margin-top:16px"><a class="nut nut-vien" href="/qt/yeu-cau">Xem từ trước tới nay</a></div>{{end}}
 </div>
 {{end}}
 

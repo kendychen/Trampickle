@@ -5,38 +5,77 @@
   <div class="khung">
     <a href="/dich-vu" class="nhan-nho" style="text-decoration:none">{{nd "dichvumot.quay-lai"}}</a>
     <h1 style="margin-top:16px">{{.DV.Ten}}</h1>
-    <div style="display:flex;gap:12px;align-items:center;margin-top:18px;flex-wrap:wrap">
-      <span class="chip chip-trung">{{nhom .DV.Nhom}}</span>
-    </div>
+    {{/* Con số đứng ngay dưới tên. Ô ngoài lưới đã in giá rồi, vào tới đây mà
+         không thấy lại nó thì khách tưởng mình bấm nhầm việc. */}}
+    {{with giaKhach .DV}}<div class="dv-mot-gia">{{.}}</div>{{end}}
     {{if .DV.DieuKien}}
     <div class="bao bao-luu" style="margin:22px 0 0;max-width:60ch">{{nd "dichvumot.dieu-kien"}} {{.DV.DieuKien}}</div>
     {{end}}
   </div>
 </section>
 
+{{/* Ba ô phải cùng một hình dạng thì mới đọc ra là một dải: con số ở cỡ
+     lớn, đơn vị ở cỡ nhỏ dính ngay sau, mọi chữ còn lại xuống dòng chú thích.
+     Trước đây ô 3 in nguyên chuỗi "10–15 g tùy vợt" ở cỡ 36px mono nên nó dài
+     gấp ba hai ô kia và tụt hàng. Khoá chung.can.muc còn dùng ở bốn trang
+     khác nên không xẻ thành ba khoá được — xẻ lúc dựng bằng tachSo. */}}
 <section class="bang-so">
   <div class="khung">
     <div class="bang-so-luoi">
       <div>
         <span class="n">{{nd "dichvumot.so.1-n"}}</span>
-        <span class="v">{{if .DV.LeadTimeNgay}}{{.DV.LeadTimeNgay}}{{else}}—{{end}}</span>
-        <span class="t">{{nd "dichvumot.so.1-t"}}</span>
+        <span class="v">{{if .DV.LeadSo}}{{.DV.LeadSo}}<i>{{nd "dichvumot.so.1-dv"}}</i>{{else}}—{{end}}</span>
+        {{if .DV.LeadSo}}<span class="t">{{nd "dichvumot.so.1-t"}}</span>{{end}}
       </div>
       <div>
         <span class="n">{{nd "dichvumot.so.2-n"}}</span>
-        <span class="v">{{if .DV.BaoHanhThang}}{{.DV.BaoHanhThang}}{{else}}—{{end}}</span>
-        <span class="t">{{nd "dichvumot.so.2-t"}}</span>
+        <span class="v">{{if .DV.BaoHanhThang}}{{.DV.BaoHanhThang}}<i>{{nd "dichvumot.so.2-dv"}}</i>{{else}}—{{end}}</span>
+        {{/* Không có số thì bỏ luôn câu "tính từ ngày giao vợt": nó đang chú
+             thích cho một dấu gạch ngang. */}}
+        {{if .DV.BaoHanhThang}}<span class="t">{{nd "dichvumot.so.2-t"}}</span>{{end}}
       </div>
+      {{with tachSo (nd "chung.can.muc")}}
       <div>
         <span class="n">{{nd "dichvumot.so.3-n"}}</span>
-        <span class="v">{{nd "chung.can.muc"}}</span>
-        <span class="t">{{nd "dichvumot.so.3-t"}}</span>
+        <span class="v">{{.So}}{{with .DonVi}}<i>{{.}}</i>{{end}}</span>
+        <span class="t">{{with .Duoi}}{{.}}, {{end}}{{nd "dichvumot.so.3-t"}}</span>
       </div>
+      {{end}}
     </div>
   </div>
 </section>
 
+{{/* Bài của việc này: vì sao hỏng, tự kiểm tra thế nào, làm gì cho đỡ bị.
+     Chữ nằm ở data/dich-vu-bai/<MA>.md, sửa ở /qt/dich-vu/<MA>/bai. Việc
+     nào chưa có bài thì cả khối biến mất và trang về đúng bản cũ.
+     Dùng lại đúng bộ khung của trang bài viết (khung doi-cot > article.bai)
+     để ăn theo luật hai cột trong css.html — xem chỗ :has(> .bai). */}}
+{{if .Than}}
 <section>
+  <div class="khung doi-cot">
+    <article class="bai">{{.Than}}</article>
+    <div class="canh">
+      <div class="the">
+        <h3>{{nd "dichvumot.gui.h3"}}</h3>
+        <p class="nho mo" style="margin-top:8px">{{ndd "dichvumot.gui.chu"}}</p>
+        <p style="margin-top:14px"><a class="nut nut-chinh" href="/#gui-yeu-cau">{{nd "chung.nut.gui-anh"}}</a></p>
+        <p style="margin-top:10px"><a class="nut nut-vien" href="/quy-trinh">{{nd "dichvumot.gui.nut-2"}}</a></p>
+      </div>
+      {{/* Danh sách việc khác đứng ngay dưới thẻ gửi vợt, không tụt xuống đáy
+           trang nữa: người đọc xong bài thì lối đi tiếp phải nằm trong tầm mắt,
+           chứ không bắt cuộn thêm một màn hình. */}}
+      {{template "dv-khac-doc" .}}
+    </div>
+  </div>
+</section>
+{{end}}
+
+{{/* Quy trình bên trái, việc khác bên phải, trong cùng một khối hai cột.
+     Trước đây hai thứ này là hai mục chồng nhau: quy trình bỏ trống hẳn cột
+     phải, còn lưới việc khác nằm dưới cùng ở dạng ô lớn ba cột — vừa thừa
+     chỗ vừa kéo trang dài thêm một màn hình. Ghép lại thì cột phải có việc
+     làm, và người đọc xong bài có ngay lối đi tiếp ngay tầm mắt. */}}
+<section{{if .Than}} class="nen2"{{end}}>
   <div class="khung doi-cot">
     <div>
       <div class="nhan-nho nhan-vach">{{nd "dichvumot.qt.nhan"}}</div>
@@ -48,48 +87,50 @@
         <li>{{ndx "dichvumot.qt.b4" "ten" .DV.Ten}}</li>
         <li>{{ndd "dichvumot.qt.b5"}}</li>
       </ol>
-    </div>
 
-    <div class="canh">
-      <div class="the">
-        <h3>{{nd "dichvumot.gui.h3"}}</h3>
-        <p class="nho mo" style="margin-top:8px">{{ndd "dichvumot.gui.chu"}}</p>
-        <p style="margin-top:14px"><a class="nut nut-chinh" href="/#gui-yeu-cau">{{nd "chung.nut.gui-anh"}}</a></p>
-        <p style="margin-top:10px"><a class="nut nut-vien" href="/quy-trinh">{{nd "dichvumot.gui.nut-2"}}</a></p>
+      {{/* Việc đã có bài thì thẻ gửi ảnh đứng cạnh bài ở khối trên rồi. Việc
+           chưa có bài thì đây vẫn là chỗ duy nhất có nút — để dưới quy trình
+           chứ không sang cột phải nữa, cột phải đã là danh sách việc. */}}
+      {{if not .Than}}
+      <div class="hero-nut" style="margin-top:26px">
+        <a class="nut nut-chinh" href="/#gui-yeu-cau">{{nd "chung.nut.gui-anh"}}</a>
+        <a class="nut nut-vien" href="/quy-trinh">{{nd "dichvumot.gui.nut-2"}}</a>
       </div>
+      {{end}}
     </div>
-  </div>
-</section>
 
-<section class="nen2">
-  <div class="khung doc-lon">
-    <div>
-      <div class="nhan-nho nhan-vach">{{nd "dichvumot.khac.nhan"}}</div>
-    </div>
-    <div class="luoi-vach">
-      {{range .Khac}}{{if ne .Ma $.DV.Ma}}
-      <a class="dv-the" href="/dich-vu/{{.Ma}}">
-        <div class="bt-o">{{template "bt-dich-vu" .Ma}}</div>
-        <div class="dau-the"><h3>{{.Ten}}</h3></div>
-        <span class="chip chip-trung">{{nhom .Nhom}}</span>
-      </a>
-      {{end}}{{end}}
-
-      {{/* Hai ô cuối không phải dịch vụ. Lưới xếp ba cột, mà bỏ dịch vụ đang
-           xem ra thì còn bốn ô — thêm hai ô này cho đủ hai hàng. */}}
-      <a class="dv-the" href="/#gui-yeu-cau">
-        <div class="bt-o">{{template "bt-hoi"}}</div>
-        <div class="dau-the"><h3>{{nd "dichvu.hoi.h3"}}</h3></div>
-        <span class="chip chip-trung">{{nd "dichvu.hoi.chip"}}</span>
-      </a>
-      <a class="dv-the" href="/dich-vu">
-        <div class="bt-o">{{template "bt-lop"}}</div>
-        <div class="dau-the"><h3>{{nd "dichvumot.tatca.h3"}}</h3></div>
-        <span class="chip chip-trung">{{nd "dichvumot.tatca.chip"}}</span>
-      </a>
-    </div>
+    {{/* Việc chưa có bài thì khối trên không tồn tại, danh sách việc khác về
+         lại chỗ này cho cột phải có thứ để đựng. */}}
+    {{if not .Than}}<div class="canh">{{template "dv-khac-doc" .}}</div>{{end}}
   </div>
 </section>
 
 {{template "html-chan" .}}
+{{end}}
+
+{{/* Danh sách việc khác, dạng cột dọc. Hai chỗ gọi nó — cột phải của khối bài
+     và cột phải của khối quy trình — nhưng không bao giờ cùng lúc: có bài thì
+     nằm trên, không có bài thì nằm dưới. Nhận nguyên gốc dữ liệu trang, nên
+     $.DV.Ma trong này vẫn là việc đang mở. */}}
+{{define "dv-khac-doc"}}
+      <div class="dv-doc">
+        <div class="nhan-nho nhan-vach" style="margin-bottom:4px">{{nd "dichvumot.khac.nhan"}}</div>
+        {{range .Khac}}{{if ne .Ma $.DV.Ma}}
+        <a href="/dich-vu/{{.Ma}}">
+          <span class="bt-o">{{template "bt-dv-mau" .Ma}}</span>
+          <span class="ten">{{.Ten}}</span>
+          {{with giaKhach .}}<span class="gia">{{.}}</span>{{end}}
+        </a>
+        {{end}}{{end}}
+        <a href="/dich-vu" class="het">
+          <span class="bt-o">{{template "btm-vot"}}</span>
+          <span class="ten">{{nd "dichvumot.tatca.h3"}}</span>
+          <span class="gia">{{nd "dichvumot.tatca.chip"}}</span>
+        </a>
+        <a href="/#gui-yeu-cau" class="het">
+          <span class="bt-o">{{template "btm-hoi"}}</span>
+          <span class="ten">{{nd "dichvu.hoi.h3"}}</span>
+          <span class="gia">{{nd "dichvu.hoi.chip"}}</span>
+        </a>
+      </div>
 {{end}}

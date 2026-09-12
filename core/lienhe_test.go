@@ -70,6 +70,9 @@ func TestDatLienHeChanSaiSot(t *testing.T) {
 	}{
 		{"email không có @", LienHe{Email: "kendy.gmail.com"}},
 		{"facebook thiếu https", LienHe{Facebook: "fb.com/trampickle"}},
+		{"tiktok thiếu https", LienHe{TikTok: "tiktok.com/@trampickle"}},
+		{"instagram thiếu https", LienHe{Instagram: "instagram.com/trampickle"}},
+		{"youtube thiếu https", LienHe{YouTube: "youtube.com/@trampickle"}},
 		{"địa chỉ dài quá", LienHe{DiaChi: strings.Repeat("x", 201)}},
 	}
 	for _, c := range xau {
@@ -174,5 +177,65 @@ func TestAnhTreoDungNoi(t *testing.T) {
 	}
 	if ds := DsAnhNoi(NoiTram); len(ds) != 1 || ds[0].Ten != "b.webp" {
 		t.Fatalf("dải ảnh trạm sai: %v", ds)
+	}
+}
+
+// --- Mạng xã hội -----------------------------------------------------------
+
+// Thứ tự hàng icon KHÔNG theo thứ tự điền: chân trang và bảng hiệu app phải
+// giống nhau mọi lúc, người ta nhớ vị trí chứ không đọc lại từng cái.
+func TestMangXaHoiChiTraCaiDaDien(t *testing.T) {
+	l := LienHe{YouTube: "https://youtube.com/@t", Facebook: "https://fb.com/t"}
+	got := l.MangXaHoi()
+	if len(got) != 2 {
+		t.Fatalf("điền 2 mà ra %d", len(got))
+	}
+	if got[0].Ma != "facebook" || got[1].Ma != "youtube" {
+		t.Fatalf("sai thứ tự: %v", got)
+	}
+	if len((LienHe{}).MangXaHoi()) != 0 {
+		t.Error("không điền gì mà vẫn có trang")
+	}
+}
+
+// Chỉ có mạng xã hội, không điện thoại không địa chỉ, thì chân trang vẫn phải
+// hiện chứ không rơi vào nhánh "Đang cập nhật".
+func TestCoGiKhongTinhCaMangXaHoi(t *testing.T) {
+	if !(LienHe{TikTok: "https://tiktok.com/@t"}).CoGiKhong() {
+		t.Error("có TikTok mà bảo là chưa có gì")
+	}
+	if (LienHe{}).CoGiKhong() {
+		t.Error("rỗng mà bảo là có")
+	}
+}
+
+// Ba khoá mới phải đi trọn đường: form /qt/lien-he → đĩa → trang /lien-he.
+func TestMangXaHoiTuFormRaTrang(t *testing.T) {
+	mux, ck := dungTrangThu(t, "chu")
+	dungLienHeTrong(t)
+
+	f := url.Values{
+		"facebook":  {"https://facebook.com/trampickle"},
+		"tiktok":    {"https://www.tiktok.com/@trampickle"},
+		"instagram": {"https://instagram.com/trampickle"},
+		"youtube":   {"https://youtube.com/@trampickle"},
+	}
+	r := httptest.NewRequest("POST", "/qt/lien-he", strings.NewReader(f.Encode()))
+	r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	r.AddCookie(ck)
+	w := httptest.NewRecorder()
+	mux.ServeHTTP(w, r)
+	if w.Code != http.StatusOK {
+		t.Fatalf("POST trả %d", w.Code)
+	}
+	if n := len(LienHeHienTai().MangXaHoi()); n != 4 {
+		t.Fatalf("lưu 4 trang mà còn %d", n)
+	}
+
+	than := moTrang(t, mux, ck, "/lien-he")
+	for _, u := range []string{"https://www.tiktok.com/@trampickle", "https://instagram.com/trampickle", "https://youtube.com/@trampickle"} {
+		if !strings.Contains(than, u) {
+			t.Errorf("/lien-he thiếu %s", u)
+		}
 	}
 }

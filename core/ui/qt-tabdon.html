@@ -1,0 +1,41 @@
+{{/* Dải tab + thanh chọn kỳ, dùng chung cho bốn trang của khu Quản lý đơn.
+
+     Bốn trang vẫn giữ bốn đường dẫn cũ (/qt/don-vot, /qt/don-giay,
+     /qt/yeu-cau, /qt/thong-ke) — lối tắt PWA và mail đã gửi còn trỏ vào đó.
+     Cái gộp lại là DẢI MENU bên trái và cảm giác khi dùng, không phải URL.
+
+     Mẫu này chỉ đụng tới mấy trường có mặt ở CẢ BỐN trang: .Trang, .Ky,
+     .GiuLai, .SoYeuCauMoi, .NguoiDung — xem dlDon trong core/quantri.go.
+     Thêm trường riêng của một trang vào đây là ba trang kia vỡ. */}}
+{{define "qt-tab-don"}}
+<div class="tab-don">
+  <nav class="tab-day">
+    <a href="/qt/don-vot?{{.Ky.Q}}" {{if eq .Trang "don-vot"}}class="day"{{end}}>Đơn vợt</a>
+    <a href="/qt/don-giay?{{.Ky.Q}}" {{if eq .Trang "don-giay"}}class="day"{{end}}>Đơn giày</a>
+    <a href="/qt/yeu-cau?{{.Ky.Q}}" {{if eq .Trang "yeu-cau"}}class="day"{{end}}>Yêu cầu web{{if .SoYeuCauMoi}} <span class="dem">{{.SoYeuCauMoi}}</span>{{end}}</a>
+    {{/* Thợ không thấy tab này. Doanh thu là chuyện của chủ — xem ghi chú
+         đầu core/quantri.go. Đường /qt/thong-ke cũng chặn ở tầng route, giấu
+         cái tab chỉ là để đỡ mời người ta bấm vào chỗ sẽ bị đuổi ra. */}}
+    {{if .NguoiDung.LaChu}}
+    <a href="/qt/thong-ke?{{.Ky.Q}}" {{if eq .Trang "thong-ke"}}class="day"{{end}}>Thống kê</a>
+    {{end}}
+  </nav>
+
+  {{/* Một ô ngày cho cả ba kiểu kỳ: chọn "tháng" rồi trỏ vào ngày nào trong
+       tháng cũng ra cả tháng ấy (DocKy tự cắt bớt). Đổi kiểu ô theo lựa chọn
+       thì phải có JS, mà thanh lọc hỏng vì JS là thanh lọc vô dụng. */}}
+  <form method="get" action="{{.Duong}}" class="loc-ky">
+    {{range .GiuLai}}<input type="hidden" name="{{.Ten}}" value="{{.Gia}}">{{end}}
+    <label class="nhan-nho">Xem theo</label>
+    <select name="ky" aria-label="Kỳ xem">
+      <option value="ngay" {{if eq .Ky.Kieu "ngay"}}selected{{end}}>Ngày</option>
+      <option value="thang" {{if eq .Ky.Kieu "thang"}}selected{{end}}>Tháng</option>
+      <option value="nam" {{if eq .Ky.Kieu "nam"}}selected{{end}}>Năm</option>
+      <option value="" {{if eq .Ky.Kieu ""}}selected{{end}}>Từ trước tới nay</option>
+    </select>
+    <input type="date" name="moc" value="{{.Ky.MocNgay}}" aria-label="Mốc thời gian">
+    <button type="submit">Xem</button>
+    <span class="ky-ten">đang xem: <b>{{.Ky.Ten}}</b></span>
+  </form>
+</div>
+{{end}}

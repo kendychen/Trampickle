@@ -552,6 +552,39 @@ func PhieuXuatCuaDon(maDon string) (*Phieu, bool) {
 	return nil, false
 }
 
+// GiaVonDon — ước tính tiền vật tư đã dùng cho một đơn, theo GIÁ NHẬP GẦN
+// NHẤT của từng loại.
+//
+// Chỗ này cố tình KHÔNG phải kế toán kho. Phiếu xuất không mang đơn giá (xem
+// chú thích trên DongPhieu.DonGia) vì sổ tiền đếm theo tiền mặt: tiền ra lúc
+// mua, không phải lúc dùng. Luật ấy giữ nguyên. Con số ở đây chỉ để so sánh
+// giữa các dịch vụ và các kỳ — nhìn xem việc nào ăn vật tư nhiều — nên lấy
+// giá nhập gần nhất là đủ, và trang thống kê phải nói rõ đây là ước tính.
+//
+// Cộng MỌI phiếu xuất mang mã đơn này, không chỉ phiếu đầu tiên: đơn làm dở
+// rồi phải bù thêm vật tư thì thợ lập phiếu thứ hai.
+func GiaVonDon(maDon string) int {
+	if maDon == "" {
+		return 0
+	}
+	// Gom số lượng trước rồi mới tra giá: GiaNhapGanNhat quét lại toàn bộ
+	// phiếu mỗi lần gọi, một đơn mười dòng cùng loại vật tư thì quét mười lần.
+	so := map[string]float64{}
+	for _, p := range phieuTheoThuTu() {
+		if p.Loai != PhieuXuat || p.MaDon != maDon {
+			continue
+		}
+		for _, d := range p.Dong {
+			so[d.MaVatTu] += d.SoLuong
+		}
+	}
+	tong := 0.0
+	for ma, sl := range so {
+		tong += sl * float64(GiaNhapGanNhat(ma))
+	}
+	return int(math.Round(tong))
+}
+
 // DeXuatXuatChoDon dựng sẵn các dòng theo định mức của những dịch vụ đã chốt
 // trong đơn. Dòng tiền gõ tay không có mã dịch vụ nên không có định mức —
 // thợ tự thêm. Cộng dồn khi hai dịch vụ cùng ăn một loại vật tư.

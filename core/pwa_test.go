@@ -170,21 +170,13 @@ func TestLoiMoiCaiCoOTrangWeb(t *testing.T) {
 	}
 }
 
-// Giao diện đổi ở /qt/giao-dien thì màu app đổi theo. Không thì mở app ra
-// thấy một thanh trạng thái màu lạ không liên quan gì tới web.
-func TestMauAppTheoGiaoDien(t *testing.T) {
-	for _, ma := range []string{"tim", "la", "cam"} {
-		nen, nhan := mauCuaTheme(ma)
-		if nen == "" || nhan == "" || nen == nhan {
-			t.Errorf("giao diện %q chưa khai đủ cặp màu", ma)
-		}
+// Màu app phải là màu thật, không phải chuỗi rỗng: thiếu nó thì thanh trạng
+// thái điện thoại tô đen, nhìn như app hỏng.
+func TestMauApp(t *testing.T) {
+	if mauNenApp == "" || mauNhanApp == "" || mauNenApp == mauNhanApp {
+		t.Error("thiếu cặp màu app")
 	}
-	for _, th := range ThemeCo {
-		if _, co := mauTheme[th.Ma]; !co {
-			t.Errorf("giao diện %q có trong ThemeCo mà thiếu màu trong mauTheme", th.Ma)
-		}
-	}
-	if nen, nhan := mauCuaTheme("khong-co-that"); nen == "" || nhan == "" {
-		t.Error("giao diện lạ phải rơi về cặp mặc định chứ không trả rỗng")
+	if mauNhanTheme() != mauNhanApp {
+		t.Error("mauNhanTheme không trả màu nhấn")
 	}
 }

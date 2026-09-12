@@ -3,6 +3,7 @@ package core
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -39,7 +40,7 @@ func TestNapLogoVaXoa(t *testing.T) {
 	if logoURL() != "" {
 		t.Errorf("chưa tải gì mà logoURL() = %q", logoURL())
 	}
-	if iconURL() != "/favicon.svg" || iconMIME() != "image/svg+xml" {
+	if !strings.HasPrefix(iconURL(), "/favicon.svg?v=") || iconMIME() != "image/svg+xml" {
 		t.Errorf("favicon mặc định sai: %q %q", iconURL(), iconMIME())
 	}
 
@@ -74,7 +75,7 @@ func TestNapLogoVaXoa(t *testing.T) {
 	if err := NapLogo(); err != nil {
 		t.Fatal(err)
 	}
-	if iconURL() != "/favicon.svg" {
+	if !strings.HasPrefix(iconURL(), "/favicon.svg?v=") {
 		t.Errorf("bỏ tệp rồi mà iconURL() = %q", iconURL())
 	}
 }

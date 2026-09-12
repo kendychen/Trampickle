@@ -20,6 +20,8 @@ func hQtVot(w http.ResponseWriter, r *http.Request) {
 		Kho     *KhoVot
 		Bang    []HangVot
 		ChiTiet map[string]ChiTietDong
+		DoiCT   map[string]CheTaoJS
+		LoiVot  map[string]LoiJS
 		SoCay   int
 		DuTin   bool
 	}
@@ -32,5 +34,7 @@ func hQtVot(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	d.Kho, d.Bang, d.ChiTiet, d.SoCay, d.DuTin = k, k.BangVot(), k.ChiTiet(), k.SoCay(), k.DuTin()
+	d.DoiCT = k.CheTaoJSON()
+	d.LoiVot = k.LoiJSON()
 	render(w, "qt-vot.html", d)
 }

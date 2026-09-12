@@ -1,0 +1,232 @@
+{{/* App QUẢN LÝ trên điện thoại — bản của Kendy và thợ, khác hẳn app khách.
+
+     Ba mảnh, đều chỉ có ở trang /qt:
+       pwa-dau-qt   thẻ khai app, nhét vào <head> của vỏ quản trị
+       qt-thanh     thanh bốn nút dưới đáy, chỉ hiện ở màn hình hẹp
+       pwa-chan-qt  đăng ký service worker, nút cài, và nút ☰ mở menu
+
+     Manifest riêng ở /qt/manifest.webmanifest chứ không dùng chung với app
+     khách: xem hManifestQt trong core/pwa.go để biết vì sao id phải khác. */}}
+{{define "pwa-dau-qt"}}
+<link rel="manifest" href="/qt/manifest.webmanifest">
+<meta name="theme-color" content="{{mauNhanQt}}">
+{{/* iOS bỏ qua manifest hoàn toàn. Ba thẻ này là cách duy nhất bảo Safari mở
+     toàn màn hình và lấy đúng tên khi Kendy tự thêm vào màn hình chính. */}}
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Quản lý">
+{{/* PNG chứ không phải SVG: xem hIconQtPNG trong core/pwa.go. */}}
+<link rel="apple-touch-icon" href="{{iconQtPNG}}">
+{{end}}
+
+
+{{/* Thanh đáy: bốn việc mở nhiều nhất trong ngày. Bốn chứ không sáu — ô thứ
+     năm trở đi hẹp hơn ngón tay cái, và thứ gì không nằm ở đây thì vẫn nằm
+     trong menu ☰.
+
+     Chủ trạm và thợ khác nhau đúng ô cuối: chủ hay mở Sổ tiền, còn thợ không
+     có quyền vào đó nên đưa vào Kho vật tư — thứ thợ đụng tới hàng ngày. */}}
+{{define "qt-thanh"}}
+<nav class="qt-thanh" aria-label="Thanh quản lý">
+  <a href="/qt/don-vot"{{if eq .Trang "don-vot"}} class="dang"{{end}}>{{template "bt-vot"}}<span>Đơn vợt</span></a>
+  <a href="/qt/don-giay"{{if eq .Trang "don-giay"}} class="dang"{{end}}>{{template "bt-giay"}}<span>Đơn giày</span></a>
+  <a href="/qt/don-moi"{{if eq .Trang "don-moi"}} class="dang"{{end}}>{{template "bt-them"}}<span>Tạo đơn</span></a>
+  {{if .NguoiDung.LaChu}}
+  <a href="/qt/tien"{{if batdau .Trang "tien"}} class="dang"{{end}}>{{template "bt-tien"}}<span>Sổ tiền</span></a>
+  {{else}}
+  <a href="/qt/kho"{{if batdau .Trang "kho"}} class="dang"{{end}}>{{template "bt-kho"}}<span>Kho</span></a>
+  {{end}}
+</nav>
+{{end}}
+
+
+{{define "pwa-chan-qt"}}
+<script nonce="{{$.Nonce}}">
+(function () {
+  // --- Menu kéo ra từ cạnh trái -------------------------------------------
+  // Ở màn hình rộng cột menu vẫn nằm cố định bên trái như cũ; CSS lo phần ấy.
+  // Đoạn này chỉ có việc ở màn hẹp: đóng/mở, và đóng lại khi bấm ra ngoài.
+  var nut = document.getElementById('qt-menu');
+  var nen = document.getElementById('qt-nen');
+  var than = document.body;
+
+  function dongMenu() {
+    than.classList.remove('qt-mo');
+    if (nut) { nut.setAttribute('aria-expanded', 'false'); }
+    if (nen) { nen.hidden = true; }
+  }
+  function moMenu() {
+    than.classList.add('qt-mo');
+    if (nut) { nut.setAttribute('aria-expanded', 'true'); }
+    if (nen) { nen.hidden = false; }
+  }
+  if (nut) {
+    nut.addEventListener('click', function () {
+      if (than.classList.contains('qt-mo')) { dongMenu(); } else { moMenu(); }
+    });
+  }
+  if (nen) { nen.addEventListener('click', dongMenu); }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { dongMenu(); }
+  });
+  // Bấm một mục trong menu là sang trang khác, nhưng trang mới mất một nhịp
+  // mới về. Đóng ngay cho thấy là đã ăn cú bấm.
+  var canh = document.getElementById('qt-canh');
+  if (canh) {
+    canh.addEventListener('click', function (e) {
+      if (e.target.closest && e.target.closest('a')) { dongMenu(); }
+    });
+  }
+
+  // --- Service worker ------------------------------------------------------
+  // Cùng một /sw.js với bản khách — phạm vi của nó là "/" nên đã phủ cả /qt.
+  // Nó KHÔNG cache trang quản lý (xem boQua trong core/pwa.go); đăng ký ở đây
+  // chỉ để hai việc: máy chịu mời cài app, và mất mạng thì có tấm /qt/mat-mang
+  // tử tế thay cho màn khủng long.
+  //
+  // Chỉ chạy trên https:// và localhost. Chỗ khác trình duyệt không có
+  // navigator.serviceWorker, nhánh này im lặng bỏ qua.
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('/sw.js').catch(function () {});
+    });
+  }
+
+  // --- Nút cài -------------------------------------------------------------
+  // Khác app khách: KHÔNG bật hộp thoại chặn giữa màn hình. Kendy đang mở
+  // trang quản lý là đang làm việc, không phải đang được mời chào. Nút nằm im
+  // dưới đáy menu, bao giờ muốn thì bấm.
+  var nutCai = document.getElementById('qt-cai');
+  var loiMoi = null;
+
+  function trongApp() {
+    var m = window.matchMedia;
+    if (m && (m('(display-mode: standalone)').matches ||
+              m('(display-mode: fullscreen)').matches ||
+              m('(display-mode: minimal-ui)').matches)) { return true; }
+    return window.navigator.standalone === true;
+  }
+  if (!nutCai || trongApp()) { return; }
+
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    loiMoi = e;
+    nutCai.hidden = false;
+  });
+  window.addEventListener('appinstalled', function () { nutCai.hidden = true; });
+
+  nutCai.addEventListener('click', function () {
+    if (!loiMoi) { return; }
+    var p;
+    try { p = loiMoi.prompt(); } catch (e) { return; }
+    if (!p || !p.then) { return; }
+    p.then(function () { return loiMoi.userChoice; })
+     .then(function () { loiMoi = null; nutCai.hidden = true; })
+     .catch(function () {});
+  });
+
+  // iPhone: Safari không có API cài, tra lại tháng 9/2026 vẫn thế. Không gọi
+  // được hộp thoại thì đừng để một cái nút bấm vào không ra gì — đổi thành
+  // dòng chỉ đường, và tắt luôn khả năng bấm.
+  var ua = navigator.userAgent || '';
+  var laIOS = /iPad|iPhone|iPod/.test(ua) ||
+              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (laIOS) {
+    nutCai.textContent = 'Cài: bấm Chia sẻ → Thêm vào Màn hình chính';
+    nutCai.classList.add('qt-cai-chu');
+    nutCai.disabled = true;
+    nutCai.hidden = false;
+  }
+})();
+
+// --- Nút bật thông báo trên máy này ---------------------------------------
+// IIFE riêng: khối trên có "return" khi đang chạy trong app đã cài, mà đúng
+// lúc đó mới là lúc cần bật thông báo nhất.
+(function () {
+  var nut = document.getElementById('qt-bao');
+  if (!nut) { return; }
+  // Safari tab thường không có PushManager. Để nút nằm đó bấm không ra gì thì
+  // tệ hơn là không có nút: cứ ẩn, người dùng không mất gì.
+  if (!('serviceWorker' in navigator) || !('PushManager' in window) ||
+      !('Notification' in window)) { return; }
+
+  var CSRF = {{$.CSRF}};
+  var dangKy = null;   // subscription của máy này, null = chưa bật
+  var dangLam = false;
+
+  function chu() {
+    nut.textContent = dangKy ? 'Tắt thông báo trên máy này'
+                             : 'Bật thông báo trên máy này';
+  }
+  // Khóa VAPID về dạng base64url, nhưng subscribe() chỉ nhận byte thô.
+  function b64ThanhByte(s) {
+    var d = (s + '===').slice(0, s.length + ((4 - s.length % 4) % 4));
+    d = d.replace(/-/g, '+').replace(/_/g, '/');
+    var tho = atob(d), u = new Uint8Array(tho.length);
+    for (var i = 0; i < tho.length; i++) { u[i] = tho.charCodeAt(i); }
+    return u;
+  }
+  function goi(duong, than) {
+    return fetch(duong, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': CSRF },
+      body: JSON.stringify(than)
+    }).then(function (r) {
+      if (!r.ok) { return r.text().then(function (t) { throw new Error(t || ('máy chủ trả ' + r.status)); }); }
+    });
+  }
+
+  navigator.serviceWorker.ready.then(function (reg) {
+    return reg.pushManager.getSubscription();
+  }).then(function (s) {
+    dangKy = s || null;
+    chu();
+    nut.hidden = false;
+  }).catch(function () {});
+
+  function bat() {
+    return Notification.requestPermission().then(function (q) {
+      if (q !== 'granted') { throw new Error('máy này chưa cho phép hiện thông báo'); }
+      return fetch('/qt/push/khoa').then(function (r) { return r.json(); });
+    }).then(function (j) {
+      if (!j || !j.khoa) { throw new Error('máy chủ chưa có khóa'); }
+      return navigator.serviceWorker.ready.then(function (reg) {
+        return reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: b64ThanhByte(j.khoa)
+        });
+      });
+    }).then(function (s) {
+      var j = s.toJSON();
+      // Máy chủ không nhận được thì bỏ luôn subscription vừa xin: giữ lại chỉ
+      // tạo ra một máy tưởng là đã bật mà mãi không có tin nào tới.
+      return goi('/qt/push/dang-ky', { endpoint: j.endpoint, keys: j.keys })
+        .then(function () { dangKy = s; })
+        .catch(function (e) {
+          return s.unsubscribe().catch(function () {}).then(function () { throw e; });
+        });
+    });
+  }
+
+  function tat() {
+    var s = dangKy;
+    return goi('/qt/push/bo', { endpoint: s.endpoint }).then(function () {
+      return s.unsubscribe().catch(function () {});
+    }).then(function () { dangKy = null; });
+  }
+
+  nut.addEventListener('click', function () {
+    if (dangLam) { return; }
+    dangLam = true;
+    nut.disabled = true;
+    (dangKy ? tat() : bat()).catch(function (e) {
+      alert('Chưa xong: ' + ((e && e.message) ? e.message : e));
+    }).then(function () {
+      dangLam = false;
+      nut.disabled = false;
+      chu();
+    });
+  });
+})();
+</script>
+{{end}}

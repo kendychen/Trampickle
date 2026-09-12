@@ -1,0 +1,190 @@
+{{/* Tờ hoá đơn in được. Trang ĐỨNG MỘT MÌNH: không có dải đầu, không menu,
+     không dùng css.html — vì tờ này còn phải ra giấy và ra PDF, mà mọi thứ
+     trong css.html đều được vẽ cho màn hình. CSS nằm ngay trong trang, khổ
+     A5 đứng, và mực in là đen trên trắng chứ không theo màu giao diện đang
+     chọn: máy in phun đổ nguyên nền màu ra giấy là tốn mực vô ích.
+
+     Hai cửa vào chung một tờ — /qt/don/{ma}/hoa-don cho thợ, /hoa-don/{token}
+     cho khách; .LaKhach phân biệt. Xem core/hoadon.go. */}}
+{{define "qt-hoadon.html"}}<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="{{iconURL}}" type="{{iconMIME}}">
+<title>{{if .TamTinh}}Tạm tính{{else}}Hoá đơn{{end}} {{.Don.Ma}} — {{.Brand.Ten}}</title>
+<style>
+  :root { --muc: #16181d; --mo: #5d6470; --vien: #cfd4dc; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 18px 12px 44px;
+    background: #eceef2; color: var(--muc);
+    font: 400 13px/1.55 -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    -webkit-print-color-adjust: exact;
+  }
+  .to {
+    width: 148mm; min-height: 200mm; margin: 0 auto; padding: 12mm 11mm;
+    background: #fff; border: 1px solid var(--vien); border-radius: 3px;
+  }
+  .dau { display: flex; gap: 12px; align-items: flex-start; border-bottom: 2px solid var(--muc); padding-bottom: 10px; }
+  .dau .ben { flex: 1; min-width: 0; }
+  .dau img { width: 46px; height: 46px; object-fit: contain; }
+  .ten-tram { font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
+  .nho { font-size: 11px; color: var(--mo); }
+  .ma-don { text-align: right; white-space: nowrap; }
+  .ma-don b { display: block; font: 700 17px/1.2 "Roboto Mono", ui-monospace, monospace; }
+  h1 { margin: 16px 0 2px; font-size: 19px; letter-spacing: .04em; text-transform: uppercase; }
+  .tam-tinh { display: inline-block; margin-bottom: 10px; padding: 2px 8px; border: 1px solid var(--muc); border-radius: 3px; font-size: 11px; font-weight: 700; letter-spacing: .05em; }
+  .cot2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 12px 0 16px; }
+  .khoi { border: 1px solid var(--vien); border-radius: 3px; padding: 9px 11px; }
+  .khoi h2 { margin: 0 0 5px; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--mo); }
+  .khoi .d { margin: 1px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th { text-align: left; font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--mo); border-bottom: 1px solid var(--muc); padding: 0 0 5px; }
+  td { padding: 6px 0; border-bottom: 1px solid #e7e9ee; vertical-align: top; }
+  .p { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  tfoot td { border-bottom: none; padding: 4px 0; }
+  tfoot .cong td { border-top: 2px solid var(--muc); padding-top: 8px; font-size: 15px; font-weight: 700; }
+  tfoot .no td { font-weight: 700; }
+  .ck { margin-top: 14px; border: 1px dashed var(--muc); border-radius: 3px; padding: 10px 11px; }
+  .ck h2 { margin: 0 0 6px; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; }
+  .ck dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 14px; margin: 0; font-size: 12.5px; }
+  .ck dt { color: var(--mo); }
+  .ck dd { margin: 0; font-weight: 600; }
+  .ck code { font: 700 13px/1.4 "Roboto Mono", ui-monospace, monospace; }
+  .chan { margin-top: 18px; padding-top: 10px; border-top: 1px solid var(--vien); font-size: 11px; color: var(--mo); }
+  .chan .cam-on { color: var(--muc); font-size: 12.5px; margin-bottom: 6px; }
+  .thanh {
+    width: 148mm; max-width: 100%; margin: 0 auto 12px;
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  }
+  .thanh a, .thanh button {
+    font: 600 13px/1 inherit; padding: 9px 14px; border-radius: 6px;
+    border: 1px solid var(--muc); background: var(--muc); color: #fff;
+    text-decoration: none; cursor: pointer;
+  }
+  .thanh a.vien { background: #fff; color: var(--muc); }
+  .thanh .goi { color: var(--mo); font-size: 11.5px; }
+  @media print {
+    body { background: #fff; padding: 0; }
+    .thanh { display: none; }
+    .to { width: auto; min-height: 0; margin: 0; padding: 0; border: 0; border-radius: 0; }
+    a { text-decoration: none; color: inherit; }
+  }
+  @page { size: A5 portrait; margin: 10mm; }
+</style>
+</head>
+<body>
+
+<div class="thanh">
+  <button type="button" id="in">In / Lưu PDF</button>
+  {{if not .LaKhach}}<a class="vien" href="/qt/don/{{.Don.Ma}}">← Về đơn</a>{{end}}
+  {{if and (not .LaKhach) .Don.KhachEmail}}<a class="vien" href="/qt/don/{{.Don.Ma}}/mail">Thư gửi khách</a>{{end}}
+  <span class="goi">Trong hộp thoại in, chọn “Lưu thành PDF” là có tệp gửi khách.</span>
+</div>
+
+<div class="to">
+  <div class="dau">
+    {{$u := logoURL}}{{if $u}}<img src="{{$u}}" alt="">{{end}}
+    <div class="ben">
+      <div class="ten-tram">{{if .Brand.TenDayDu}}{{.Brand.TenDayDu}}{{else if .Brand.Ten}}{{.Brand.Ten}}{{else}}Trạm{{end}}</div>
+      <div class="nho">
+        {{if .LienHe.DiaChi}}{{.LienHe.DiaChi}}<br>{{end}}
+        {{if .LienHe.DienThoai}}ĐT {{.LienHe.DienThoai}}{{end}}
+        {{if .LienHe.Email}} · {{.LienHe.Email}}{{end}}
+      </div>
+    </div>
+    <div class="ma-don">
+      <span class="nho">Mã đơn</span>
+      <b>{{.Don.Ma}}</b>
+      <span class="nho">Nhận {{ngaydep .Don.Ngay}}</span>
+    </div>
+  </div>
+
+  <h1>{{if .TamTinh}}Phiếu tạm tính{{else}}Hoá đơn{{end}}</h1>
+  {{if .TamTinh}}
+  {{/* Đơn chưa xong mà in ra thì đây KHÔNG phải hoá đơn: dòng tiền còn sửa
+       được, thợ mở máy ra có khi lòi thêm việc. Phải nói thẳng trên giấy,
+       không thì khách cầm tờ tạm tính đi cãi giá. */}}
+  <div class="tam-tinh">Chưa xong · con số có thể đổi</div>
+  {{else}}
+  <div class="nho" style="margin-bottom:10px">Giao {{if .Don.NgayGiao}}{{ngaydep .Don.NgayGiao}}{{else}}—{{end}}</div>
+  {{end}}
+
+  <div class="cot2">
+    <div class="khoi">
+      <h2>Khách hàng</h2>
+      <div class="d"><b>{{if .Don.KhachTen}}{{.Don.KhachTen}}{{else}}(chưa ghi tên){{end}}</b></div>
+      {{if .Don.KhachLienHe}}<div class="d">{{.Don.KhachLienHe}}</div>{{end}}
+      {{if .Don.KhachEmail}}<div class="d">{{.Don.KhachEmail}}</div>{{end}}
+      {{if .Don.KhachDiaChi}}<div class="d nho">{{.Don.KhachDiaChi}}</div>{{end}}
+    </div>
+    <div class="khoi">
+      <h2>{{.Don.TenLoai}}</h2>
+      <div class="d"><b>{{.Don.TenMon}}</b></div>
+      {{if .Don.LaGiay}}
+        {{if .Don.GiaySize}}<div class="d nho">Size {{.Don.GiaySize}}</div>{{end}}
+      {{else}}
+        {{if .Don.CanSauG}}<div class="d nho">Cân sau khi sửa: {{.Don.CanSauG}} g</div>{{end}}
+      {{end}}
+      {{if .Don.BaoHanhDen}}<div class="d nho">Bảo hành đến {{ngaydep .Don.BaoHanhDen}}</div>{{end}}
+    </div>
+  </div>
+
+  <table>
+    <thead><tr><th>Nội dung</th><th class="p">Thành tiền</th></tr></thead>
+    <tbody>
+      {{range .Don.DongTien}}
+      <tr><td>{{.Ten}}</td><td class="p">{{tien .SoTien}}</td></tr>
+      {{else}}
+      <tr><td colspan="2">Chưa có dòng tiền nào.</td></tr>
+      {{end}}
+    </tbody>
+    <tfoot>
+      <tr class="cong"><td>Tổng cộng</td><td class="p">{{tien .Don.TongTien}}</td></tr>
+      <tr><td>Đã thanh toán</td><td class="p">{{tien .DaThu}}</td></tr>
+      {{if gt .ConNo 0}}
+      <tr class="no"><td>Còn phải trả</td><td class="p">{{tien .ConNo}}</td></tr>
+      {{else if lt .ConNo 0}}
+      <tr class="no"><td>Thu thừa, phải trả lại khách</td><td class="p">{{tien .ConNo}}</td></tr>
+      {{else}}
+      <tr class="no"><td>Còn phải trả</td><td class="p">đã thanh toán đủ</td></tr>
+      {{end}}
+    </tfoot>
+  </table>
+
+  {{/* Chỉ in khối chuyển khoản khi còn nợ thật. Đơn đã thu đủ mà vẫn chìa số
+       tài khoản ra là mời khách chuyển lần hai.
+
+       In chữ chứ không in mã QR: trong binary không có bộ vẽ QR, mà gọi ảnh
+       QR từ dịch vụ ngoài thì tài khoản nhận tiền của trạm đi qua máy người
+       khác — xem ghi chú đầu core/vietqr.go. Số tài khoản gõ tay vẫn chuyển
+       được, mã QR hỏng thì không. */}}
+  {{if and .CoCK (gt .ConNo 0)}}
+  <div class="ck">
+    <h2>Chuyển khoản</h2>
+    <dl>
+      {{if .TenNH}}<dt>Ngân hàng</dt><dd>{{.TenNH}}</dd>{{end}}
+      <dt>Số tài khoản</dt><dd><code>{{.NganHang.SoTK}}</code></dd>
+      <dt>Chủ tài khoản</dt><dd>{{.NganHang.ChuTK}}</dd>
+      <dt>Số tiền</dt><dd>{{tien .ConNo}}</dd>
+      <dt>Nội dung</dt><dd><code>{{.NoiDungCK}}</code></dd>
+    </dl>
+    <div class="nho" style="margin-top:6px">Nội dung chuyển khoản ghi đúng mã đơn thì tiền vào đúng đơn, khỏi phải nhắn xác nhận.</div>
+  </div>
+  {{end}}
+
+  <div class="chan">
+    <div class="cam-on">Cảm ơn anh/chị đã tin trạm. Có gì chưa ưng, nhắn lại trong thời gian bảo hành.</div>
+    {{if .LinkTra}}<div>Theo dõi đơn: {{.LinkTra}}</div>{{end}}
+    <div>In lúc {{.InLuc}}{{if not .LaKhach}} · {{.NguoiDung.TenHienThi}}{{end}}</div>
+  </div>
+</div>
+
+<script nonce="{{.Nonce}}">
+  document.getElementById('in').addEventListener('click', function () { window.print(); });
+</script>
+</body>
+</html>
+{{end}}

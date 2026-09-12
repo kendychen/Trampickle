@@ -59,7 +59,7 @@
 
 <div class="the-nhom">
   <div class="cuon">
-    <table class="bang" id="bang-vot">
+    <table class="bang bang-the" id="bang-vot">
       <thead>
         <tr>
           <th>Cây vợt</th><th>Lõi</th><th>Chế tạo</th>
@@ -71,6 +71,7 @@
       {{range .Bang}}
         <tr class="cay" data-ma="{{.MaDong}}" data-tim="{{.Tim}}"
             data-gap="{{.MucGap}}" data-nuoc="{{if .TuVN}}vn{{else}}ngoai{{end}}"
+            data-ct="{{.MaCheTao}}" data-loi="{{.MaLoi}}"
             data-ten="{{.Hang}} — {{.Ten}}"
             {{if .GhiChu}}data-ghi="{{.GhiChu}}"{{end}}
             {{if .CanhBao}}data-canhbao="{{.CanhBao}}"{{end}}>
@@ -78,12 +79,12 @@
             <b>{{.Ten}}</b>{{if .GhiChu}} <span title="có ghi chú riêng cho cây này">⚠</span>{{end}}
             <div class="nho">{{.Hang}} · {{.Dong}}{{if .Nam}} · {{.Nam}}{{end}}</div>
           </td>
-          <td class="nho">{{.Loi}}</td>
-          <td class="nho">{{.CheTao}}</td>
-          <td class="p">{{.DoDay}}</td>
-          <td class="p">{{.KhoiLuong}}</td>
-          <td class="p nho">{{.NguonSo}}</td>
-          <td class="nho">{{.MucGapNhan}}</td>
+          <td data-n="Lõi" class="nho">{{.Loi}}</td>
+          <td data-n="Chế tạo" class="nho">{{.CheTao}}</td>
+          <td data-n="Dày" class="p">{{.DoDay}}</td>
+          <td data-n="Nặng" class="p">{{.KhoiLuong}}</td>
+          <td data-n="Nguồn số" class="p nho">{{.NguonSo}}</td>
+          <td data-n="Hay gặp" class="nho">{{.MucGapNhan}}</td>
         </tr>
       {{end}}
       </tbody>
@@ -95,7 +96,9 @@
   </div>
 </div>
 
-<script nonce="{{$.Nonce}}">var CT = {{.ChiTiet | json}};</script>
+{{template "hinh-cau-tao-kho" .}}
+
+<script nonce="{{$.Nonce}}">var CT = {{.ChiTiet | json}}, DOI = {{.DoiCT | json}}, LOI = {{.LoiVot | json}};</script>
 
 <script nonce="{{$.Nonce}}">
 (function () {
@@ -126,11 +129,39 @@
     trong.style.display = hien ? 'none' : '';
   }
 
+  function esc(v) {
+    return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  }
+
   function doan(nhan, giatri) {
     if (!giatri) return '';
     return '<div style="margin-bottom:10px"><b>' + nhan + '</b><br>' +
-           String(giatri).replace(/&/g, '&amp;').replace(/</g, '&lt;')
-                         .replace(/\n/g, '<br>') + '</div>';
+           esc(giatri).replace(/\n/g, '<br>') + '</div>';
+  }
+
+  // Sơ đồ cấu tạo: một hình cho mỗi ĐỜI chế tạo, không phải mỗi cây. Cây chưa
+  // xác định được đời thì nói thẳng là chưa biết — mượn tạm hình của đời gần
+  // giống là vẽ ra một cây vợt không tồn tại, và thợ tin vào hình.
+  function cautao(h, d) {
+    var ma = h.dataset.ct, ti = ma ? DOI[ma] : null, kho;
+    if (!ti) {
+      var co = (d.che_tao_ma || []).map(function (m) {
+        return DOI[m] ? DOI[m].ten : m;
+      });
+      return '<div style="margin-bottom:10px"><b>Cấu tạo</b><br><span class="nho">' +
+             'Chưa ghi cây này thuộc đời nào' +
+             (co.length ? '; cả dòng có ' + co.length + ' đời: ' + esc(co.join(' · ')) : '') +
+             '. Ghi che_tao cho cây trong data/vot.yaml thì sơ đồ hiện ra.' +
+             '</span></div>';
+    }
+    kho = document.querySelector('#kho-so-do [data-ct="' + ma + '"]');
+    return '<div style="margin-bottom:10px"><b>Cấu tạo — ' + esc(ti.ten) + '</b>' +
+           '<div class="nho" style="margin:4px 0 6px">' + esc(ti.cach_lam) +
+           ' Sống điển hình: ' + esc(ti.tuoi_tho) + '.</div>' +
+           (kho ? '<div class="ct-so-do">' + kho.innerHTML + '</div>' : '') +
+           (ti.vi_sao ? '<div class="nho" style="margin-top:6px">' + esc(ti.vi_sao) +
+                        '</div>' : '') +
+           '</div>';
   }
 
   function mo(h) {
@@ -145,11 +176,19 @@
     if (h.dataset.ghi) s += doan('Riêng cây này', h.dataset.ghi);
     s += doan('Nhận sửa thế nào', d.nhan_sua);
     if (d.hay_hong && d.hay_hong.length) s += doan('Hay hỏng', d.hay_hong.join(' · '));
+    // Cảnh báo của CÂY đã in ở trên. Dòng chỉ có một đời chế tạo thì hai chỗ ra
+    // đúng một câu — in lại lần nữa là dạy thợ lướt qua ô đỏ.
     if (d.canh_bao && d.canh_bao.length) {
       for (var i = 0; i < d.canh_bao.length; i++)
-        s += '<div class="bao bao-loi">' + d.canh_bao[i] + '</div>';
+        if (d.canh_bao[i] !== h.dataset.canhbao)
+          s += '<div class="bao bao-loi">' + d.canh_bao[i] + '</div>';
     }
-    s += doan('Lõi', d.loi + (d.loi_cau_tao ? ' — ' + d.loi_cau_tao : ''));
+    // Lõi lấy theo CÂY, không theo dòng: một dòng có thể vừa bán cây tổ ong
+    // vừa bán cây bọt, và cây bọt mà ghi "tổ ong" thì thợ gõ nhầm kỳ vọng.
+    var lo = LOI[h.dataset.loi];
+    s += doan('Lõi', lo ? lo.ten + (lo.cau_tao ? ' — ' + lo.cau_tao : '')
+                        : d.loi + (d.loi_cau_tao ? ' — ' + d.loi_cau_tao : ''));
+    s += cautao(h, d);
     s += doan('Mặt / viền', d.mat + ' · ' + d.vien);
     s += doan('Giá vợt mới tại VN (ước lượng, không phải giá sửa)', d.gia);
     s += doan('Vì sao xếp mức này', d.co_so);

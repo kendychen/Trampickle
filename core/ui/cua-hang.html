@@ -1,0 +1,104 @@
+{{define "cua-hang.html"}}
+{{template "html-dau" .}}
+
+<main class="la-cua-hang">
+<div class="khung doc-lon">
+
+{{if not .Mo}}
+  <h1>{{nd "cuahang.dong.tieu-de"}}</h1>
+  {{ndm "cuahang.dong.than"}}
+  <p style="margin-top:20px"><a class="nut nut-vien" href="/lien-he">{{nd "chung.nut.lien-he"}}</a></p>
+{{else}}
+  <h1>{{nd "cuahang.mo.tieu-de"}}</h1>
+  {{ndm "cuahang.mo.dan"}}
+
+  {{if .Loi}}<p class="ch-loi">{{.Loi}}</p>{{end}}
+
+  <form method="post" action="/cua-hang" class="ch-form" enctype="multipart/form-data">
+    <input type="hidden" name="_csrf" value="{{.CSRF}}">
+
+    <fieldset class="ch-o">
+      <legend>{{nd "cuahang.buoc.mon"}}</legend>
+      <div class="ch-mon">
+        <label><input type="radio" name="loai" value="vot" data-mon {{if ne .Loai "giay"}}checked{{end}}> Vợt pickleball</label>
+        <label><input type="radio" name="loai" value="giay" data-mon {{if eq .Loai "giay"}}checked{{end}}> Giày</label>
+      </div>
+    </fieldset>
+
+    <fieldset class="ch-o">
+      <legend>{{nd "cuahang.buoc.goi"}}</legend>
+      <div class="ch-goi-ds">
+        {{range .DichVu}}
+        <label class="ch-goi">
+          <input type="radio" name="dich_vu" value="{{.Ma}}">
+          <span class="ch-goi-than">
+            <span class="ch-goi-ten">{{.Ten}}</span>
+            <span class="ch-goi-gia">{{.Gia}}</span>
+            {{if .DieuKien}}<span class="ch-goi-dk">{{.DieuKien}}</span>{{end}}
+          </span>
+        </label>
+        {{end}}
+      </div>
+      <div class="ch-nhac">{{ndm "cuahang.buoc.gia-nhac"}}</div>
+    </fieldset>
+
+    <fieldset class="ch-o">
+      <legend>{{nd "cuahang.buoc.tinh-trang"}}</legend>
+      {{if eq .Loai "giay"}}
+      <label class="ch-d">Hãng / đời giày
+        <input name="giay_hang" maxlength="100" autocomplete="off"></label>
+      <label class="ch-d">Size giày
+        <input name="giay_size" maxlength="20" autocomplete="off"></label>
+      <label class="ch-d">Kiểu giày
+        <select name="giay_kieu">
+          <option value="">— chọn —</option>
+          <option value="chay_bo">Giày chạy bộ</option>
+          <option value="di_lai">Giày đi lại</option>
+        </select></label>
+      {{else}}
+      <label class="ch-d">Hãng / đời vợt
+        <input name="vot_hang" maxlength="100" autocomplete="off"></label>
+      {{end}}
+      <label class="ch-d">Giá trị món (đ)
+        <input name="gia_tri" inputmode="numeric" autocomplete="off"></label>
+      <label class="ch-d">Mô tả chỗ hỏng
+        <textarea name="tinh_trang" rows="4" maxlength="1000"></textarea></label>
+      <label class="ch-d">Ảnh chỗ hỏng
+        <input type="file" name="anh" accept="image/*" multiple></label>
+      <div class="ch-nhac">{{ndm "cuahang.buoc.anh-nhac"}}</div>
+    </fieldset>
+
+    <fieldset class="ch-o">
+      <legend>{{nd "cuahang.buoc.nguoi-nhan"}}</legend>
+      <label class="ch-d">Tên
+        <input name="ten" maxlength="100" required autocomplete="name"></label>
+      <label class="ch-d">Số điện thoại / Zalo
+        <input name="lien_he" maxlength="100" required autocomplete="tel"></label>
+      <label class="ch-d">Địa chỉ nhận lại
+        <textarea name="dia_chi" rows="2" maxlength="300" required autocomplete="street-address"></textarea></label>
+    </fieldset>
+
+    <button class="nut" type="submit">{{nd "cuahang.buoc.nut"}}</button>
+  </form>
+
+  <script nonce="{{.Nonce}}">
+  // Đổi món thì nạp lại trang: bảng việc của vợt và của giày khác hẳn nhau,
+  // dựng sẵn cả hai rồi ẩn đi là để một hôm nào đó khách gửi được đơn giày
+  // kèm việc của vợt. Đường dẫn mang theo ?loai= nên link chia sẻ được.
+  (function () {
+    var form = document.querySelector('.ch-form');
+    if (!form) return;
+    form.querySelectorAll('[data-mon]').forEach(function (e) {
+      e.addEventListener('change', function () {
+        window.location = '/cua-hang?loai=' + encodeURIComponent(e.value);
+      });
+    });
+  })();
+  </script>
+{{end}}
+
+</div>
+</main>
+
+{{template "html-chan" .}}
+{{end}}

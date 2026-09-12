@@ -242,6 +242,8 @@ type HangVot struct {
 	Nam        int
 	Loi        string
 	CheTao     string
+	MaLoi      string // mã lõi ĐÃ giải ra — biến thể ghi đè thì khác lõi của dòng
+	MaCheTao   string // mã đời chế tạo — panel dùng để chọn sơ đồ cấu tạo
 	CanhBao    string // cảnh báo của đời chế tạo, nếu có
 	DoDay      string
 	KhoiLuong  string
@@ -318,7 +320,9 @@ func (k *KhoVot) BangVot() []HangVot {
 				Ten:        b.Ten,
 				Nam:        b.Nam,
 				Loi:        k.TenLoi(lo),
+				MaLoi:      lo,
 				CheTao:     k.TenCheTao(ct),
+				MaCheTao:   ct,
 				CanhBao:    k.CanhBaoCheTao(ct),
 				DoDay:      so(b.DoDayMm),
 				KhoiLuong:  gam(b.KhoiLuongG),
@@ -365,6 +369,7 @@ type ChiTietDong struct {
 	NhanSua   string   `json:"nhan_sua"`
 	TinCay    string   `json:"tin_cay"`
 	GhiChu    string   `json:"ghi_chu"`
+	CheTaoMa  []string `json:"che_tao_ma"`
 	CanhBao   []string `json:"canh_bao"`
 	Nguon     []string `json:"nguon"`
 }
@@ -393,6 +398,7 @@ func (k *KhoVot) ChiTiet() map[string]ChiTietDong {
 		for _, m := range d.HayHong {
 			c.HayHong = append(c.HayHong, k.TenLoiHong(m))
 		}
+		c.CheTaoMa = d.CheTao
 		seen := map[string]bool{}
 		for _, m := range d.CheTao {
 			if cb := k.CanhBaoCheTao(m); cb != "" && !seen[cb] {
@@ -403,6 +409,63 @@ func (k *KhoVot) ChiTiet() map[string]ChiTietDong {
 		out[d.Ma] = c
 	}
 	return out
+}
+
+// CheTaoJS — phần của một đời chế tạo mà panel cần. Panel chỉ đọc, nên gửi
+// sang JS bản đã làm sạch thay vì cả MoTaCheTao (nguồn và cảnh báo đã dùng ở
+// chỗ khác rồi).
+type CheTaoJS struct {
+	Ten     string `json:"ten"`
+	CachLam string `json:"cach_lam"`
+	ViSao   string `json:"vi_sao"`
+	TuoiTho string `json:"tuoi_tho"`
+}
+
+// LoiJSON — mô tả lõi cho panel. Biến thể được ghi đè lõi của dòng cha (Kamito
+// bán cả cây tổ ong lẫn cây bọt trong một dòng), nên panel phải tra theo mã lõi
+// của CÂY, không phải của dòng — nếu không nó ghi "tổ ong PP" ngay trên sơ đồ
+// nói "bỏ hẳn tổ ong".
+func (k *KhoVot) LoiJSON() map[string]LoiJS {
+	out := map[string]LoiJS{}
+	for _, x := range k.Loi {
+		out[x.Ma] = LoiJS{Ten: x.Ten, CauTao: strings.TrimSpace(x.CauTao)}
+	}
+	return out
+}
+
+type LoiJS struct {
+	Ten    string `json:"ten"`
+	CauTao string `json:"cau_tao"`
+}
+
+func (k *KhoVot) CheTaoJSON() map[string]CheTaoJS {
+	out := map[string]CheTaoJS{}
+	for _, x := range k.CheTao {
+		out[x.Ma] = CheTaoJS{
+			Ten:     x.Ten,
+			CachLam: strings.TrimSpace(x.CachLam),
+			ViSao:   strings.TrimSpace(x.ViSao),
+			TuoiTho: tuoiTho(x.TuoiThoThang),
+		}
+	}
+	return out
+}
+
+// tuoiTho — khoảng sống điển hình của một đời chế tạo. Đầu nào để null thì
+// đọc thành "trên"/"dưới": ghi "24 – 0 tháng" là nói ngược hẳn ý.
+func tuoiTho(t []*int) string {
+	if len(t) != 2 || (t[0] == nil && t[1] == nil) {
+		return "chưa có số"
+	}
+	switch {
+	case t[0] == nil:
+		return "dưới " + strconv.Itoa(*t[1]) + " tháng"
+	case t[1] == nil:
+		return "trên " + strconv.Itoa(*t[0]) + " tháng"
+	case *t[0] == *t[1]:
+		return strconv.Itoa(*t[0]) + " tháng"
+	}
+	return strconv.Itoa(*t[0]) + " – " + strconv.Itoa(*t[1]) + " tháng"
 }
 
 func khoangGia(g []*int) string {

@@ -21,13 +21,20 @@ func TestMoiTrangDeuDungDuoc(t *testing.T) {
 		"/app", "/app/kiem", "/app/quy-trinh", "/app/tra-cuu", "/app/gui-anh",
 		"/dang-nhap",
 		// Trang quản trị.
-		"/qt", "/qt/don", "/qt/don-moi", "/qt/yeu-cau", "/qt/vot",
+		"/qt", "/qt/don", "/qt/don-vot", "/qt/don-giay",
+		"/qt/don-moi", "/qt/don-moi?loai=giay", "/qt/doi-tac",
+		"/qt/khach", "/qt/khach?vang=6&con_no=1",
+		"/qt/yeu-cau", "/qt/vot",
 		"/qt/kho", "/qt/kho/phieu", "/qt/kho/phieu/moi", "/qt/kho/vat-tu",
 		"/qt/tien", "/qt/tien/dinh-ky", "/qt/tien/sao-ke", "/qt/thong-ke",
 		"/qt/bai-viet", "/qt/bai-viet/moi", "/qt/giao-trinh",
 		"/qt/dich-vu", "/qt/noi-dung", "/qt/lien-he", "/qt/nguong",
 		"/qt/giao-dien", "/qt/anh-trang-chu", "/qt/cai-dat",
 		"/qt/nguoi-dung", "/qt/mat-khau",
+		// Ba đường của app quản lý — mở được khi CHƯA đăng nhập (điện thoại đi
+		// lấy manifest và icon lúc chưa có cookie phiên). Ở đây quét kèm cho
+		// chắc chúng không hỏng lúc render.
+		"/qt/manifest.webmanifest", "/qt/icon.svg", "/qt/icon.png", "/qt/mat-mang",
 	}
 	for _, d := range duong {
 		r := httptest.NewRequest("GET", d, nil)

@@ -27,10 +27,13 @@
           {{if .LienHe.DienThoai}}<dt>{{nd "lienhe.lh.dt"}}</dt><dd><a href="tel:{{soGoi .LienHe.DienThoai}}">{{.LienHe.DienThoai}}</a></dd>{{end}}
           {{if .LienHe.Zalo}}<dt>{{nd "lienhe.lh.zalo"}}</dt><dd><a href="https://zalo.me/{{.LienHe.Zalo}}">{{.LienHe.Zalo}}</a></dd>{{end}}
           {{if .LienHe.Email}}<dt>{{nd "lienhe.lh.email"}}</dt><dd><a href="mailto:{{.LienHe.Email}}">{{.LienHe.Email}}</a></dd>{{end}}
-          {{if .LienHe.Facebook}}<dt>{{nd "lienhe.lh.fb"}}</dt><dd><a href="{{.LienHe.Facebook}}">{{.LienHe.Facebook}}</a></dd>{{end}}
+          {{with .LienHe.MangXaHoi}}<dt>{{nd "lienhe.lh.mxh"}}</dt><dd class="mxh-hang">
+            {{range .}}<a href="{{.URL}}" target="_blank" rel="noopener me" title="{{.Ten}}" aria-label="{{.Ten}}">{{template "bt-mxh" .Ma}}</a>{{end}}
+          </dd>{{end}}
           {{if .LienHe.DiaChi}}<dt>{{nd "lienhe.lh.dia-chi"}}</dt><dd>{{.LienHe.DiaChi}}</dd>{{end}}
           {{if .LienHe.GioLamVic}}<dt>{{nd "lienhe.lh.gio"}}</dt><dd>{{.LienHe.GioLamVic}}</dd>{{end}}
         </dl>
+        {{template "tb-chua-mo"}}
       </div>
       {{else}}
       <div class="bao bao-luu" style="margin:0">{{ndd "lienhe.trong"}}</div>

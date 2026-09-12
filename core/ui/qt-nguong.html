@@ -22,7 +22,7 @@
     khách — khách đang đọc trang cũ vẫn nhớ con số cũ.
   </p>
   {{range .Web}}
-  <div class="o-nguong" style="border-left:3px solid var(--nhan,#d6f32f);padding:12px 0 12px 16px;margin:16px 0">
+  <div class="o-nguong" style="border-left:3px solid var(--nhan,#FFC72C);padding:12px 0 12px 16px;margin:16px 0">
     <label for="{{.Khoa}}"><b>{{.Nhan}}</b></label>
     <div style="display:flex;gap:10px;align-items:center;margin:8px 0">
       <input id="{{.Khoa}}" name="{{.Khoa}}" value="{{.So}}" inputmode="decimal"
@@ -37,7 +37,8 @@
 
   <h2 style="margin:32px 0 4px">Luật vận hành nội bộ</h2>
   <p class="nho mo" style="margin-top:0;max-width:64ch">
-    Ba số này không hiện ở đâu trên web. Dùng để cảnh báo và để tính lãi.
+    Mấy số này không hiện ở đâu trên web. Dùng để cảnh báo, để tính lãi, và
+    để điền sẵn mức giảm cho khách quen lúc lập đơn.
   </p>
   {{range .NoiBo}}
   <div class="o-nguong" style="padding:12px 0 12px 19px;margin:16px 0">

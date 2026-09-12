@@ -139,16 +139,17 @@ func hQtBaiLuu(w http.ResponseWriter, r *http.Request) {
 func baiTuForm(r *http.Request) BaiViet {
 	thu, _ := strconv.Atoi(strings.TrimSpace(r.FormValue("thu_tu")))
 	return BaiViet{
-		Slug:   strings.TrimSpace(r.FormValue("slug")),
-		ThuTu:  thu,
-		TieuDe: strings.TrimSpace(r.FormValue("tieu_de")),
-		MoTa:   strings.TrimSpace(r.FormValue("mo_ta")),
-		Ngay:   ngayISO(r.FormValue("ngay")),
-		Sua:    ngayISO(r.FormValue("sua")),
-		TomTat: strings.TrimSpace(r.FormValue("tom_tat")),
-		Anh:    strings.TrimSpace(r.FormValue("anh")),
-		Nhap:   r.FormValue("nhap") != "",
-		Than:   r.FormValue("than"),
+		Slug:      strings.TrimSpace(r.FormValue("slug")),
+		ThuTu:     thu,
+		TieuDe:    strings.TrimSpace(r.FormValue("tieu_de")),
+		TieuDeSEO: strings.TrimSpace(r.FormValue("tieu_de_seo")),
+		MoTa:      strings.TrimSpace(r.FormValue("mo_ta")),
+		Ngay:      ngayISO(r.FormValue("ngay")),
+		Sua:       ngayISO(r.FormValue("sua")),
+		TomTat:    strings.TrimSpace(r.FormValue("tom_tat")),
+		Anh:       strings.TrimSpace(r.FormValue("anh")),
+		Nhap:      r.FormValue("nhap") != "",
+		Than:      r.FormValue("than"),
 	}
 }
 

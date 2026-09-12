@@ -1,0 +1,291 @@
+{{define "qt-giay.html"}}
+{{template "qt-dau" .}}
+
+{{if .Loi}}
+<div class="qt-dau-trang"><h1>Danh mục giày</h1></div>
+<div class="bao bao-loi">{{.Loi}}</div>
+{{else}}
+
+<div class="qt-dau-trang">
+  <h1>Danh mục giày</h1>
+  <div class="phai nho">Cập nhật {{.Kho.CapNhat}}</div>
+</div>
+
+{{if not .DuTin}}
+<div class="bao bao-loi">
+  <b>Chưa có ca thật chống lưng cho bảng này.</b>
+  Mới {{.Kho.SoCaLamCoSo}}/{{.Kho.NguongTinDuoc}} ca. Cột <i>hay gặp</i> là ước
+  lượng từ thị trường, không phải đếm từ sổ. Cột <i>gắn đế</i> cũng là phán
+  đoán theo hãng — vẫn phải rà móng tay quanh mép đế của ĐÔI GIÀY TRÊN BÀN
+  trước khi báo giá. Model cụ thể luôn thắng cái tên hãng.
+</div>
+{{end}}
+
+<div class="luoi-so" style="margin-bottom:18px">
+  <div class="o-so"><div class="v">{{.SoDoi}}</div><div class="t">dòng giày</div></div>
+  <div class="o-so"><div class="v">{{.SoNhan}}</div><div class="t">nhận được</div></div>
+  <div class="o-so"><div class="v" id="so-hien">{{.SoDoi}}</div><div class="t">đang hiện sau khi lọc</div></div>
+</div>
+
+<div class="the" style="margin-bottom:18px">
+  <div class="hang" style="align-items:flex-end">
+    <label style="margin:0;flex:1">Tìm
+      <input id="q" autofocus autocomplete="off"
+             placeholder="tên hãng, tên dòng, môn — gõ tới đâu lọc tới đó">
+    </label>
+    <label style="margin:0" class="co-hep">Gắn đế
+      <select id="f-gande">
+        <option value="">Tất cả</option>
+        {{range .Kho.GanDe}}<option value="{{.Ma}}">{{.Ten}}</option>{{end}}
+      </select>
+    </label>
+    <label style="margin:0" class="co-hep">Nhận / từ chối
+      <select id="f-xuly">
+        <option value="">Tất cả</option>
+        <option value="nhan">Nhận</option>
+        <option value="nhan_dk">Nhận có điều kiện</option>
+        <option value="xet">Xét từng đôi</option>
+        <option value="gui_di">Gửi tiệm ngoài</option>
+        <option value="tu_choi">Từ chối</option>
+      </select>
+    </label>
+    <label style="margin:0" class="co-hep">Xuất xứ
+      <select id="f-nuoc">
+        <option value="">Tất cả</option>
+        <option value="vn">Thương hiệu Việt</option>
+        <option value="ngoai">Ngoài nước</option>
+      </select>
+    </label>
+  </div>
+  <div class="nho" style="margin-top:8px">
+    Bấm vào một dòng để mở cách nhận biết tại bàn, lý do nhận hay từ chối và
+    cảnh báo của dòng đó.
+  </div>
+</div>
+
+{{/* Bảng kiểu đế đứng TRƯỚC bảng giày, gấp lại sẵn. Danh mục 57 dòng không
+     bao giờ phủ hết cái khách mang tới; lúc search hụt thì thứ duy nhất kết
+     luận được là cách đế dính vào mũ giày, nên nó phải ở ngay trên màn chứ
+     không nằm trong file markdown của agent. */}}
+<details id="kieu-de" class="the" style="margin-bottom:18px">
+  <summary style="cursor:pointer">
+    <b>Các kiểu gắn đế — thay được hay không</b>
+    <span class="nho"> · mở ra khi đôi giày trên bàn không có trong bảng dưới</span>
+  </summary>
+
+  <div class="nho" style="margin:12px 0">
+    Lật đế lên, rà móng tay quanh mép, đối chiếu cột <i>nhận ra bằng gì</i>.
+    Cách gắn đế quyết định thay được hay không — tên hãng không quyết định.
+  </div>
+
+  <div class="cuon">
+    <table class="bang bang-the">
+      <thead>
+        <tr><th>Kiểu gắn đế</th><th>Nhận ra bằng gì</th><th>Bóc đế ra được không</th><th>Xưởng</th></tr>
+      </thead>
+      <tbody>
+      {{range .Kho.GanDe}}
+        <tr>
+          <td>
+            <b>{{.Ten}}</b>
+            {{if .TenEn}}<div class="nho">{{.TenEn}}</div>{{end}}
+          </td>
+          <td data-n="Nhận ra bằng gì" class="nho">{{.NhanRa}}</td>
+          <td data-n="Bóc đế" class="nho">{{.BocDuoc}}</td>
+          <td data-n="Xưởng">
+            <span class="chip {{if eq .XuongNhan "nhan"}}chip-nhan{{else if eq .XuongNhan "tu_choi"}}chip-tuchoi{{else}}chip-cho{{end}}">{{index $.Nhan .XuongNhan}}</span>
+            {{if .CanhBaoXuong}}<div class="nho" style="margin-top:6px">{{.CanhBaoXuong}}</div>{{end}}
+          </td>
+        </tr>
+      {{end}}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="nho" style="margin:16px 0 10px">
+    <b>Tầng bọt bên trong — không thay được, nhưng quyết định được phép hơ nóng tới đâu.</b>
+    Bóc đế là làm mềm keo bằng nhiệt, nên nhận nhầm tầng bọt là méo phom vĩnh viễn.
+  </div>
+
+  <div class="cuon">
+    <table class="bang bang-the">
+      <thead>
+        <tr><th>Đế giữa</th><th>Chịu nhiệt</th><th>Luật cho thợ</th></tr>
+      </thead>
+      <tbody>
+      {{range .Kho.DeGiua}}
+        <tr>
+          <td><b>{{.Ten}}</b>{{if .CoODau}}<div class="nho">{{.CoODau}}</div>{{end}}</td>
+          <td data-n="Chịu nhiệt" class="nho">{{.ChiuNhiet}}</td>
+          <td data-n="Luật cho thợ" class="nho">
+            {{.LuatChoTho}}
+            {{if .CanhBao}}<div style="margin-top:6px"><b>{{.CanhBao}}</b></div>{{end}}
+          </td>
+        </tr>
+      {{end}}
+      </tbody>
+    </table>
+  </div>
+</details>
+
+<div id="panel" class="the" style="display:none;margin-bottom:18px"></div>
+
+<div class="the-nhom">
+  <div class="cuon">
+    <table class="bang bang-the" id="bang-giay">
+      <thead>
+        <tr>
+          <th>Dòng giày</th><th>Môn</th><th>Gắn đế</th><th>Đế giữa</th>
+          <th>Xử lý</th><th class="p">Hay gặp</th>
+        </tr>
+      </thead>
+      <tbody>
+      {{range .Bang}}
+        <tr class="cay" data-ma="{{.MaDong}}" data-tim="{{.Tim}}"
+            data-gande="{{.GanDe}}" data-xuly="{{.XuLy}}"
+            data-nuoc="{{if .TuVN}}vn{{else}}ngoai{{end}}"
+            data-ten="{{.Hang}} — {{.Ten}}"
+            data-xulynhan="{{.XuLyNhan}}"
+            data-gandenhan="{{.GanDeNhan}}"
+            data-degiua="{{.DeGiua}}"
+            data-dengoai="{{.DeNgoai}}"
+            data-nhansua="{{.NhanSua}}"
+            {{if .GhiChu}}data-ghi="{{.GhiChu}}"{{end}}
+            {{if .CanhBao}}data-canhbao="{{.CanhBao}}"{{end}}>
+          <td>
+            <b>{{.Ten}}</b>{{if .GhiChu}} <span title="có ghi chú riêng cho dòng này">⚠</span>{{end}}
+            <div class="nho">{{.Hang}}{{if .Dong}} · {{.Dong}}{{end}} · {{.Nuoc}}</div>
+          </td>
+          <td data-n="Môn" class="nho">{{.Mon}}</td>
+          <td data-n="Gắn đế" class="nho">{{.GanDeNhan}}</td>
+          <td data-n="Đế giữa" class="nho">{{.DeGiua}}</td>
+          <td data-n="Xử lý">
+            <span class="chip {{if eq .XuLy "nhan"}}chip-nhan{{else if eq .XuLy "tu_choi"}}chip-tuchoi{{else}}chip-cho{{end}}">{{.XuLyNhan}}</span>
+          </td>
+          <td data-n="Hay gặp" class="p nho">{{.MucGapNhan}}</td>
+        </tr>
+      {{end}}
+      </tbody>
+    </table>
+  </div>
+  <div id="trong" style="display:none;padding:18px">
+    <div class="nho">
+      Không có dòng nào khớp. Giày không có trong danh mục thì ghi "không rõ"
+      vào phiếu và xử theo cách gắn đế, đừng đoán sang một hãng gần giống.
+    </div>
+    <div style="margin-top:12px">
+      <button class="phu" id="mo-kieu-de">Không có trong danh mục — tra theo kiểu đế</button>
+    </div>
+  </div>
+</div>
+
+<script nonce="{{$.Nonce}}">var CT = {{.ChiTiet | json}};</script>
+
+<script nonce="{{$.Nonce}}">
+(function () {
+  var q = document.getElementById('q'),
+      fd = document.getElementById('f-gande'),
+      fx = document.getElementById('f-xuly'),
+      fn = document.getElementById('f-nuoc'),
+      hang = Array.prototype.slice.call(document.querySelectorAll('tr.cay')),
+      dem = document.getElementById('so-hien'),
+      trong = document.getElementById('trong'),
+      panel = document.getElementById('panel');
+
+  function bo_dau(s) {
+    return s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd');
+  }
+
+  function loc() {
+    var t = bo_dau(q.value.toLowerCase().trim()),
+        d = fd.value, x = fx.value, n = fn.value, hien = 0;
+    for (var i = 0; i < hang.length; i++) {
+      var h = hang[i],
+          ok = (!t || bo_dau(h.dataset.tim).indexOf(t) >= 0) &&
+               (!d || h.dataset.gande === d) &&
+               (!x || h.dataset.xuly === x) &&
+               (!n || h.dataset.nuoc === n);
+      h.style.display = ok ? '' : 'none';
+      if (ok) hien++;
+    }
+    dem.textContent = hien;
+    trong.style.display = hien ? 'none' : '';
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  }
+
+  function doan(nhan, giatri) {
+    if (!giatri) return '';
+    return '<div style="margin-bottom:10px"><b>' + nhan + '</b><br>' +
+           esc(giatri).replace(/\n/g, '<br>') + '</div>';
+  }
+
+  function mo(h) {
+    var d = CT[h.dataset.ma];
+    if (!d) return;
+    var s = '';
+    s += '<div class="qt-dau-trang" style="margin-bottom:12px"><h3 style="margin:0">' +
+         esc(h.dataset.ten) + '</h3><div class="phai"><button class="phu nho" id="dong-panel">Đóng</button></div></div>';
+    s += '<div class="nho" style="margin-bottom:12px">' + esc(d.hang) +
+         (d.dong ? ' · ' + esc(d.dong) : '') + ' · ' + esc(d.nuoc) +
+         ' · ' + esc(d.mon) + ' · gặp ở mức: ' + esc(d.muc_gap) + '</div>';
+
+    // Quyết định lên trước mọi thứ khác: thợ mở panel này lúc khách đang chờ
+    // câu trả lời có nhận hay không.
+    s += '<div style="margin-bottom:12px"><span class="chip ' +
+         (h.dataset.xuly === 'nhan' ? 'chip-nhan' :
+          h.dataset.xuly === 'tu_choi' ? 'chip-tuchoi' : 'chip-cho') +
+         '">' + esc(h.dataset.xulynhan) + '</span></div>';
+    s += doan('Nhận sửa thế nào', h.dataset.nhansua || d.nhan_sua);
+
+    if (h.dataset.canhbao) s += '<div class="bao bao-loi">' + esc(h.dataset.canhbao) + '</div>';
+    else if (d.canh_bao && d.canh_bao.length) {
+      for (var i = 0; i < d.canh_bao.length; i++)
+        s += '<div class="bao bao-loi">' + esc(d.canh_bao[i]) + '</div>';
+    }
+
+    if (d.nhan_ra && d.nhan_ra.length)
+      s += doan('Nhận biết tại bàn', d.nhan_ra.join('\n'));
+    if (h.dataset.ghi) s += doan('Riêng dòng này', h.dataset.ghi);
+    s += doan('Gắn đế của dòng này', h.dataset.gandenhan +
+              (d.gan_de && d.gan_de.length > 1 ? ' (cả dòng: ' + d.gan_de.join(', ') + ')' : ''));
+    s += doan('Đế giữa', h.dataset.degiua +
+              (d.de_giua && d.de_giua.length > 1 ? ' (cả dòng: ' + d.de_giua.join(', ') + ')' : ''));
+    if (h.dataset.dengoai !== '—') s += doan('Đế ngoài', h.dataset.dengoai);
+    if (d.hay_hong && d.hay_hong.length) s += doan('Hay hỏng', d.hay_hong.join(' · '));
+    s += doan('Vì sao xếp mức này', d.co_so);
+    s += doan('Ghi chú', d.ghi_chu);
+    s += '<div class="nho">Độ tin của số liệu dòng này: <b>' + esc(d.tin_cay) + '</b>' +
+         (d.nguon && d.nguon.length ? ' · nguồn: ' + esc(d.nguon.join(', ')) : '') + '</div>';
+    panel.innerHTML = s;
+    panel.style.display = '';
+    panel.scrollIntoView({block: 'nearest'});
+    document.getElementById('dong-panel').onclick = function () {
+      panel.style.display = 'none';
+    };
+  }
+
+  document.getElementById('mo-kieu-de').addEventListener('click', function () {
+    var d = document.getElementById('kieu-de');
+    d.open = true;
+    d.scrollIntoView({block: 'start'});
+  });
+
+  q.addEventListener('input', loc);
+  fd.addEventListener('change', loc);
+  fx.addEventListener('change', loc);
+  fn.addEventListener('change', loc);
+  for (var i = 0; i < hang.length; i++) {
+    hang[i].style.cursor = 'pointer';
+    hang[i].addEventListener('click', function () { mo(this); });
+  }
+  loc();
+})();
+</script>
+
+{{end}}
+
+{{template "qt-chan" .}}
+{{end}}

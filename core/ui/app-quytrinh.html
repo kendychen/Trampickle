@@ -12,9 +12,9 @@
 <meta name="robots" content="noindex">
 <link rel="icon" href="{{iconURL}}" type="{{iconMIME}}">
 {{template "pwa-dau" .}}
-{{template "css" .}}
+<link rel="stylesheet" href="{{cssURL}}">
 </head>
-<body class="{{.LopThan}} la-app">
+<body class="la-app">
 
 <header class="app-dau app-dau-2">
   <a class="app-lui" href="/app" aria-label="Quay lại">{{template "bt-lui"}}</a>
@@ -69,6 +69,22 @@
     <h2 class="app-h2">{{nd "quytrinh.ship.h3"}}</h2>
     <p class="nho mo">{{ndx "quytrinh.ship.chu-1" "nguong" (tien .Nguong.FreeShipVeTuDong)}}</p>
     <p class="nho mo" style="margin-top:8px">{{ndd "quytrinh.ship.chu-2"}}</p>
+  </section>
+
+  {{/* Bốn cam kết. Trước đứng ở màn hình đầu dưới dạng bốn chip; Kendy lấy
+       chỗ ấy cho khuyến mãi nên chúng về đây — và đây mới là chỗ đúng: trang
+       này nói trạm làm việc thế nào, cam kết là phần "và nếu hỏng thì sao".
+
+       Ở đây trang được phép cuộn nên bày thẳng bốn dòng, không phải bóp thành
+       chip rồi giấu chữ sau một cú bấm nữa. */}}
+  <section class="app-muc">
+    <h2 class="app-h2">{{nd "app.cs.h2"}}</h2>
+    <div class="app-doi">
+      <div><h3>{{nd "app.cs.1"}}</h3><p class="nho mo">{{ndd "app.cs.1-chu"}}</p></div>
+      <div><h3>{{nd "app.cs.2"}}</h3><p class="nho mo">{{ndd "app.cs.2-chu"}}</p></div>
+      <div><h3>{{nd "app.cs.3"}}</h3><p class="nho mo">{{ndd "app.cs.3-chu"}}</p></div>
+      <div><h3>{{nd "app.cs.4"}}</h3><p class="nho mo">{{ndd "app.cs.4-chu"}}</p></div>
+    </div>
   </section>
 
   <section class="app-muc">

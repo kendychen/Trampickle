@@ -12,9 +12,9 @@
 <meta name="robots" content="noindex">
 <link rel="icon" href="{{iconURL}}" type="{{iconMIME}}">
 {{template "pwa-dau" .}}
-{{template "css" .}}
+<link rel="stylesheet" href="{{cssURL}}">
 </head>
-<body class="{{.LopThan}} la-app">
+<body class="la-app">
 
 <header class="app-dau app-dau-2">
   <a class="app-lui" href="/app" aria-label="Quay lại">{{template "bt-lui"}}</a>
@@ -29,9 +29,49 @@
     <span class="app-dv-bt">{{template "bt-dv-mau" .DV.Ma}}</span>
     <div>
       <h1 class="app-dv-ten">{{.DV.Ten}}</h1>
-      <span class="chip chip-trung">{{nhom .DV.Nhom}}</span>
     </div>
   </div>
+
+  {{/* Giá. Kendy chốt: "bảng giá cho vào chỗ khi ấn vào dịch vụ thì sẽ cung
+       cấp giá". Bảng ba dòng ở màn hình đầu bỏ đi, con số chuyển về đây —
+       khách đang xem đúng việc mình cần thì con số mới có nghĩa, chứ ba dòng
+       ngoài kia là ba việc trạm tự xếp lên đầu, không chắc là việc của khách.
+
+       Con số lấy từ giaSan, tức ô `gia` đã gõ sẵn trong bảng giá. KHÔNG tự
+       tính lại từ vat_tu và gio_cong — việc tính là của src/quote.py, Go chỉ
+       đọc ra để hiện.
+
+       Ba trạng thái, không gộp: chưa mở bán ở giai đoạn này và "có bán nhưng
+       phải xem vợt" cùng ra -1 nên cùng hiện "Xem vợt rồi báo"; 0 là việc
+       trạm không thu tiền; còn lại là số thật, kèm chữ "từ" vì đây là giá
+       sàn chứ không phải giá chốt. */}}
+  <div class="app-dv-gia">
+    <span class="app-dv-gia-nhan">{{nd "app.gia.h2"}}</span>
+    {{$g := giaSan .DV}}
+    {{if lt $g 0}}
+    <b class="app-dv-gia-so app-gia-hoi">{{nd "app.gia.bao-rieng"}}</b>
+    {{else if eq $g 0}}
+    <b class="app-dv-gia-so app-gia-mp">{{nd "app.gia.mien-phi"}}</b>
+    {{else}}
+    {{/* Có đầu trên thì in cả khoảng: giá sàn một mình dễ bị đọc thành giá
+         chốt, rồi tới lúc báo giá thật cao hơn là khách thấy mình bị dắt.
+         Chữ "đ" chỉ đứng ở số sau — hai lần "đ" trong một dòng số to cỡ này
+         là mắt đọc thành hai con số rời nhau. */}}
+    {{$t := giaTran .DV}}
+    <b class="app-dv-gia-so{{if gt $t $g}} app-dv-gia-khoang{{end}}"><i>{{nd "app.gia.tu"}}</i>
+      {{- if gt $t $g}} {{tientron $g}} <i>{{nd "app.gia.den"}}</i> {{tien $t}}
+      {{- else}} {{tien $g}}{{end}}</b>
+    {{end}}
+  </div>
+  {{/* Hai câu khác nhau cho hai kiểu giá. Một con số thì câu cũ đúng: đây là
+       giá sàn, khám xong mới có số chính thức. Còn khi đã in cả khoảng thì
+       "đây là giá sàn" nói ngược với thứ khách vừa đọc — dùng đúng câu đang
+       treo dưới lưới việc, khách đi từ lưới vào đây thấy lại một câu quen. */}}
+  {{if gt $g 0}}
+  <p class="app-dan nho">
+    {{- if gt (giaTran .DV) $g}}{{ndd "app.gia.tuy-the"}}{{else}}{{ndd "dichvumot.gia.chu"}}{{end -}}
+  </p>
+  {{end}}
 
   {{if .DV.DieuKien}}
   <div class="bao bao-luu">{{nd "dichvumot.dieu-kien"}} {{.DV.DieuKien}}</div>
@@ -40,7 +80,7 @@
   {{/* Ba con số khách hỏi trước khi hỏi giá. Để ngay đầu, không bắt cuộn. */}}
   <div class="app-so3">
     <div>
-      <b>{{if .DV.LeadTimeNgay}}{{.DV.LeadTimeNgay}}{{else}}—{{end}}</b>
+      <b>{{if .DV.LeadSo}}{{.DV.LeadSo}}{{else}}—{{end}}</b>
       <span>{{nd "dichvumot.so.1-t"}}</span>
     </div>
     <div>
@@ -81,7 +121,7 @@
       <a class="app-o" href="/app/dich-vu/{{.Ma}}">
         <span class="app-bt">{{template "bt-dv-mau" .Ma}}</span>
         <span class="app-ten">{{.Ten}}</span>
-        {{if .LeadTimeNgay}}<span class="app-phu">{{.LeadTimeNgay}} ngày</span>{{end}}
+        {{with .LeadChu}}<span class="app-phu">{{.}}</span>{{end}}
       </a>
       {{end}}{{end}}
       <a class="app-o app-o-hoi" href="/app/gui-anh">

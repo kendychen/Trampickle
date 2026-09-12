@@ -29,7 +29,7 @@
 {{if .Phieu}}
 <div class="the-nhom">
   <div class="cuon">
-    <table class="bang">
+    <table class="bang bang-the">
       <thead>
         <tr><th>Mã</th><th>Loại</th><th>Ngày</th><th>Đơn / nhà cung cấp</th><th>Vật tư</th><th>Người ghi</th>{{if .NguoiDung.LaChu}}<th class="p">Tiền</th>{{end}}</tr>
       </thead>
@@ -37,17 +37,17 @@
       {{range .Phieu}}
         <tr class="co-link">
           <td><a href="/qt/kho/phieu/{{.Ma}}" class="so">{{.Ma}}</a></td>
-          <td class="nho">{{.TenLoai}}</td>
-          <td class="nho mo">{{ngaydep .Ngay}}</td>
-          <td class="nho">
+          <td data-n="Loại" class="nho">{{.TenLoai}}</td>
+          <td data-n="Ngày" class="nho mo">{{ngaydep .Ngay}}</td>
+          <td data-n="Đơn / nhà cung cấp" class="nho">
             {{if .MaDon}}<a href="/qt/don/{{.MaDon}}" class="so">{{.MaDon}}</a>{{else if .NhaCungCap}}{{.NhaCungCap}}{{else}}<span class="mo">—</span>{{end}}
           </td>
-          <td class="nho mo">
+          <td data-n="Vật tư" class="nho mo">
             {{range $i, $d := .Dong}}{{if lt $i 3}}{{if $i}}, {{end}}{{tenvt $d.MaVatTu}}{{end}}{{end}}
             {{if gt (len .Dong) 3}}…{{end}}
           </td>
-          <td class="nho mo">{{.Nguoi}}</td>
-          {{if $.NguoiDung.LaChu}}<td class="p">{{if .TongTien}}{{tien .TongTien}}{{else}}<span class="mo">—</span>{{end}}</td>{{end}}
+          <td data-n="Người ghi" class="nho mo">{{.Nguoi}}</td>
+          {{if $.NguoiDung.LaChu}}<td data-n="Tiền" class="p">{{if .TongTien}}{{tien .TongTien}}{{else}}<span class="mo">—</span>{{end}}</td>{{end}}
         </tr>
       {{end}}
       </tbody>
