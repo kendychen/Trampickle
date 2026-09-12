@@ -29,19 +29,23 @@
   <div class="the-nhom">
     <h3>Khách</h3>
     <div class="noi">
-      <div class="hang">
-        <label>Tên khách<input name="khach_ten" maxlength="100" value="{{if $d}}{{$d.KhachTen}}{{end}}" autofocus></label>
+      {{/* Gợi ý khách quen: gõ tên hoặc số ra hồ sơ cũ, ô nào đang trống thì
+           trạm điền hộ. Không đè lên chữ thợ vừa gõ — thợ nhìn khách trước
+           mặt, hồ sơ thì có thể đã cũ; riêng ô thợ đang gõ dở thì bấm chọn
+           tức là bảo trạm viết nốt hộ, nên ô đó được ghi đè.
+
+           Hộp gợi ý do trạm tự vẽ, không dùng <datalist> của trình duyệt:
+           hộp kia mỗi máy một kiểu, không đặt được cỡ chữ, và nó đứng lẫn
+           với lịch sử gõ form nên khách thật nằm chung với chữ rác. Vì thế
+           cả hai ô đều tắt autocomplete. */}}
+      <div class="hang goiy-khung">
+        <label>Tên khách<input name="khach_ten" maxlength="100" value="{{if $d}}{{$d.KhachTen}}{{end}}" autocomplete="off" autofocus></label>
         <label>Điện thoại / Zalo *
           <span class="hd">Khách tra cứu đơn bằng 4 số cuối của số này.</span>
-          <input name="khach_lien_he" maxlength="60" value="{{if $d}}{{$d.KhachLienHe}}{{end}}" list="ds-khach" autocomplete="off" required>
+          <input name="khach_lien_he" maxlength="60" value="{{if $d}}{{$d.KhachLienHe}}{{end}}" autocomplete="off" required>
         </label>
+        <div class="goiy" id="goiy-khach" role="listbox" hidden></div>
       </div>
-      {{/* Gợi ý khách quen: gõ số ra hồ sơ cũ, ô nào đang trống thì trạm điền
-           hộ. Không đè lên chữ thợ vừa gõ — thợ nhìn khách trước mặt, hồ sơ
-           thì có thể đã cũ. */}}
-      <datalist id="ds-khach">
-        {{range .GoiY}}<option value="{{.LienHe}}">{{if .Ten}}{{.Ten}}{{else}}chưa có tên{{end}} · {{.SoDon}} đơn</option>{{end}}
-      </datalist>
       <p class="nho" id="tin-khach" hidden style="margin:-8px 0 0"></p>
       {{/* Email không bắt buộc — nhiều bác chơi pickleball chỉ dùng Zalo. Có
            thì bấm được nút gửi báo giá và hoá đơn; không có thì thợ nhắn tay,
@@ -50,7 +54,7 @@
       <div class="hang">
         <label>Email khách
           <span class="hd">Để gửi mã tra cứu, báo giá và hoá đơn. Bỏ trống cũng được.</span>
-          <input type="email" name="khach_email" maxlength="254" value="{{if $d}}{{$d.KhachEmail}}{{end}}">
+          <input type="email" name="khach_email" maxlength="254" value="{{if $d}}{{$d.KhachEmail}}{{end}}" autocomplete="off">
         </label>
       </div>
       <div class="hang">
@@ -227,13 +231,130 @@ tinhTong();
     if (e && !e.value.trim() && gt) e.value = gt;
   }
 
+  // --- Hộp gợi ý tự vẽ ---------------------------------------------------
+  //
+  // Lọc theo cả tên lẫn số vì thợ nhớ kiểu nào cũng có: người thì gõ "chú
+  // Hải", người thì gõ bốn số cuối. Bỏ dấu trước khi so để "hai" ra được
+  // "Hải" — thợ gõ nhanh trên điện thoại hiếm khi bỏ dấu đúng.
+  var oTen = document.querySelector('input[name=khach_ten]');
+  var hop = document.getElementById('goiy-khach');
+  var TOI_DA = 8;
+  var hienDs = [], chon = -1;
+
+  // Dải dấu thanh dựng bằng fromCharCode chứ không viết escape thẳng: mẫu
+  // này nằm trong template, mà bộ escape của html/template từng làm hỏng
+  // escape kiểu đó ở css.html. Dựng lúc chạy thì không ai đụng vào được.
+  var reDau = new RegExp('[' + String.fromCharCode(0x300) + '-' + String.fromCharCode(0x36f) + ']', 'g');
+  function boDau(s) {
+    s = (s || '').toLowerCase();
+    if (s.normalize) s = s.normalize('NFD').replace(reDau, '');
+    return s.replace(/đ/g, 'd');
+  }
+  function loc(chu, laSo) {
+    var q = laSo ? chuanSo(chu) : boDau(chu.trim());
+    if (!q) return [];
+    var ra = [], i, k;
+    for (i = 0; i < kho.length && ra.length < TOI_DA; i++) {
+      k = kho[i];
+      if (laSo ? k.so.indexOf(q) >= 0 : (boDau(k.ten).indexOf(q) >= 0 || k.so.indexOf(q) >= 0)) {
+        ra.push(k);
+      }
+    }
+    return ra;
+  }
+  function dong(k) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'goiy-dong';
+    b.setAttribute('role', 'option');
+    var t = document.createElement('span');
+    t.className = 'g-ten';
+    t.textContent = k.ten || 'Chưa có tên';
+    if (!k.ten) t.classList.add('mo');
+    b.appendChild(t);
+    var s = document.createElement('span');
+    s.className = 'g-so';
+    s.textContent = k.lien_he || k.so;
+    b.appendChild(s);
+    if (k.con_no > 0) {
+      var n = document.createElement('span');
+      n.className = 'g-no';
+      n.textContent = 'nợ ' + tien(k.con_no);
+      b.appendChild(n);
+    }
+    var d = document.createElement('span');
+    d.className = 'g-dem';
+    // Hồ sơ mới đổ từ danh bạ thì chưa có đơn nào — "0 đơn" đọc như lỗi.
+    d.textContent = k.so_don > 0 ? k.so_don + ' đơn' : 'khách mới';
+    b.appendChild(d);
+    return b;
+  }
+  function veHop(ds) {
+    hienDs = ds; chon = -1;
+    while (hop.firstChild) hop.removeChild(hop.firstChild);
+    if (!ds.length) { hop.hidden = true; return; }
+    for (var i = 0; i < ds.length; i++) {
+      (function (k, b) {
+        b.addEventListener('click', function () { nhat(k); });
+        hop.appendChild(b);
+      })(ds[i], dong(ds[i]));
+    }
+    hop.hidden = false;
+  }
+  function dongHop() { hop.hidden = true; chon = -1; }
+  function toSang(i) {
+    var ds = hop.children, j;
+    for (j = 0; j < ds.length; j++) ds[j].classList.toggle('chon', j === i);
+    if (i >= 0 && ds[i]) ds[i].scrollIntoView({ block: 'nearest' });
+  }
+  // Ô thợ đang gõ dở thì ghi đè — bấm chọn tức là "viết nốt hộ tôi". Ô khác
+  // chỉ điền khi đang trống, theo đúng luật ở trên.
+  function nhat(k) {
+    if (oTen) { if (dangGo === oTen || !oTen.value.trim()) oTen.value = k.ten; }
+    o.value = k.lien_he || k.so;
+    dienNeuTrong('khach_email', k.email);
+    dongHop();
+    soi();
+    // Trả con trỏ về ô số nhưng đừng để cú focus ấy mở lại hộp: chọn xong
+    // rồi thì nhìn thấy hộp cũ nằm đó là tưởng chưa chọn được.
+    boQuaFocus = true;
+    o.focus();
+    boQuaFocus = false;
+  }
+
+  var dangGo = null, boQuaFocus = false;
+  function noiVao(e, laSo) {
+    if (!e) return;
+    e.addEventListener('input', function () { dangGo = e; veHop(loc(e.value, laSo)); });
+    e.addEventListener('focus', function () {
+      dangGo = e;
+      if (boQuaFocus) return;
+      if (e.value.trim()) veHop(loc(e.value, laSo));
+    });
+    e.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape') { dongHop(); return; }
+      if (hop.hidden || !hienDs.length) return;
+      if (ev.key === 'ArrowDown') { ev.preventDefault(); chon = (chon + 1) % hienDs.length; toSang(chon); }
+      else if (ev.key === 'ArrowUp') { ev.preventDefault(); chon = (chon <= 0 ? hienDs.length : chon) - 1; toSang(chon); }
+      else if (ev.key === 'Enter' && chon >= 0) { ev.preventDefault(); nhat(hienDs[chon]); }
+    });
+  }
+  noiVao(oTen, false);
+  noiVao(o, true);
+  // Giữ con trỏ trong ô khi bấm chuột xuống hộp, nếu không blur sẽ đóng hộp
+  // trước cả khi click kịp nổ.
+  hop.addEventListener('mousedown', function (ev) { ev.preventDefault(); });
+  document.addEventListener('click', function (ev) {
+    if (!hop.contains(ev.target) && ev.target !== o && ev.target !== oTen) dongHop();
+  });
+
   function soi() {
     var so = chuanSo(o.value), k = null, i;
     for (i = 0; i < kho.length; i++) { if (kho[i].so === so) { k = kho[i]; break; } }
     if (!k) { tin.hidden = true; tin.textContent = ''; return; }
     dienNeuTrong('khach_ten', k.ten);
     dienNeuTrong('khach_email', k.email);
-    var chu = 'Khách quen · ' + k.so_don + ' đơn';
+    var chu = k.so_don > 0 ? 'Khách quen · ' + k.so_don + ' đơn' : 'Đã có hồ sơ · chưa có đơn nào';
     if (k.con_no > 0) chu += ' · còn nợ ' + tien(k.con_no);
     if (k.lan_cuoi) chu += ' · lần cuối ' + k.lan_cuoi;
     tin.textContent = '';

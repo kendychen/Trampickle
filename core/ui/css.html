@@ -1369,6 +1369,47 @@ button.do:hover { background: var(--tuchoi); opacity: .88; }
    duyệt, và hàng tràn ra khỏi màn hình điện thoại. */
 .hang input, .hang select { min-width: 0; }
 
+/* --- Hộp gợi ý khách quen ------------------------------------------------
+   Trạm tự vẽ danh sách thay cho <datalist>: hộp của trình duyệt mỗi máy một
+   kiểu, cỡ chữ nhỏ hơn cả ô nhập, và nó xếp chung hàng với lịch sử gõ form
+   nên khách thật nằm lẫn với chữ rác thợ từng gõ nhầm.
+
+   Hộp treo tuyệt đối dưới cả hàng chứ không dưới từng ô: hai ô tên và số
+   cùng lọc ra một danh sách, treo dưới ô nào cũng lệch. Trên điện thoại
+   hàng gập thành hai dòng, hộp vẫn nằm dưới cùng nên không đè lên ô nào. */
+.goiy-khung { position: relative; }
+.goiy {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 30;
+  background: var(--the); border: 1px solid var(--vien-dam);
+  border-radius: var(--r-nho); box-shadow: var(--bong);
+  max-height: 296px; overflow-y: auto; padding: 4px;
+}
+.goiy-dong {
+  display: flex; align-items: baseline; gap: 10px; width: 100%;
+  padding: 9px 11px; margin: 0; border: 0; border-radius: var(--r-nho);
+  background: none; color: var(--chu); font-family: inherit; font-size: 14.5px;
+  font-weight: 400; text-align: left; cursor: pointer;
+}
+.goiy-dong:hover, .goiy-dong.chon { background: var(--nen-2); }
+/* Tên và số đứng liền nhau bên trái chứ không dàn ra hai mép: mắt thợ đọc
+   một cụm rồi mới liếc sang số đơn, để chúng cách nhau nửa màn hình thì
+   dòng nào cũng phải quét ngang một lần. */
+.goiy-dong .g-ten {
+  flex: 0 1 auto; min-width: 0; font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.goiy-dong .g-so {
+  flex: 0 0 auto; margin-right: auto;
+  font: 400 13px/1.5 "Roboto Mono", monospace; color: var(--chu-mo);
+}
+.goiy-dong .g-no { flex: 0 0 auto; font-size: 12.5px; color: var(--tuchoi); }
+.goiy-dong .g-dem { flex: 0 0 auto; font-size: 12.5px; color: var(--chu-mo); }
+/* Màn hẹp: số và số đơn xuống dòng dưới tên thay vì bóp tên còn ba chữ. */
+@media (max-width: 520px) {
+  .goiy-dong { flex-wrap: wrap; gap: 4px 8px; }
+  .goiy-dong .g-ten { flex: 1 1 100%; }
+}
+
 .bao { padding: 13px 15px; border-radius: var(--r-nho); margin-bottom: 18px; font-size: 15px; }
 .bao-ok { background: var(--nhan-nen);   color: var(--nhan); }
 .bao-loi { background: var(--tuchoi-nen); color: var(--tuchoi); }

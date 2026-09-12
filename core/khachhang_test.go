@@ -213,8 +213,13 @@ func TestFormDonMoiGoiYKhachQuen(t *testing.T) {
 	ma := GhiNhanKhach("Chị Bảy", "0900000077", "bay@vd.vn", "")
 
 	s := moTrang(t, mux, ck, "/qt/don-moi")
-	if !strings.Contains(s, `id="ds-khach"`) || !strings.Contains(s, "0900000077") {
+	// Hộp gợi ý là của trạm, không phải <datalist> của trình duyệt: kiểm cái
+	// khung rỗng cộng kho JSON nuôi nó.
+	if !strings.Contains(s, `id="goiy-khach"`) || !strings.Contains(s, "0900000077") {
 		t.Error("form lập đơn thiếu kho gợi ý khách quen")
+	}
+	if strings.Contains(s, `<datalist`) {
+		t.Error("vẫn còn datalist của trình duyệt trên form lập đơn")
 	}
 
 	s = moTrang(t, mux, ck, "/qt/don-moi?khach="+ma)
