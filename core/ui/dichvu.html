@@ -26,7 +26,7 @@
         {{if .DieuKien}}<div class="mota">{{.DieuKien}}</div>{{end}}
         <div class="chan">
           {{with .LeadChu}}<span>{{.}}</span>{{end}}
-          {{if .BaoHanhThang}}<span>BH {{.BaoHanhThang}} tháng</span>{{end}}
+          {{if .BaoHanhThang}}<span>{{ndx "chung.the.bao-hanh" "thang" .BaoHanhThang}}</span>{{end}}
         </div>
       </a>
       {{end}}

@@ -68,6 +68,12 @@ var CayND = []TrangND{
 				},
 			},
 			{
+				Ten: "Ô dịch vụ (lưới việc ở trang chủ và trang dịch vụ)",
+				Muc: []MucND{
+					{Khoa: "chung.the.bao-hanh", Nhan: "Nhãn bảo hành — {thang} là số tháng khai ở /qt/dich-vu", Mac: "BH {thang} tháng"},
+				},
+			},
+			{
 				Ten: "Chân trang",
 				Muc: []MucND{
 					{Khoa: "chung.chan.gioi-thieu", Nhan: "Câu giới thiệu (đứng sau dòng mô tả thương hiệu)", Dai: true,
@@ -677,6 +683,7 @@ var CayND = []TrangND{
 					{Khoa: "app.gui.chup-phu", Nhan: "Chữ nhỏ dưới nút chụp ảnh", Mac: "Mở máy ảnh chụp ngay"},
 					{Khoa: "app.gui.may", Nhan: "Nút lấy ảnh có sẵn trong máy", Mac: "Chọn từ máy"},
 					{Khoa: "app.gui.may-phu", Nhan: "Chữ nhỏ dưới nút chọn từ máy", Mac: "Ảnh hoặc video đã chụp"},
+					{Khoa: "app.nut.quay-lai", Nhan: "Mũi tên lùi ở góc trái — chữ cho người dùng máy đọc màn hình", Mac: "Quay lại"},
 				},
 			},
 			{
@@ -830,6 +837,26 @@ var CayND = []TrangND{
 				},
 			},
 			{
+				Ten: "Nhãn từng ô trong biểu mẫu",
+				Muc: []MucND{
+					{Khoa: "cuahang.o.mon-vot", Nhan: "Chọn món — vợt", Mac: "Vợt pickleball"},
+					{Khoa: "cuahang.o.mon-giay", Nhan: "Chọn món — giày", Mac: "Giày"},
+					{Khoa: "cuahang.o.giay-hang", Nhan: "Ô hãng giày", Mac: "Hãng / đời giày"},
+					{Khoa: "cuahang.o.giay-size", Nhan: "Ô size giày", Mac: "Size giày"},
+					{Khoa: "cuahang.o.giay-kieu", Nhan: "Ô kiểu giày", Mac: "Kiểu giày"},
+					{Khoa: "cuahang.o.chua-chon", Nhan: "Dòng đầu ô kiểu giày khi chưa chọn", Mac: "— chọn —"},
+					{Khoa: "cuahang.o.giay-chay", Nhan: "Kiểu giày — lựa chọn 1", Mac: "Giày chạy bộ"},
+					{Khoa: "cuahang.o.giay-di", Nhan: "Kiểu giày — lựa chọn 2", Mac: "Giày đi lại"},
+					{Khoa: "cuahang.o.vot-hang", Nhan: "Ô hãng vợt", Mac: "Hãng / đời vợt"},
+					{Khoa: "cuahang.o.gia-tri", Nhan: "Ô giá trị món", Mac: "Giá trị món (đ)"},
+					{Khoa: "cuahang.o.tinh-trang", Nhan: "Ô mô tả chỗ hỏng", Mac: "Mô tả chỗ hỏng"},
+					{Khoa: "cuahang.o.anh", Nhan: "Ô đính ảnh", Mac: "Ảnh chỗ hỏng"},
+					{Khoa: "cuahang.o.ten", Nhan: "Ô tên người nhận", Mac: "Tên"},
+					{Khoa: "cuahang.o.lien-he", Nhan: "Ô số điện thoại", Mac: "Số điện thoại / Zalo"},
+					{Khoa: "cuahang.o.dia-chi", Nhan: "Ô địa chỉ nhận lại", Mac: "Địa chỉ nhận lại"},
+				},
+			},
+			{
 				Ten: "Màn kết — sau khi đặt xong",
 				Muc: []MucND{
 					{Khoa: "cuahang.xong.tieu-de", Nhan: "Tiêu đề", Mac: "Đã nhận đơn. Giờ gửi đồ tới nhé"},
@@ -861,6 +888,7 @@ var CayND = []TrangND{
 					{Khoa: "cuahang.vandon.tieu-de", Nhan: "Tiêu đề ô", Mac: "Đã gửi hàng rồi?"},
 					{Khoa: "cuahang.vandon.dan", Nhan: "Câu dẫn", Dai: true,
 						Mac: "Dán mã vận đơn vào đây để trạm biết kiện đang trên đường. Chưa gửi thì để trống cũng được."},
+					{Khoa: "cuahang.vandon.o", Nhan: "Nhãn ô nhập", Mac: "Mã vận đơn"},
 					{Khoa: "cuahang.vandon.nut", Nhan: "Nút lưu", Mac: "Lưu mã vận đơn"},
 					{Khoa: "cuahang.vandon.ve", Nhan: "Nhãn mã vận đơn trạm gửi về", Mac: "Mã vận đơn gửi về"},
 				},
@@ -877,6 +905,17 @@ var CayND = []TrangND{
 					{Khoa: "cuahang.tra.cod", Nhan: "Tiêu đề cách 2 — trả khi nhận", Mac: "Trả khi nhận hàng"},
 					{Khoa: "cuahang.tra.cod-nhac", Nhan: "Nhắc khi trả COD", Dai: true,
 						Mac: "Trạm gửi hàng thu hộ, anh/chị trả tiền cho bên giao rồi mới nhận. Tiền ship về tính thêm theo bảng giá của hãng vận chuyển."},
+					{Khoa: "cuahang.tra.k-ngan-hang", Nhan: "Bảng chuyển khoản — dòng ngân hàng", Mac: "Ngân hàng"},
+					{Khoa: "cuahang.tra.k-so-tk", Nhan: "Bảng chuyển khoản — dòng số tài khoản", Mac: "Số tài khoản"},
+					{Khoa: "cuahang.tra.k-chu-tk", Nhan: "Bảng chuyển khoản — dòng chủ tài khoản", Mac: "Chủ tài khoản"},
+					{Khoa: "cuahang.tra.k-so-tien", Nhan: "Bảng chuyển khoản — dòng số tiền", Mac: "Số tiền"},
+					{Khoa: "cuahang.tra.k-noi-dung", Nhan: "Bảng chuyển khoản — dòng nội dung", Mac: "Nội dung"},
+					{Khoa: "cuahang.tra.nut-qr", Nhan: "Nút chọn chuyển khoản", Mac: "Tôi sẽ chuyển khoản"},
+					{Khoa: "cuahang.tra.nut-cod", Nhan: "Nút chọn trả khi nhận", Mac: "Tôi trả khi nhận hàng"},
+					{Khoa: "cuahang.tra.da-chon-qr", Nhan: "Câu xác nhận sau khi chọn chuyển khoản", Dai: true,
+						Mac: "Anh/chị đã chọn: chuyển khoản."},
+					{Khoa: "cuahang.tra.da-chon-cod", Nhan: "Câu xác nhận sau khi chọn trả khi nhận", Dai: true,
+						Mac: "Anh/chị đã chọn: trả khi nhận hàng."},
 				},
 			},
 			{

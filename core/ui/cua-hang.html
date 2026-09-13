@@ -20,8 +20,8 @@
     <fieldset class="ch-o">
       <legend>{{nd "cuahang.buoc.mon"}}</legend>
       <div class="ch-mon">
-        <label><input type="radio" name="loai" value="vot" data-mon {{if ne .Loai "giay"}}checked{{end}}> Vợt pickleball</label>
-        <label><input type="radio" name="loai" value="giay" data-mon {{if eq .Loai "giay"}}checked{{end}}> Giày</label>
+        <label><input type="radio" name="loai" value="vot" data-mon {{if ne .Loai "giay"}}checked{{end}}> {{nd "cuahang.o.mon-vot"}}</label>
+        <label><input type="radio" name="loai" value="giay" data-mon {{if eq .Loai "giay"}}checked{{end}}> {{nd "cuahang.o.mon-giay"}}</label>
       </div>
     </fieldset>
 
@@ -45,36 +45,36 @@
     <fieldset class="ch-o">
       <legend>{{nd "cuahang.buoc.tinh-trang"}}</legend>
       {{if eq .Loai "giay"}}
-      <label class="ch-d">Hãng / đời giày
+      <label class="ch-d">{{nd "cuahang.o.giay-hang"}}
         <input name="giay_hang" maxlength="100" autocomplete="off"></label>
-      <label class="ch-d">Size giày
+      <label class="ch-d">{{nd "cuahang.o.giay-size"}}
         <input name="giay_size" maxlength="20" autocomplete="off"></label>
-      <label class="ch-d">Kiểu giày
+      <label class="ch-d">{{nd "cuahang.o.giay-kieu"}}
         <select name="giay_kieu">
-          <option value="">— chọn —</option>
-          <option value="chay_bo">Giày chạy bộ</option>
-          <option value="di_lai">Giày đi lại</option>
+          <option value="">{{nd "cuahang.o.chua-chon"}}</option>
+          <option value="chay_bo">{{nd "cuahang.o.giay-chay"}}</option>
+          <option value="di_lai">{{nd "cuahang.o.giay-di"}}</option>
         </select></label>
       {{else}}
-      <label class="ch-d">Hãng / đời vợt
+      <label class="ch-d">{{nd "cuahang.o.vot-hang"}}
         <input name="vot_hang" maxlength="100" autocomplete="off"></label>
       {{end}}
-      <label class="ch-d">Giá trị món (đ)
+      <label class="ch-d">{{nd "cuahang.o.gia-tri"}}
         <input name="gia_tri" inputmode="numeric" autocomplete="off"></label>
-      <label class="ch-d">Mô tả chỗ hỏng
+      <label class="ch-d">{{nd "cuahang.o.tinh-trang"}}
         <textarea name="tinh_trang" rows="4" maxlength="1000"></textarea></label>
-      <label class="ch-d">Ảnh chỗ hỏng
+      <label class="ch-d">{{nd "cuahang.o.anh"}}
         <input type="file" name="anh" accept="image/*" multiple></label>
       <div class="ch-nhac">{{ndm "cuahang.buoc.anh-nhac"}}</div>
     </fieldset>
 
     <fieldset class="ch-o">
       <legend>{{nd "cuahang.buoc.nguoi-nhan"}}</legend>
-      <label class="ch-d">Tên
+      <label class="ch-d">{{nd "cuahang.o.ten"}}
         <input name="ten" maxlength="100" required autocomplete="name"></label>
-      <label class="ch-d">Số điện thoại / Zalo
+      <label class="ch-d">{{nd "cuahang.o.lien-he"}}
         <input name="lien_he" maxlength="100" required autocomplete="tel"></label>
-      <label class="ch-d">Địa chỉ nhận lại
+      <label class="ch-d">{{nd "cuahang.o.dia-chi"}}
         <textarea name="dia_chi" rows="2" maxlength="300" required autocomplete="street-address"></textarea></label>
     </fieldset>
 

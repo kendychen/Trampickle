@@ -88,7 +88,7 @@
             <form method="post" action="/tra-cuu/{{.Token}}/van-don" style="margin-top:12px">
               <input type="hidden" name="_csrf" value="{{$.CSRF}}">
               <div class="hang" style="align-items:flex-end">
-                <label style="margin:0">Mã vận đơn<input name="ma_van_don" maxlength="60" value="{{.MaVanDonDen}}" placeholder="VD: GHTK123456"></label>
+                <label style="margin:0">{{nd "cuahang.vandon.o"}}<input name="ma_van_don" maxlength="60" value="{{.MaVanDonDen}}" placeholder="VD: GHTK123456"></label>
                 <button type="submit" style="flex:0 0 auto">{{nd "cuahang.vandon.nut"}}</button>
               </div>
             </form>
@@ -145,11 +145,11 @@
           <div class="cuon">
             <table class="bang">
               <tbody>
-              <tr><td>Ngân hàng</td><td class="p">{{$.NganHang.Ma}}</td></tr>
-              <tr><td>Số tài khoản</td><td class="p">{{$.NganHang.SoTK}}</td></tr>
-              <tr><td>Chủ tài khoản</td><td class="p">{{$.NganHang.ChuTK}}</td></tr>
-              <tr><td>Số tiền</td><td class="p">{{tien $.SoTienTra}}</td></tr>
-              <tr><td>Nội dung</td><td class="p"><b>{{$.NoiDungCK}}</b></td></tr>
+              <tr><td>{{nd "cuahang.tra.k-ngan-hang"}}</td><td class="p">{{$.NganHang.Ma}}</td></tr>
+              <tr><td>{{nd "cuahang.tra.k-so-tk"}}</td><td class="p">{{$.NganHang.SoTK}}</td></tr>
+              <tr><td>{{nd "cuahang.tra.k-chu-tk"}}</td><td class="p">{{$.NganHang.ChuTK}}</td></tr>
+              <tr><td>{{nd "cuahang.tra.k-so-tien"}}</td><td class="p">{{tien $.SoTienTra}}</td></tr>
+              <tr><td>{{nd "cuahang.tra.k-noi-dung"}}</td><td class="p"><b>{{$.NoiDungCK}}</b></td></tr>
               </tbody>
             </table>
           </div>
@@ -157,7 +157,7 @@
           <form method="post" action="/tra-cuu/{{.Token}}/hinh-thuc-tra" style="margin-top:12px">
             <input type="hidden" name="_csrf" value="{{$.CSRF}}">
             <input type="hidden" name="cach" value="qr">
-            <button class="nut" type="submit">Tôi sẽ chuyển khoản</button>
+            <button class="nut" type="submit">{{nd "cuahang.tra.nut-qr"}}</button>
           </form>
           {{end}}
 
@@ -166,11 +166,11 @@
           <form method="post" action="/tra-cuu/{{.Token}}/hinh-thuc-tra" style="margin-top:12px">
             <input type="hidden" name="_csrf" value="{{$.CSRF}}">
             <input type="hidden" name="cach" value="cod">
-            <button class="nut nut-vien" type="submit">Tôi trả khi nhận hàng</button>
+            <button class="nut nut-vien" type="submit">{{nd "cuahang.tra.nut-cod"}}</button>
           </form>
 
           {{if .HinhThucTra}}
-          <p class="nho mo" style="margin-top:12px">Anh/chị đã chọn: {{if eq .HinhThucTra "qr"}}chuyển khoản{{else}}trả khi nhận hàng{{end}}.</p>
+          <p class="nho mo" style="margin-top:12px">{{if eq .HinhThucTra "qr"}}{{ndd "cuahang.tra.da-chon-qr"}}{{else}}{{ndd "cuahang.tra.da-chon-cod"}}{{end}}</p>
           {{end}}
         </div>
         {{end}}
