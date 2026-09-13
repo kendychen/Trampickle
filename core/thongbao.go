@@ -52,14 +52,7 @@ type SuKien struct {
 // errKenhTat: kênh chưa khai báo. Không phải lỗi — đừng ghi nhật ký.
 var errKenhTat = errors.New("kênh chưa khai")
 
-func gocWeb() string { return strings.TrimRight(strings.TrimSpace(CFG.Email.GocWeb), "/") }
-
-func tenTram() string {
-	if t := strings.TrimSpace(CFG.ThuongHieu.Ten); t != "" {
-		return t
-	}
-	return "Trạm"
-}
+func gocWeb() string { return GocWeb() }
 
 // LinkDayDu — đường tuyệt đối để dán vào tin nhắn. Không khai email.goc_web
 // thì trả về đường tương đối: nó vô dụng trong Telegram, nhưng vẫn nói cho
@@ -152,7 +145,7 @@ func guiMailSuKien(sk SuKien) (string, error) {
 		return "chưa khai địa chỉ chủ trạm", errKenhTat
 	}
 	h, c := thanMailSuKien(sk)
-	if err := guiMail(den, "["+tenTram()+"] "+sk.TieuDe, h, c); err != nil {
+	if err := guiMail(den, "["+TenTram()+"] "+sk.TieuDe, h, c); err != nil {
 		return "", err
 	}
 	return "đã gửi tới " + den, nil

@@ -526,6 +526,7 @@ var tieuDeTrang = map[string]string{
 	"app":           "App",
 	"dich-vu":       "Dịch vụ",
 	"dich-vu-qt":    "Bảng dịch vụ",
+	"tram":          "Thông tin trạm",
 	"lien-he-qt":    "Liên hệ",
 	"cau-hoi-qt":    "Câu hỏi thường gặp",
 	"bai-viet":      "Bài viết",
@@ -582,7 +583,7 @@ var moTaTrang = map[string]string{
 func chung(r *http.Request, trang string) Chung {
 	nd, ok := NguoiDangNhap(r)
 	return Chung{
-		Brand:      CFG.ThuongHieu,
+		Brand:      ThuongHieuHienTai(),
 		LienHe:     LienHeHienTai(),
 		Trang:      trang,
 		TieuDe:     tieuDeTrang[trang],

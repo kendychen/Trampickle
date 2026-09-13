@@ -246,12 +246,7 @@ func XoaChiTuPhieu(maPhieu string) error {
 
 // --- Mail báo cáo tháng ----------------------------------------------
 
-func emailChu() string {
-	if s := strings.TrimSpace(CFG.Email.BaoCao); s != "" {
-		return s
-	}
-	return strings.TrimSpace(CFG.Email.TraLoi)
-}
+func emailChu() string { return MailBaoCao() }
 
 // ThanBaoCaoThang dựng nội dung báo cáo. Tách khỏi việc gửi để trang quản trị
 // xem thử được trước khi mail bay đi.
@@ -264,7 +259,7 @@ func ThanBaoCaoThang(thang string) (tieuDe, thanHTML, thanChu string) {
 		}
 	}
 	vv := TinhVeVon()
-	tieuDe = fmt.Sprintf("[%s] Sổ tháng %s: %s", CFG.ThuongHieu.Ten, thang, tomTatLaiLo(t))
+	tieuDe = fmt.Sprintf("[%s] Sổ tháng %s: %s", TenTram(), thang, tomTatLaiLo(t))
 
 	dong := []string{
 		fmt.Sprintf("Tháng %s", thang),
@@ -305,7 +300,7 @@ func ThanBaoCaoThang(thang string) (tieuDe, thanHTML, thanChu string) {
 	if n := SoVatTuCanMua(); n > 0 {
 		fmt.Fprintf(&b, `<p style="margin:8px 0 0;color:#a15c00">Có %d vật tư dưới mức tồn tối thiểu.</p>`, n)
 	}
-	if goc := strings.TrimSpace(CFG.Email.GocWeb); goc != "" {
+	if goc := GocWeb(); goc != "" {
 		fmt.Fprintf(&b, `<p style="margin:20px 0 0"><a href="%s/qt/tien">Mở sổ tiền</a></p>`,
 			html.EscapeString(strings.TrimRight(goc, "/")))
 	}

@@ -102,6 +102,11 @@ func main() {
 	if err := core.NapLienHe(); err != nil {
 		fmt.Fprintln(os.Stderr, "Cảnh báo liên hệ:", err)
 	}
+	// Tên trạm, tiền tố mã đơn, cụm email — sửa ở /qt/tram. Thiếu file thì
+	// lấy khoá thuong_hieu và email trong config.yaml như trước.
+	if err := core.NapTram(); err != nil {
+		fmt.Fprintln(os.Stderr, "Cảnh báo thông tin trạm:", err)
+	}
 	// Danh sách tiệm gia công ngoài ở data/doi-tac.yaml. Chưa có file thì
 	// danh sách rỗng — đơn vẫn chạy, chỉ là chưa gửi đi đâu được.
 	if err := core.NapDoiTac(); err != nil {
@@ -180,7 +185,7 @@ func main() {
 		IdleTimeout:  120 * time.Second,
 	}
 
-	fmt.Printf("\n%s\n", core.CFG.ThuongHieu.TenDayDu)
+	fmt.Printf("\n%s\n", core.TenDayDuTram())
 	fmt.Printf("Thư mục dự án: %s\n", core.Root)
 	if *public {
 		fmt.Printf("Chế độ CÔNG KHAI — web khách + trang quản trị (có đăng nhập).\n")

@@ -37,14 +37,6 @@ const (
 
 var mailClient = &http.Client{Timeout: mailTimeout}
 
-// MailBat cho biết có gửi được mail hay không. Ba điều kiện, thiếu một là
-// tắt: bật trong config, có địa chỉ người gửi, và có khóa trong môi trường.
-func MailBat() bool {
-	return CFG.Email.Bat &&
-		strings.TrimSpace(CFG.Email.Tu) != "" &&
-		ResendKey() != ""
-}
-
 // HopLeEmail — kiểm tra vừa đủ để khỏi gọi API với chuỗi rác. Không cố viết
 // regex đúng RFC 5322: chuyện đó vô ích, địa chỉ có gõ đúng cú pháp vẫn có
 // thể không tồn tại. Sai thì Resend trả lỗi, và ta đã quyết định nuốt lỗi.
@@ -81,9 +73,9 @@ func guiMail(den, tieuDe, thanHTML, thanChu string) error {
 		return fmt.Errorf("địa chỉ nhận không hợp lệ")
 	}
 	b, err := json.Marshal(thuResend{
-		From:    CFG.Email.Tu,
+		From:    MailTu(),
 		To:      []string{strings.TrimSpace(den)},
-		ReplyTo: strings.TrimSpace(CFG.Email.TraLoi),
+		ReplyTo: MailTraLoi(),
 		Subject: tieuDe,
 		Html:    thanHTML,
 		Text:    thanChu,
@@ -137,7 +129,7 @@ func MailXacNhanYeuCau(yc yeuCauKhach) {
 		return
 	}
 	go func() {
-		tieuDe := fmt.Sprintf("Đã nhận yêu cầu %s — %s", yc.Ma, CFG.ThuongHieu.Ten)
+		tieuDe := fmt.Sprintf("Đã nhận yêu cầu %s — %s", yc.Ma, TenTram())
 		h, c := thanMailYeuCau(yc)
 		if err := guiMail(den, tieuDe, h, c); err != nil {
 			// Chỉ ghi log. Khách đã cầm mã trên màn hình, không mất gì.
@@ -147,7 +139,7 @@ func MailXacNhanYeuCau(yc yeuCauKhach) {
 }
 
 func linkTraCuu() string {
-	goc := strings.TrimRight(strings.TrimSpace(CFG.Email.GocWeb), "/")
+	goc := GocWeb()
 	if goc == "" {
 		return ""
 	}
@@ -174,7 +166,7 @@ func thanMailYeuCau(yc yeuCauKhach) (string, string) {
 	var h strings.Builder
 	h.WriteString(`<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.65;color:#1a1d18;max-width:560px">`)
 	fmt.Fprintf(&h, `<p>%s,</p>`, e(chao))
-	fmt.Fprintf(&h, `<p>%s đã nhận được ảnh anh/chị gửi. Thợ đang xem để báo giá, và sẽ nhắn lại trong ngày.</p>`, e(CFG.ThuongHieu.Ten))
+	fmt.Fprintf(&h, `<p>%s đã nhận được ảnh anh/chị gửi. Thợ đang xem để báo giá, và sẽ nhắn lại trong ngày.</p>`, e(TenTram()))
 	fmt.Fprintf(&h, `<p style="margin:22px 0;padding:14px 16px;border:1px dashed #999;border-radius:8px">`+
 		`<span style="font-size:13px;color:#666">Mã yêu cầu của anh/chị</span><br>`+
 		`<b style="font-size:19px;letter-spacing:.04em">%s</b></p>`, e(yc.Ma))
@@ -199,15 +191,15 @@ func thanMailYeuCau(yc yeuCauKhach) (string, string) {
 		h.WriteString(`<p>Vào mục <b>Tra cứu</b> trên web, gõ mã trên cùng 4 số cuối điện thoại là xem được yêu cầu đang tới đâu.</p>`)
 	}
 	h.WriteString(`<p><b>Chưa đồng ý giá thì trạm chưa động vào vợt.</b> Báo giá xong, anh/chị gật thì thợ mới làm.</p>`)
-	fmt.Fprintf(&h, `<p style="font-size:13px;color:#666;margin-top:26px">%s`, e(CFG.ThuongHieu.Ten))
-	if dt := strings.TrimSpace(CFG.ThuongHieu.LienHe.DienThoai); dt != "" {
+	fmt.Fprintf(&h, `<p style="font-size:13px;color:#666;margin-top:26px">%s`, e(TenTram()))
+	if dt := strings.TrimSpace(LienHeHienTai().DienThoai); dt != "" {
 		fmt.Fprintf(&h, ` · %s`, e(dt))
 	}
 	h.WriteString(`<br>Thư này gửi tự động, anh/chị trả lời thẳng vào đây cũng được.</p></div>`)
 
 	var c strings.Builder
 	fmt.Fprintf(&c, "%s,\n\n%s đã nhận được ảnh anh/chị gửi. Thợ đang xem để báo giá, và sẽ nhắn lại trong ngày.\n\n",
-		chao, CFG.ThuongHieu.Ten)
+		chao, TenTram())
 	fmt.Fprintf(&c, "MÃ YÊU CẦU: %s\n\n", yc.Ma)
 	if v := strings.TrimSpace(yc.VotHang); v != "" {
 		fmt.Fprintf(&c, "Vợt: %s\n", v)
@@ -225,8 +217,8 @@ func thanMailYeuCau(yc yeuCauKhach) (string, string) {
 		c.WriteString("Vào mục Tra cứu trên web, gõ mã trên cùng 4 số cuối điện thoại.\n\n")
 	}
 	c.WriteString("Chưa đồng ý giá thì trạm chưa động vào vợt.\n\n")
-	c.WriteString(CFG.ThuongHieu.Ten)
-	if dt := strings.TrimSpace(CFG.ThuongHieu.LienHe.DienThoai); dt != "" {
+	c.WriteString(TenTram())
+	if dt := strings.TrimSpace(LienHeHienTai().DienThoai); dt != "" {
 		c.WriteString(" · " + dt)
 	}
 	c.WriteString("\nThư này gửi tự động, anh/chị trả lời thẳng vào đây cũng được.\n")

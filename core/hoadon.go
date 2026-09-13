@@ -86,7 +86,7 @@ func veHoaDon(w http.ResponseWriter, r *http.Request, don *Don, laKhach bool) {
 // Rỗng khi chưa khai gốc web ở /qt/cai-dat: thà mail không có link còn hơn
 // có một link http://localhost gửi cho khách.
 func LinkHoaDon(don *Don) string {
-	goc := strings.TrimRight(strings.TrimSpace(CFG.Email.GocWeb), "/")
+	goc := GocWeb()
 	if goc == "" || don == nil || don.Token == "" {
 		return ""
 	}

@@ -378,7 +378,7 @@ func hQtCaiDat(w http.ResponseWriter, r *http.Request) {
 			case "gui-thu":
 				ke, di := BaoTinThu(SuKien{
 					Loai:   TinThu,
-					TieuDe: "Thử thông báo từ " + tenTram(),
+					TieuDe: "Thử thông báo từ " + TenTram(),
 					Than: "Đây là tin thử, không có đơn nào cả.\n" +
 						"Nhận được tin này nghĩa là kênh đó đã thông.",
 					Duong: "/qt/cai-dat",

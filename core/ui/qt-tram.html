@@ -1,0 +1,57 @@
+{{define "qt-tram.html"}}
+{{template "qt-dau" .}}
+
+<div class="qt-dau-trang"><h1>Thông tin trạm</h1></div>
+
+{{if .OK}}<div class="bao bao-ok">{{.OK}}</div>{{end}}
+{{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
+
+<p class="mo" style="max-width:64ch">
+  Tên trạm, dòng mô tả, tiền tố mã đơn và cụm email. Trước đây bốn thứ này nằm
+  trong file cấu hình trên máy chủ — đổi một chữ là phải nhờ người mở máy chủ
+  ra sửa. Từ đây gõ thẳng ở trang này.
+</p>
+<p class="nho mo" style="max-width:64ch">
+  Ghi ra <code>{{.Tep}}</code>. File này nằm trong <code>data/</code> nên mọi
+  lần đẩy bản mới lên máy chủ đều không đụng tới.
+</p>
+
+<form method="post" action="/qt/tram" style="max-width:760px;margin-top:24px">
+  <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+  {{range .O}}
+  {{if .DauNhom}}<div class="nhan-nho nhom" style="margin-top:28px">{{.Nhom}}</div>{{end}}
+  <div class="o-nguong" style="border-left:3px solid var(--nhan,#FFC72C);padding:12px 0 12px 16px;margin:16px 0">
+    <label for="{{.Khoa}}"><b>{{.Nhan}}</b></label>
+    <div style="margin:8px 0">
+      <input id="{{.Khoa}}" name="{{.Khoa}}" value="{{.Gia}}" autocomplete="off"
+             style="width:100%;max-width:520px">
+    </div>
+    <div class="nho mo">{{.Goi}}</div>
+  </div>
+  {{/* Hai ghi chú dưới đây bám đuôi đúng ô của nó, không tách thành khối riêng:
+       người đang gõ tiền tố phải thấy ngay mã sẽ ra sao. */}}
+  {{if eq .Khoa "tien_to_giay"}}
+  <p class="nho mo" style="margin:-4px 0 0 19px;max-width:64ch">
+    Mã đơn tiếp theo sẽ có dạng <code>{{$.MauMa}}</code>. Đơn đã phát ra giữ
+    nguyên mã cũ — đổi tiền tố không viết lại lịch sử.
+    {{if $.TienToCu}}<br>Tiền tố cũ vẫn được nhận khi đọc sao kê ngân hàng:
+    <code>{{$.TienToCu}}</code>.{{end}}
+  </p>
+  {{end}}
+  {{if eq .Khoa "goc_web"}}
+  <div class="o-nguong" style="border-left:3px solid var(--nhan,#FFC72C);padding:12px 0 12px 16px;margin:16px 0">
+    <label><input type="checkbox" name="mail_bat" value="1" {{if $.MailBat}}checked{{end}}>
+      <b>Gửi mail cho khách</b></label>
+    <div class="nho mo" style="margin-top:6px">
+      Tắt cái này là trạm không gửi mail nào nữa, kể cả mail báo nhận đơn. Vẫn
+      cần khoá Resend ở <a href="/qt/cai-dat">Khóa API</a> thì mail mới đi được.
+    </div>
+  </div>
+  {{end}}
+  {{end}}
+
+  <button class="nut nut-chinh" type="submit" style="margin-top:20px">Lưu</button>
+</form>
+
+{{template "qt-chan" .}}
+{{end}}

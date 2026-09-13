@@ -105,13 +105,13 @@ type biIcon struct {
 
 func hManifest(w http.ResponseWriter, r *http.Request) {
 	nen, nhan := mauNenApp, mauNhanApp
-	ten := CFG.ThuongHieu.Ten
+	ten := TenTram()
 	if ten == "" {
 		ten = "Trạm"
 	}
 	tenDai := ten
-	if CFG.ThuongHieu.DongMoTa != "" {
-		tenDai = ten + " — " + CFG.ThuongHieu.DongMoTa
+	if DongMoTaTram() != "" {
+		tenDai = ten + " — " + DongMoTaTram()
 	}
 
 	co := coCuaIcon()
@@ -178,7 +178,7 @@ func hManifest(w http.ResponseWriter, r *http.Request) {
 // Icon lấy bản vẽ trong binary chứ không lấy logo Kendy tải lên: logo ấy đã là
 // icon của app khách rồi, dùng lại là hai icon giống hệt nhau nằm cạnh nhau.
 func hManifestQt(w http.ResponseWriter, r *http.Request) {
-	ten := CFG.ThuongHieu.Ten
+	ten := TenTram()
 	if ten == "" {
 		ten = "Trạm"
 	}

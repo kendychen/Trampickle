@@ -62,7 +62,7 @@ func bangThe() map[string]string {
 	return map[string]string{
 		"nguong_can": strconv.FormatFloat(NguongHienTai().TangKhoiLuongToiDaG, 'f', -1, 64),
 		"free_ship":  dinhDangTien(NguongHienTai().FreeShipVeTuDong),
-		"ten_xuong":  CFG.ThuongHieu.Ten,
+		"ten_xuong":  TenTram(),
 	}
 }
 

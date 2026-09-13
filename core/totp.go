@@ -87,7 +87,7 @@ func byteNgauNhien(n int) []byte {
 }
 
 func uriOTPAuth(taiKhoan, biMatB32 string) string {
-	pht := strings.TrimSpace(CFG.ThuongHieu.Ten)
+	pht := strings.TrimSpace(TenTram())
 	if pht == "" {
 		pht = "TramVot"
 	}

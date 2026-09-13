@@ -62,6 +62,9 @@ func main() {
 	if err := core.NapLienHe(); err != nil {
 		fmt.Fprintln(os.Stderr, "Cảnh báo liên hệ:", err)
 	}
+	if err := core.NapTram(); err != nil {
+		fmt.Fprintln(os.Stderr, "Cảnh báo thông tin trạm:", err)
+	}
 	// Danh sách tiệm gia công ngoài ở data/doi-tac.yaml. Chưa có file thì
 	// danh sách rỗng — đơn vẫn chạy, chỉ là chưa gửi đi đâu được.
 	if err := core.NapDoiTac(); err != nil {
@@ -86,7 +89,7 @@ func main() {
 	mux := core.NewMux(false)
 
 	err := wails.Run(&options.App{
-		Title:            core.CFG.ThuongHieu.TenDayDu,
+		Title:            core.TenDayDuTram(),
 		Width:            1280,
 		Height:           860,
 		MinWidth:         900,

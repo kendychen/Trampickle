@@ -518,17 +518,10 @@ func LayDonTheoToken(token string) (*Don, bool) {
 	return nil, false
 }
 
-// MaDonMoi — TV-2609-001: TV + năm 2 số + tháng 2 số + số thứ tự trong
-// tháng. Đủ ngắn để khách đọc qua điện thoại, đủ dài để không trùng.
-// Giày dùng tiền tố TG- và đếm riêng: nhìn mã là biết ngay đôi giày hay cây
-// vợt, không phải mở đơn ra xem.
-func TienToDon(loai string) string {
-	if LoaiHopLe(loai) == LoaiGiay {
-		return "TG-"
-	}
-	return "TV-"
-}
-
+// MaDonMoi — TV-2609-001: tiền tố + năm 2 số + tháng 2 số + số thứ tự trong
+// tháng. Đủ ngắn để khách đọc qua điện thoại, đủ dài để không trùng. Tiền tố
+// sửa được ở /qt/tram — xem TienToDon trong core/tram.go. Đếm theo từng tiền
+// tố nên đổi tiền tố giữa tháng cũng không đụng vào mã đã phát ra.
 func MaDonMoi(loai string) string {
 	now := time.Now()
 	tien := fmt.Sprintf("%s%s-", TienToDon(loai), now.Format("0601"))

@@ -10,7 +10,7 @@ import (
 func TestNoiDungCKKhopDuocBangReMaDon(t *testing.T) {
 	for _, ma := range []string{"TV-2609-001", "TV-2612-045"} {
 		nd := NoiDungCK(ma)
-		if !reMaDon.MatchString(nd) {
+		if !reMaDon().MatchString(nd) {
 			t.Fatalf("nội dung %q không khớp reMaDon — sao kê sẽ không nhận ra đơn %s", nd, ma)
 		}
 	}
@@ -26,7 +26,7 @@ func TestNoiDungCKKhopKhiBiNganHangLamBien(t *testing.T) {
 		"CK tu 0900000000 " + nd,
 		"CHUYEN TIEN " + nd + " GD 123456",
 	} {
-		if !reMaDon.MatchString(bien) {
+		if !reMaDon().MatchString(bien) {
 			t.Fatalf("không khớp: %q", bien)
 		}
 	}

@@ -26,7 +26,7 @@ func canhBaoDangNhapLa(ten, ip string) {
 		return
 	}
 	luc := time.Now().Format("15:04 02/01/2006")
-	th := strings.TrimSpace(CFG.ThuongHieu.Ten)
+	th := strings.TrimSpace(TenTram())
 	if th == "" {
 		th = "Trạm"
 	}

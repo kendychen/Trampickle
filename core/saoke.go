@@ -18,11 +18,31 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
-// TV-2609-001, chấp nhận thiếu gạch hoặc thay bằng khoảng trắng.
-var reMaDon = regexp.MustCompile(`(?i)TV[\s\-_.]?(\d{4})[\s\-_.]?(\d{3})`)
+// TV-2609-001, chấp nhận thiếu gạch hoặc thay bằng khoảng trắng. Tiền tố
+// không cố định: nó sửa được ở /qt/tram, và biểu thức phải nhận cả những tiền
+// tố đã từng dùng — đổi tên thương hiệu không được làm đơn năm ngoái biến mất
+// khỏi màn đối chiếu sao kê. TienToNhanDien đã lọc còn chữ hoa và chữ số nên
+// ghép thẳng vào biểu thức là an toàn.
+var (
+	maDonMu   sync.Mutex
+	maDonRe   *regexp.Regexp
+	maDonKhoa string
+)
+
+func reMaDon() *regexp.Regexp {
+	khoa := strings.Join(TienToNhanDien(), "|")
+	maDonMu.Lock()
+	defer maDonMu.Unlock()
+	if maDonRe == nil || maDonKhoa != khoa {
+		maDonRe = regexp.MustCompile(`(?i)(` + khoa + `)[\s\-_.]?(\d{4})[\s\-_.]?(\d{3})`)
+		maDonKhoa = khoa
+	}
+	return maDonRe
+}
 
 var (
 	reNgayDMY = regexp.MustCompile(`\b(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4}|\d{2})\b`)
@@ -78,8 +98,8 @@ func docMotDongSaoKe(s string) DongSaoKe {
 		d.LyDo = them(d.LyDo, "dòng có nhiều số tiền")
 	}
 
-	if m := reMaDon.FindStringSubmatch(s); m != nil {
-		d.MaDon = strings.ToUpper("TV-" + m[1] + "-" + m[2])
+	if m := reMaDon().FindStringSubmatch(s); m != nil {
+		d.MaDon = strings.ToUpper(m[1] + "-" + m[2] + "-" + m[3])
 	}
 
 	switch {
@@ -151,7 +171,7 @@ func ghepNgay(nam, thang, ngay string) string {
 // trúng số dư thì ghi vào sổ một khoản thu vài chục triệu không có thật.
 // Dù sao dòng đó cũng đã bị đánh dấu để người kiểm.
 func timSoTien(s string, ngay string) (int, bool) {
-	sach := reMaDon.ReplaceAllString(s, " ")
+	sach := reMaDon().ReplaceAllString(s, " ")
 	sach = reNgayYMD.ReplaceAllString(sach, " ")
 	sach = reNgayDMY.ReplaceAllString(sach, " ")
 

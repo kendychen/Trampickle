@@ -115,7 +115,7 @@ func GuiThuDon(kieu string, don *Don, nguoi string) error {
 // vào lá thư do trạm đứng tên gửi.
 func thanThuDon(kieu string, don *Don) (string, string, string) {
 	e := html.EscapeString
-	ten := CFG.ThuongHieu.Ten
+	ten := TenTram()
 	if ten == "" {
 		ten = "Trạm"
 	}
@@ -125,7 +125,7 @@ func thanThuDon(kieu string, don *Don) (string, string, string) {
 		chao = "Chào anh/chị " + t
 	}
 	link := ""
-	if g := strings.TrimRight(strings.TrimSpace(CFG.Email.GocWeb), "/"); g != "" && don.Token != "" {
+	if g := GocWeb(); g != "" && don.Token != "" {
 		link = g + "/tra-cuu/" + don.Token
 	}
 
@@ -199,7 +199,7 @@ func thanThuDon(kieu string, don *Don) (string, string, string) {
 
 	fmt.Fprintf(&h, `<p style="font-size:13px;color:#666;margin-top:26px">%s`, e(ten))
 	c.WriteString("\n" + ten)
-	if dt := strings.TrimSpace(CFG.ThuongHieu.LienHe.DienThoai); dt != "" {
+	if dt := strings.TrimSpace(LienHeHienTai().DienThoai); dt != "" {
 		fmt.Fprintf(&h, ` · %s`, e(dt))
 		c.WriteString(" · " + dt)
 	}
