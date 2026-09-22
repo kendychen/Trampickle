@@ -3,7 +3,13 @@ import path from 'path';
 const ROOT = path.resolve('.');
 const SRC = path.join(ROOT, 'giao-trinh-sua-vot');
 const OUT = path.join(ROOT, 'dist');
+// cây sitemap động của Go đã khai ở core/baiviet.go:hSitemap. Tập này chỉ
+// build tài liệu tĩnh giao-trinh-sua-vot, nên sitemap tĩnh BỔ SUNG thêm các
+// đường dẫn tiền phương (/ , /dich-vu ...) để khi nginx KHÔNG proxy về Go
+// (deploy tĩnh) Google vẫn thấy đủ. Khi có proxy nginx (VPS Go đang chạy)
+// thì file này bị qua mặt bởi proxy_pass — không xung đột.
 const DOMAIN = 'https://trampickle.vn';
+const GO_CORE_URLS = ["/","/dich-vu","/bai-viet","/quy-trinh","/cau-hoi","/gioi-thieu","/ve-chung-toi","/lien-he"];
 
 function walk(dir){ let r=[]; for(const e of fs.readdirSync(dir,{withFileTypes:true})){ const p=path.join(dir,e.name); if(e.isDirectory()) r.push(...walk(p)); else r.push(p);} return r; }
 function mdToHtml(md){
@@ -72,8 +78,18 @@ for(const f of walk(SRC)){
 // root index
 const rootIndex = `<!doctype html><html lang="vi"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>trampickle.vn - Sua chua vot Pickleball</title><meta name="description" content="Sua chua vot Pickleball chuyen nghiep - Giao trinh sua vot, dich vu, lien he trampickle.vn"/><link rel="canonical" href="${DOMAIN}/"/></head><body style="max-width:820px;margin:0 auto;padding:24px;font-family:system-ui"><h1>trampickle.vn</h1><p>Chuyen sua chua vot Pickleball.</p><ul>${pages.slice(0,30).map(p=>`<li><a href="/${p}">${p}</a></li>`).join('')}</ul><p><a href="/giao-trinh-sua-vot/readme.html">Vao giao trinh →</a></p></body></html>`;
 fs.writeFileSync(path.join(OUT,'index.html'), rootIndex,'utf8');
-// copy sitemap robots
-for(const f of ['sitemap.xml','robots.txt']) if(fs.existsSync(path.join(ROOT,f))) fs.copyFileSync(path.join(ROOT,f), path.join(OUT,f));
+// robots: copy từ gốc (đã có Disallow /qt ...)
+if(fs.existsSync(path.join(ROOT,'robots.txt'))) fs.copyFileSync(path.join(ROOT,'robots.txt'), path.join(OUT,'robots.txt'));
+// sitemap: hợp nhất GO_CORE_URLS + trang giao-trinh-sua-vot -> dist/sitemap.xml
+// (để bản tĩnh không làm Google mù /, /dich-vu, /bai-viet)
+{
+  const allUrls = [...GO_CORE_URLS.map(p=>`${DOMAIN}${p}`), ...pages.map(p=>`${DOMAIN}/${p}`)];
+  const uniq = [...new Set(allUrls)].sort();
+  const sm = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${uniq.map(u=>`  <url><loc>${u}</loc></url>`).join('\n')}\n</urlset>\n`;
+  fs.writeFileSync(path.join(OUT,'sitemap.xml'), sm, 'utf8');
+  // đồng bộ lại sitemap.xml gốc để lần sau không lệch
+  fs.writeFileSync(path.join(ROOT,'sitemap.xml'), sm, 'utf8');
+}
 // copy assets if any
 if(fs.existsSync(path.join(ROOT,'giao-trinh-sua-vot/anh'))) { fs.cpSync(path.join(ROOT,'giao-trinh-sua-vot/anh'), path.join(OUT,'giao-trinh-sua-vot/anh'), {recursive:true}); }
 console.log('built',pages.length,'pages to dist/');

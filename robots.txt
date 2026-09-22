@@ -1,4 +1,9 @@
 User-agent: *
+Disallow: /qt
+Disallow: /noi-bo
+Disallow: /api
+Disallow: /dang-nhap
+Disallow: /tra-cuu
 Allow: /
 Sitemap: https://trampickle.vn/sitemap.xml
 Host: https://trampickle.vn

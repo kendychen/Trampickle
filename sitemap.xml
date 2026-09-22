@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://trampickle.vn/</loc></url>
+  <url><loc>https://trampickle.vn/bai-viet</loc></url>
+  <url><loc>https://trampickle.vn/cau-hoi</loc></url>
+  <url><loc>https://trampickle.vn/dich-vu</loc></url>
   <url><loc>https://trampickle.vn/giao-trinh-sua-vot/00-ke-hoach.html</loc></url>
   <url><loc>https://trampickle.vn/giao-trinh-sua-vot/01-nen-tang/1-1-cau-tao-vot.html</loc></url>
   <url><loc>https://trampickle.vn/giao-trinh-sua-vot/01-nen-tang/1-2-vat-lieu-keo.html</loc></url>
@@ -22,7 +25,13 @@
   <url><loc>https://trampickle.vn/giao-trinh-sua-vot/04-lam-nghe/4-1-gia-bao-hanh.html</loc></url>
   <url><loc>https://trampickle.vn/giao-trinh-sua-vot/04-lam-nghe/4-2-loi-tho-moi.html</loc></url>
   <url><loc>https://trampickle.vn/giao-trinh-sua-vot/04-lam-nghe/4-3-khao-sat-thi-truong-can-gay.html</loc></url>
+  <url><loc>https://trampickle.vn/giao-trinh-sua-vot/_nguon/readme.html</loc></url>
+  <url><loc>https://trampickle.vn/giao-trinh-sua-vot/anh/readme.html</loc></url>
   <url><loc>https://trampickle.vn/giao-trinh-sua-vot/nguon.html</loc></url>
-  <url><loc>https://trampickle.vn/giao-trinh-sua-vot/video.html</loc></url>
   <url><loc>https://trampickle.vn/giao-trinh-sua-vot/readme.html</loc></url>
+  <url><loc>https://trampickle.vn/giao-trinh-sua-vot/video.html</loc></url>
+  <url><loc>https://trampickle.vn/gioi-thieu</loc></url>
+  <url><loc>https://trampickle.vn/lien-he</loc></url>
+  <url><loc>https://trampickle.vn/quy-trinh</loc></url>
+  <url><loc>https://trampickle.vn/ve-chung-toi</loc></url>
 </urlset>
