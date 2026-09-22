@@ -371,7 +371,7 @@ func (d DichVu) DoiTuongChuan() string {
 		return "vot"
 	}
 }
-func LaDoiTuongHopLe(s string) bool { return s=="vot"||s=="giay"||s=="ca_hai" }
+func LaDoiTuongHopLe(s string) bool { return s == "vot" || s == "giay" || s == "ca_hai" }
 
 func P(rel string) string { return filepath.Join(Root, rel) }
 
