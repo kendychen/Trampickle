@@ -1,0 +1,7 @@
+services:
+  web:
+    build: .
+    container_name: trampickle
+    ports:
+      - "80:80"
+    restart: unless-stopped

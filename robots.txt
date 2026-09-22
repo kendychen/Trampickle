@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Sitemap: https://trampickle.vn/sitemap.xml
+Host: https://trampickle.vn
