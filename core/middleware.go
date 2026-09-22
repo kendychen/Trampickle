@@ -23,7 +23,7 @@ const (
 // NewHandler trả về mux đã bọc đủ lớp. main.go dùng cái này, không dùng
 // NewMux trực tiếp — NewMux vẫn xuất khẩu vì test dựng mux trần cho nhanh.
 func NewHandler(public bool) http.Handler {
-	return boHeader(boCSRF(boNhatKy(NewMux(public))))
+	return boHeader(boBaoTri(boCSRF(boNhatKy(NewMux(public)))))
 }
 
 // --- Header an toàn --------------------------------------------------

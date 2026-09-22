@@ -191,6 +191,7 @@ type DichVu struct {
 	Ma                string  `yaml:"ma"`
 	Ten               string  `yaml:"ten"`
 	Nhom              string  `yaml:"nhom"`
+	DoiTuong          string  `yaml:"doi_tuong"`
 	Gia               []*int  `yaml:"gia"`
 	GiaDen            []*int  `yaml:"gia_den"`
 	VatTu             int     `yaml:"vat_tu"`
@@ -356,8 +357,21 @@ func LoadConfig() error {
 		return fmt.Errorf("bảng giá hỏng: %w", err)
 	}
 	GiaiDoan = GIA.GiaiDoanHienTai
+	NapBaoTri()
 	return nil
 }
+
+func (d DichVu) DoiTuongChuan() string {
+	switch d.DoiTuong {
+	case "giay":
+		return "giay"
+	case "ca_hai":
+		return "ca_hai"
+	default:
+		return "vot"
+	}
+}
+func LaDoiTuongHopLe(s string) bool { return s=="vot"||s=="giay"||s=="ca_hai" }
 
 func P(rel string) string { return filepath.Join(Root, rel) }
 

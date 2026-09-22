@@ -313,7 +313,7 @@ func giaKhach(d DichVu) string {
 		return ND("app.gia.tu") + " " + tienTron(*p) +
 			" " + ND("app.gia.den") + " " + dinhDangTien(*den)
 	}
-	return ND("app.gia.tu") + " " + dinhDangTien(*p)
+	return dinhDangTien(*p)
 }
 
 // tienNgan rút "100.000đ" thành "100k". CHỈ rút khi con số chia hết cho 1000
@@ -346,7 +346,7 @@ func giaNgan(d DichVu) string {
 	if den := d.GiaDenTheoGiaiDoan(GiaiDoan); den != nil && *den > *p {
 		return tienNgan(*p) + "–" + tienNgan(*den)
 	}
-	return ND("app.gia.tu") + " " + tienNgan(*p)
+	return tienNgan(*p)
 }
 
 // coGiaTheoTinhTrang: trong lưới có ít nhất một việc chưa niêm yết giá, hoặc

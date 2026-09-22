@@ -66,6 +66,7 @@ type ODichVu struct {
 	Ma           string
 	Ten          string
 	Nhom         string
+	DoiTuong     string
 	DieuKien     string
 	Gia          [3]string // rỗng = chưa mở bán ở giai đoạn đó
 	GiaDen       [3]string // rỗng = giá một con số, không phải một khoảng
@@ -87,7 +88,7 @@ type ODichVu struct {
 
 func oTuDichVu(d DichVu) ODichVu {
 	o := ODichVu{
-		Ma: d.Ma, Ten: d.Ten, Nhom: d.Nhom,
+		Ma: d.Ma, Ten: d.Ten, Nhom: d.Nhom, DoiTuong: d.DoiTuongChuan(),
 		DieuKien:    strings.TrimSpace(d.DieuKien),
 		BaoGiaRieng: d.BaoGiaRieng,
 		NoiBat:      d.NoiBat,
@@ -203,6 +204,14 @@ func docODichVu(cu ODichVu, f func(string) string) (ODichVu, error) {
 	moi.DieuKien = strings.Join(strings.Fields(f("dieu_kien")), " ")
 	if len([]rune(moi.DieuKien)) > dieuKienToiDa {
 		return moi, loi("điều kiện dài quá %d ký tự", dieuKienToiDa)
+	}
+
+	moi.DoiTuong = strings.TrimSpace(f("doi_tuong"))
+	if moi.DoiTuong == "" {
+		moi.DoiTuong = "vot"
+	}
+	if !LaDoiTuongHopLe(moi.DoiTuong) {
+		return moi, loi("đối tượng phải là vot, giay hoặc ca_hai")
 	}
 
 	// Hai ô một giai đoạn: "từ" và "đến". Ô "đến" để trống là giá một con số,
@@ -513,6 +522,9 @@ func suaMotMuc(dong []string, ds, de int, cu, moi ODichVu) []string {
 	if moi.ThuTu != cu.ThuTu {
 		dat("thu_tu", []string{"    thu_tu: " + moi.ThuTu}, moi.ThuTu != "")
 	}
+	if moi.DoiTuong != cu.DoiTuong {
+		dat("doi_tuong", []string{"    doi_tuong: " + moi.DoiTuong}, moi.DoiTuong != "" && moi.DoiTuong != "vot")
+	}
 	if len(ss) == 0 {
 		return dong
 	}
@@ -602,6 +614,76 @@ func SuaDichVu(moi map[string]ODichVu) ([]string, error) {
 	return doi, nil
 }
 
+var reMaDV = regexp.MustCompile(`^[A-Z0-9_]{2,24}$`)
+
+func ThemDichVu(o ODichVu) error {
+	dvMu.Lock(); defer dvMu.Unlock()
+	if !reMaDV.MatchString(o.Ma) { return fmt.Errorf("ma %q chi gom A-Z, 0-9, _, 2-24 ky tu", o.Ma) }
+	for _, d := range GIA.DichVu { if d.Ma == o.Ma { return fmt.Errorf("ma %s da co", o.Ma) } }
+	if o.Ten == "" { return fmt.Errorf("chua dien ten viec") }
+	if o.DoiTuong == "" { o.DoiTuong = "vot" }
+	if !LaDoiTuongHopLe(o.DoiTuong) { return fmt.Errorf("doi tuong phai la vot, giay hoac ca_hai") }
+	b, err := os.ReadFile(fileBangGia())
+	if err != nil { return err }
+	noi := string(b)
+	dong := strings.Split(strings.ReplaceAll(noi, "\r\n", "\n"), "\n")
+	dau, cuoi := khoiKhoaTrenCung(dong, "dich_vu")
+	if dau < 0 { return fmt.Errorf("khong tim thay khoi dich_vu") }
+	chen := cuoi
+	for chen > dau+1 && strings.TrimSpace(dong[chen-1]) == "" { chen-- }
+	giaDong := dongGia("gia", o.Gia)
+	var moiDong []string
+	moiDong = append(moiDong, "  - ma: "+o.Ma)
+	moiDong = append(moiDong, "    ten: "+nhayKep(o.Ten))
+	moiDong = append(moiDong, "    nhom: "+o.Nhom)
+	if o.DoiTuong != "" && o.DoiTuong != "vot" { moiDong = append(moiDong, "    doi_tuong: "+o.DoiTuong) }
+	moiDong = append(moiDong, "    "+giaDong)
+	has:=false; for _,v:=range o.GiaDen{ if v!=""{has=true;break}}
+	if has { moiDong=append(moiDong,"    "+dongGia("gia_den",o.GiaDen)) }
+	moiDong=append(moiDong,"    vat_tu: 0")
+	moiDong=append(moiDong,"    gio_cong: 0")
+	if o.BaoHanhThang!="" && o.BaoHanhThang!="0" { moiDong=append(moiDong,"    bao_hanh_thang: "+o.BaoHanhThang) }
+	if o.LeadTimeNgay!="" && o.LeadTimeNgay!="0" { moiDong=append(moiDong,"    lead_time_ngay: "+o.LeadTimeNgay) }
+	if o.LeadTimeDen!="" { moiDong=append(moiDong,"    lead_time_ngay_den: "+o.LeadTimeDen) }
+	if o.ThuTu!="" && o.ThuTu!="0" { moiDong=append(moiDong,"    thu_tu: "+o.ThuTu) }
+	if o.TuGiaiDoan>1 { moiDong=append(moiDong,"    tu_giai_doan: "+strconv.Itoa(o.TuGiaiDoan)) }
+	if o.DieuKien!="" { moiDong=append(moiDong,dongFolded("dieu_kien",o.DieuKien)...) }
+	if o.BaoGiaRieng { moiDong=append(moiDong,"    bao_gia_rieng: true") }
+	if o.NoiBat { moiDong=append(moiDong,"    noi_bat: true") }
+	if o.An { moiDong=append(moiDong,"    an: true") }
+	ra:=make([]string,0,len(dong)+len(moiDong))
+	ra=append(ra,dong[:chen]...);ra=append(ra,moiDong...);ra=append(ra,dong[chen:]...)
+	out:=strings.Join(ra,"\n")
+	var thu BangGia
+	if err:=yaml.Unmarshal([]byte(out),&thu);err!=nil{return fmt.Errorf("them xong bang gia khong doc duoc: %w",err)}
+	if err:=ghiAtomic(fileBangGia(),[]byte(out));err!=nil{return err}
+	GIA.DichVu=thu.DichVu
+	return nil
+}
+
+func XoaDichVu(ma string) error {
+	dvMu.Lock();defer dvMu.Unlock()
+	found:=false;for _,d:=range GIA.DichVu{if d.Ma==ma{found=true;break}}
+	if !found{return fmt.Errorf("khong thay %s",ma)}
+	b,err:=os.ReadFile(fileBangGia())
+	if err!=nil{return err}
+	noi:=string(b)
+	dong:=strings.Split(strings.ReplaceAll(noi, "\r\n", "\n"),"\n")
+	dau,cuoi:=khoiKhoaTrenCung(dong,"dich_vu")
+	if dau<0{return fmt.Errorf("khong tim thay khoi dich_vu")}
+	ds,de:=vungMuc(dong,dau,cuoi,ma)
+	if ds<0{return fmt.Errorf("khong thay muc %s trong file",ma)}
+	ra:=make([]string,0,len(dong)-(de-ds))
+	ra=append(ra,dong[:ds]...);ra=append(ra,dong[de:]...)
+	out:=strings.Join(ra,"\n")
+	var thu BangGia
+	if err:=yaml.Unmarshal([]byte(out),&thu);err!=nil{return fmt.Errorf("xoa xong bang gia hong: %w",err)}
+	if len(thu.DichVu)!=len(GIA.DichVu)-1{return fmt.Errorf("sau khi xoa con %d thay vi %d",len(thu.DichVu),len(GIA.DichVu)-1)}
+	if err:=ghiAtomic(fileBangGia(),[]byte(out));err!=nil{return err}
+	GIA.DichVu=thu.DichVu
+	return nil
+}
+
 // --- Trang quản trị --------------------------------------------------
 
 type dlQtDichVu struct {
@@ -666,10 +748,81 @@ func hQtDichVu(w http.ResponseWriter, r *http.Request) {
 			d.SoHien++
 		}
 	}
-	d.Tep = CFG.DuongDan.BangGia
+	if r.URL.Query().Get("ok") != "" && d.OK == "" { d.OK = r.URL.Query().Get("ok") }
+        if r.URL.Query().Get("loi") != "" && d.Loi == "" { d.Loi = r.URL.Query().Get("loi") }
+        d.Tep = CFG.DuongDan.BangGia
 	d.GiaiDoan = GiaiDoan
 	d.NoiBatTat = !DvNoiBatBat()
 	render(w, "qt-dich-vu.html", d)
+}
+
+func hQtDichVuThem(w http.ResponseWriter, r *http.Request) {
+        r.Body = http.MaxBytesReader(w, r.Body, 64*1024)
+        if err := r.ParseForm(); err != nil { http.Error(w, "biểu mãu lỗi", 400); return }
+        ma := strings.ToUpper(strings.TrimSpace(r.FormValue("ma")))
+        ten := strings.TrimSpace(r.FormValue("ten"))
+        nhom := strings.ToUpper(strings.TrimSpace(r.FormValue("nhom")))
+        if nhom == "" { nhom = "A" }
+        if nhom != "A" && nhom != "B" && nhom != "C" { nhom = "A" }
+        doiTuong := strings.TrimSpace(r.FormValue("doi_tuong"))
+        if doiTuong == "" { doiTuong = "vot" }
+        var gia [3]string
+        var giaDen [3]string
+        for i:=0;i<3;i++ {
+                gia[i] = strings.TrimSpace(r.FormValue("gia"+strconv.Itoa(i+1)))
+                giaDen[i] = strings.TrimSpace(r.FormValue("giaden"+strconv.Itoa(i+1)))
+        }
+        o := ODichVu{Ma: ma, Ten: ten, Nhom: nhom, DoiTuong: doiTuong, Gia: gia, GiaDen: giaDen, TuGiaiDoan: 1}
+        // Lay them cac truong tuy chon
+        if v:=strings.TrimSpace(r.FormValue("thu_tu")); v!="" { o.ThuTu=v }
+        if v:=strings.TrimSpace(r.FormValue("dieu_kien")); v!="" { o.DieuKien=v }
+        // Validate qua docODichVu de dung chung luat gia
+        base := ODichVu{Ma: ma, Ten: ten, Nhom: nhom, DoiTuong: doiTuong}
+        // docODichVu can cu ODichVu de lay loi prefix, va f de doc field
+        m, err := docODichVu(base, func(k string) string {
+                switch k {
+                case "ten": return ten
+                case "dieu_kien": return o.DieuKien
+                case "doi_tuong": return doiTuong
+                case "tu_giai_doan": return "1"
+                case "bao_hanh_thang", "lead_time_ngay", "lead_time_ngay_den", "thu_tu":
+                        if k=="thu_tu" { return o.ThuTu }
+                        return ""
+                case "bao_gia_rieng", "noi_bat", "an": return ""
+                default:
+                        // gia/giaden
+                        for i:=0;i<3;i++ {
+                                if k=="gia"+strconv.Itoa(i+1) { return gia[i] }
+                                if k=="giaden"+strconv.Itoa(i+1) { return giaDen[i] }
+                        }
+                        return ""
+                }
+        })
+        if err != nil {
+                http.Redirect(w, r, "/qt/dich-vu?loi="+urlQueryEscape(err.Error()), http.StatusSeeOther)
+                return
+        }
+        // Giữ thông tin đã validate
+        o.Ten = m.Ten; o.DieuKien=m.DieuKien; o.DoiTuong=m.DoiTuong; o.Gia=m.Gia; o.GiaDen=m.GiaDen; o.ThuTu=m.ThuTu
+        o.Nhom = nhom
+        if err := ThemDichVu(o); err != nil {
+                http.Redirect(w, r, "/qt/dich-vu?loi="+urlQueryEscape(err.Error()), http.StatusSeeOther)
+                return
+        }
+        http.Redirect(w, r, "/qt/dich-vu?ok="+urlQueryEscape("Đã thêm "+ma), http.StatusSeeOther)
+}
+
+func urlQueryEscape(s string) string { return strings.ReplaceAll(strings.ReplaceAll(s, "%", "%25"), "&", "%26") }
+
+func hQtDichVuXoa(w http.ResponseWriter, r *http.Request) {
+        ma := strings.ToUpper(r.PathValue("ma"))
+        if ma == "" { ma = strings.ToUpper(strings.TrimSpace(r.FormValue("ma"))) }
+        if !reMaDV.MatchString(ma) { http.Error(w, "mã không hợp lệ", 400); return }
+        if err := XoaDichVu(ma); err != nil {
+                http.Redirect(w, r, "/qt/dich-vu?loi="+urlQueryEscape(err.Error()), http.StatusSeeOther)
+                return
+        }
+        http.Redirect(w, r, "/qt/dich-vu?ok="+urlQueryEscape("Đã xóa "+ma), http.StatusSeeOther)
 }
 
 // --- Bài của từng việc -------------------------------------------------

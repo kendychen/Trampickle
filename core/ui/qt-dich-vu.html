@@ -31,6 +31,28 @@
   mấy thứ đó đổi là đổi cách tính lãi, phải mở file mà sửa cho biết mình đang
   làm gì.
 </p>
+<div class="o-nguong" style="border-left:3px solid var(--nhan,#FFC72C);padding:14px 16px;margin:24px 0;max-width:860px">
+  <b>Thêm dịch vụ mới</b>
+  <form method="post" action="/qt/dich-vu/them" style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:end">
+    <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+    <label>Mã<br><input name="ma" placeholder="VD: DAN_VOT" style="max-width:180px" required></label>
+    <label>Tên<br><input name="ten" placeholder="Tên việc" style="min-width:220px" required></label>
+    <label>Nhóm<br><select name="nhom"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select></label>
+    <label>Đối tượng<br><select name="doi_tuong"><option value="vot" selected>Vợt</option><option value="giay">Giày</option><option value="ca_hai">Cả hai</option></select></label>
+    <label>Giá Gđ 1<br><input name="gia1" inputmode="numeric" placeholder="VD 120000" style="max-width:130px"></label>
+    <label>Đến<br><input name="giaden1" inputmode="numeric" placeholder="—" style="max-width:130px"></label>
+    <button type="submit">Thêm</button>
+  </form>
+  <p class="nho mo" style="margin:8px 0 0">Vat tu / giờ công mặc định 0, sửa tay trong file sau nếu cần tính lãi.</p>
+</div>
+<div style="max-width:860px;margin:10px 0;display:flex;gap:8px;flex-wrap:wrap">
+  <span class="nho mo">Lọc:</span>
+  <button type="button" class="nut nut-phu" onclick="locDV('tatca')">Tất cả</button>
+  <button type="button" class="nut nut-phu" onclick="locDV('vot')">Vợt</button>
+  <button type="button" class="nut nut-phu" onclick="locDV('giay')">Giày</button>
+  <button type="button" class="nut nut-phu" onclick="locDV('ca_hai')">Cả hai</button>
+</div>
+
 
 <form method="post" action="/qt/dich-vu" style="max-width:860px;margin-top:24px">
   <input type="hidden" name="_csrf" value="{{$.CSRF}}">
@@ -48,8 +70,13 @@
       <a class="nho" href="/qt/dich-vu/{{.Ma}}/bai" style="margin-left:auto">
         {{if coBaiDV .Ma}}Sửa bài ↗{{else}}Chưa có bài — viết ↗{{end}}
       </a>
+      <form method="post" action="/qt/dich-vu/xoa" onsubmit="return confirm('Xoá {{.Ma}}?')" style="margin-left:8px;display:inline"><input type="hidden" name="_csrf" value="{{$.CSRF}}"><input type="hidden" name="ma" value="{{.Ma}}"><button type="submit" class="nut nut-phu" style="padding:2px 8px;font-size:12px">Xoá</button></form>
     </div>
 
+    <div style="margin:6px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:end">
+      <label>Đối tượng<br><select name="doi_tuong.{{.Ma}}"><option value="vot" {{if eq .DoiTuong "vot"}}selected{{end}}>Vợt</option><option value="giay" {{if eq .DoiTuong "giay"}}selected{{end}}>Giày</option><option value="ca_hai" {{if eq .DoiTuong "ca_hai"}}selected{{end}}>Cả hai</option></select></label>
+      <span class="nho mo" style="align-self:center">{{.DoiTuong}}</span>
+    </div>
     <div style="margin:10px 0">
       <label for="ten.{{.Ma}}" class="nho mo">Tên việc</label>
       <input id="ten.{{.Ma}}" name="ten.{{.Ma}}" value="{{.Ten}}" style="width:100%;max-width:520px" autocomplete="off">
@@ -170,10 +197,12 @@
       <a class="nho" href="/qt/dich-vu/{{.Ma}}/bai" style="margin-left:auto">
         {{if coBaiDV .Ma}}Sửa bài ↗{{else}}Chưa có bài — viết ↗{{end}}
       </a>
+      <form method="post" action="/qt/dich-vu/xoa" onsubmit="return confirm('Xoá {{.Ma}}?')" style="margin-left:8px;display:inline"><input type="hidden" name="_csrf" value="{{$.CSRF}}"><input type="hidden" name="ma" value="{{.Ma}}"><button type="submit" class="nut nut-phu" style="padding:2px 8px;font-size:12px">Xoá</button></form>
     </div>
   </div>
   {{end}}
 </div>
+<script>function locDV(loai){document.querySelectorAll('.o-nguong').forEach(function(el){var sel=el.querySelector('select[name^="doi_tuong."]'); if(!sel) return; var v=sel.value; el.style.display=(loai=='tatca'||v==loai)?'':'none';});}</script>
 {{end}}
 
 {{if .CongKhai}}

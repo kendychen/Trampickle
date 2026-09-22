@@ -210,6 +210,7 @@ type dlCaiDat struct {
 	PushMay      []PushMay
 	MailChu      string // địa chỉ đang nhận báo việc, rỗng = chưa khai
 	MailBat      bool
+        DangBaoTri   bool
 }
 
 // thuKhoaGemini gọi endpoint liệt kê model. Nó xác thực khóa mà KHÔNG sinh
@@ -287,7 +288,13 @@ func hQtCaiDat(w http.ResponseWriter, r *http.Request) {
 				m.ResendKey = ""
 			case "xoa-telegram":
 				m.TelegramToken, m.TelegramChat = "", ""
-			case "xoa-push":
+			case "bao-tri-bat":
+                            if err := DatBaoTri(true); err != nil { d.Loi = err.Error() } else { d.OK = "Da bat bao tri." }
+                            capNhat = false
+                        case "bao-tri-tat":
+                            if err := DatBaoTri(false); err != nil { d.Loi = err.Error() } else { d.OK = "Da tat bao tri." }
+                            capNhat = false
+                        case "xoa-push":
 				// Xóa một máy khỏi danh sách nhận push. Không đụng bi-mat.yaml
 				// nên thoát sớm, đừng ghi lại file khóa vì một việc khác hẳn.
 				if err := XoaPushMay(strings.TrimSpace(r.FormValue("xoa_push"))); err != nil {
@@ -401,6 +408,7 @@ func hQtCaiDat(w http.ResponseWriter, r *http.Request) {
 	d.EnvTelegram = strings.TrimSpace(os.Getenv("TELEGRAM_BOT_TOKEN")) != ""
 	d.PushMay = DanhSachPushMay()
 	d.MailChu, d.MailBat = emailChu(), MailBat()
+        d.DangBaoTri = DangBaoTri()
 	d.MacDinhCfg = strings.ToLower(strings.TrimSpace(CFG.Model.MacDinh))
 	d.DuPhongCfg = strings.ToLower(strings.TrimSpace(CFG.Model.DuPhong))
 	d.DangDung = Provider()
