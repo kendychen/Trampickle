@@ -137,6 +137,7 @@ func main() {
 	if err := core.NapLogo(); err != nil {
 		fmt.Fprintln(os.Stderr, "Cảnh báo logo:", err)
 	}
+	core.NapBaoTri()
 
 	switch {
 	case *themND != "":
