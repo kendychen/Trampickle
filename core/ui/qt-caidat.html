@@ -173,7 +173,7 @@
 
   <div class="o-nguong" style="border-left:3px solid #e33;padding:12px 0 12px 16px;margin:16px 0">
     <b>Chế độ bảo trì</b>
-    <div class="nho mo" style="margin:4px 0 8px">Hiện tại: {{if .DangBaoTri}}<b style="color:#e33">Đang bật</b> — khách vào web sẽ thấy trang bảo trì (503), quản trị vẫn vào được.{{else}}<b>Đang tắt</b>{{end}}</div>
+    <div class="nho mo" style="margin:4px 0 8px">Hiện tại: {{if .DangBaoTri}}<b style="color:#e33">Đang bật</b> — khách vào web sẽ thấy trang bảo trì (503).{{else}}<b>Đang tắt</b>{{end}}</div>
     <div class="hang-nut">
       {{if .DangBaoTri}}<button class="nut nut-phu" type="submit" name="viec" value="bao-tri-tat">Tắt bảo trì</button>{{else}}<button class="nut nut-phu" type="submit" name="viec" value="bao-tri-bat" style="background:#e33;color:#fff">Bật bảo trì</button>{{end}}
     </div>

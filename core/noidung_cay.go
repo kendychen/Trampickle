@@ -670,7 +670,8 @@ var CayND = []TrangND{
 					{Khoa: "app.lh.goi", Nhan: "Nút giữa — dòng gọi điện trong bảng bật lên", Mac: "Gọi điện"},
 					{Khoa: "app.nut.zalo", Nhan: "Nút giữa — dòng Zalo trong bảng bật lên", Mac: "Zalo"},
 					{Khoa: "app.nut.gui-anh", Nhan: "Nút 4, cũng là lối tắt khi giữ lâu vào icon app", Mac: "Khám vợt"},
-					{Khoa: "app.nut.quy-trinh", Nhan: "Nút 5", Mac: "Quy trình"},
+					{Khoa: "app.nut.chi-duong", Nhan: "Nút 5 — mở Google Maps tới trạm", Mac: "Chỉ đường"},
+					{Khoa: "app.nut.quy-trinh", Nhan: "Link phụ trong app (không còn trên thanh đáy)", Mac: "Quy trình"},
 				},
 			},
 			{

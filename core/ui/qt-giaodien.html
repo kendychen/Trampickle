@@ -59,6 +59,21 @@
   </div>
 </div>
 
+  <div class="gd-o" style="display:block">
+    <b>Giao diện mobile mới (thử nghiệm)</b>
+    <p class="nho mo" style="margin:6px 0 12px">
+      Thanh đáy dạng viên thuốc nổi (floating pill), nút giữa gọn hơn, chỉ hiện icon không kèm số dưới nút. Bố cục đỡ chật, hợp mắt hơn trên điện thoại tai thỏ. Bật để xem thử ở <a href="/app" target="_blank">/app</a> trên điện thoại, tắt để quay về bản cũ.</p>
+    <form method="post" action="/qt/giao-dien/gd-moi">
+      <input type="hidden" name="_csrf" value="{{$.CSRF}}">
+      <label style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+        <input type="checkbox" name="gd_moi" value="1" {{if .GDMoi}}checked{{end}}>
+        <b>Bật giao diện mới</b>
+      </label>
+      <button type="submit">Lưu</button>
+    </form>
+  </div>
+</div>
+
 <h2 style="margin-top:26px">Logo và biểu tượng</h2>
 
 <p class="mo" style="max-width:62ch">

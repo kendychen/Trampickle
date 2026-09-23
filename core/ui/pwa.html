@@ -22,6 +22,26 @@
      ô nhập to bằng ngón tay. Bản web vẫn còn nguyên ở /tra-cuu, /quy-trinh
      cho Google và cho người ngồi máy tính. */}}
 {{define "thanh-app"}}
+{{/* GDMoi: giao dien moi — thanh noi kieu vien thuoc (floating pill) thay vi thanh sat day. */}}
+{{if .GDMoi}}<div class="app-tai" aria-hidden="true"><i></i></div>
+<nav class="app-chan app-chan-moi" aria-label="Thanh dieu huong">
+  <a href="/app"{{if eq .Trang "app"}} class="dang"{{end}}>{{template "bt-nha"}}<span>{{nd "app.nut.trang-chu"}}</span></a>
+  <a href="/app/tra-cuu"{{if eq .Trang "tra-cuu"}} class="dang"{{end}}>{{template "bt-tim"}}<span>{{nd "app.nut.tra-cuu"}}</span></a>
+  {{if and .LienHe.DienThoai .LienHe.Zalo}}
+  <details class="app-chan-tron app-lh">
+    <summary><span class="tron">{{template "bt-goi"}}</span></summary>
+    <div class="app-lh-menu">
+      <a href="tel:{{soGoi .LienHe.DienThoai}}">{{template "bt-goi"}}<span>{{nd "app.lh.goi"}}<b>{{.LienHe.DienThoai}}</b></span></a>
+      <a href="https://zalo.me/{{.LienHe.Zalo}}">{{template "bt-chat"}}<span>{{nd "app.nut.zalo"}}<b>{{.LienHe.Zalo}}</b></span></a>
+    </div>
+  </details>
+  {{else}}
+  <a class="app-chan-tron" href="{{if .LienHe.DienThoai}}tel:{{soGoi .LienHe.DienThoai}}{{else if .LienHe.Zalo}}https://zalo.me/{{.LienHe.Zalo}}{{else}}/lien-he{{end}}"><span class="tron">{{template "bt-goi"}}</span></a>
+  {{end}}
+  <a href="/app/gui-anh"{{if eq .Trang "gui-anh"}} class="dang"{{end}}>{{template "bt-anh"}}<span>{{nd "app.nut.gui-anh"}}</span></a>
+  {{if .LienHe.BanDo}}<a class="app-chi-duong" href="{{.LienHe.BanDo}}" target="_blank" rel="noopener">{{template "bt-ghim"}}<span>{{nd "app.nut.chi-duong"}}</span></a>{{else}}<a href="/app/quy-trinh"{{if eq .Trang "quy-trinh"}} class="dang"{{end}}>{{template "bt-sach"}}<span>{{nd "app.nut.quy-trinh"}}</span></a>{{end}}
+</nav>
+{{else}}
 {{/* Vạch chạy trên đỉnh màn hình lúc đang sang trang. Đặt trong khối này vì
      khối này có mặt ở mọi trang app lẫn web trên điện thoại — thêm một chỗ là
      đủ cho cả site, khỏi phải nhớ dán vào từng tệp. */}}
@@ -67,8 +87,12 @@
   {{end}}
 
   <a href="/app/gui-anh"{{if eq .Trang "gui-anh"}} class="dang"{{end}}>{{template "bt-anh"}}<span>{{nd "app.nut.gui-anh"}}</span></a>
-  <a href="/app/quy-trinh"{{if eq .Trang "quy-trinh"}} class="dang"{{end}}>{{template "bt-sach"}}<span>{{nd "app.nut.quy-trinh"}}</span></a>
+  {{/* Ô cuối: Chỉ đường thay cho Quy trình. Quy trình vẫn còn ở /app/quy-trinh
+       và được link từ trong trang app (xem app.html). Chưa điền địa chỉ thì rơi
+       về Quy trình để không có nút chết. */}}
+  {{if .LienHe.BanDo}}<a class="app-chi-duong" href="{{.LienHe.BanDo}}" target="_blank" rel="noopener">{{template "bt-ghim"}}<span>{{nd "app.nut.chi-duong"}}</span></a>{{else}}<a href="/app/quy-trinh"{{if eq .Trang "quy-trinh"}} class="dang"{{end}}>{{template "bt-sach"}}<span>{{nd "app.nut.quy-trinh"}}</span></a>{{end}}
 </nav>
+{{end}}
 
 <script nonce="{{$.Nonce}}">
 (function () {

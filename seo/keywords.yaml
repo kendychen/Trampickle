@@ -1,0 +1,102 @@
+keywords:
+  - {tu: "tram pickle", cap: 1, nhom: brand}
+  - {tu: "trampickle", cap: 1, nhom: brand}
+  - {tu: "sua vot pickleball", cap: 1}
+  - {tu: "sua vot pickleball ha noi", cap: 1}
+  - {tu: "sua vot pickleball toan quoc", cap: 1}
+  - {tu: "dan vien vot pickleball", cap: 2, slug_dv: "dan-vien-vot-pickleball"}
+  - {tu: "thay vien vot pickleball", cap: 2, slug_dv: "thay-vien-vot-pickleball"}
+  - {tu: "sua vot tach lop", cap: 2, slug_dv: "sua-vot-pickleball-tach-lop"}
+  - {tu: "han can vot pickleball", cap: 2, slug_dv: "han-can-vot-pickleball"}
+  - {tu: "va mat vot pickleball", cap: 2, slug_dv: "va-mat-vot-pickleball"}
+  - {tu: "quan grip vot pickleball", cap: 2, slug_dv: "quan-grip-vot-pickleball"}
+  - {tu: "dan chi can bang vot", cap: 2, slug_dv: "dan-chi-can-bang-vot-pickleball"}
+  - {tu: "phu nham mat vot", cap: 2, slug_dv: "phu-nham-mat-vot-pickleball"}
+  - {tu: "sua loi vot pickleball", cap: 2, slug_dv: "sua-loi-vot-pickleball"}
+  - {tu: "thay de giay chay bo", cap: 2, slug_dv: "thay-de-giay-chay-bo"}
+  - {tu: "ve sinh vot pickleball", cap: 2, slug_dv: "ve-sinh-vot-pickleball"}
+  - {tu: "bao duong vot pickleball", cap: 2, slug_dv: "ve-sinh-vot-pickleball"}
+  - {tu: "sua vot carbon", cap: 2, slug_dv: "han-can-vot-pickleball"}
+  - {tu: "sua vot pickleball gia re", cap: 2}
+  - {tu: "sua vot lay ngay", cap: 2}
+  - {tu: "dan vien bong mep", cap: 3, slug_dv: "dan-vien-vot-pickleball"}
+  - {tu: "thay vien tron vien", cap: 3, slug_dv: "thay-vien-vot-pickleball"}
+  - {tu: "sua tach lop mat vot", cap: 3, slug_dv: "sua-vot-pickleball-tach-lop"}
+  - {tu: "han can nut", cap: 3, slug_dv: "han-can-vot-pickleball"}
+  - {tu: "han can carbon", cap: 3, slug_dv: "han-can-vot-pickleball"}
+  - {tu: "va mat thung nho", cap: 3, slug_dv: "va-mat-vot-pickleball"}
+  - {tu: "va mat bi lung", cap: 3, slug_dv: "va-mat-vot-pickleball"}
+  - {tu: "quan grip chong truot", cap: 3, slug_dv: "quan-grip-vot-pickleball"}
+  - {tu: "thay grip", cap: 3, slug_dv: "quan-grip-vot-pickleball"}
+  - {tu: "can vot lead tape", cap: 3, slug_dv: "dan-chi-can-bang-vot-pickleball"}
+  - {tu: "phu nham tang xoay", cap: 3, slug_dv: "phu-nham-mat-vot-pickleball"}
+  - {tu: "sua loi sap", cap: 3, slug_dv: "sua-loi-vot-pickleball"}
+  - {tu: "sua vot bi phong", cap: 3, slug_dv: "sua-loi-vot-pickleball"}
+  - {tu: "thay de giay mon", cap: 3, slug_dv: "thay-de-giay-chay-bo"}
+  - {tu: "thay de giay the thao", cap: 3, slug_dv: "thay-de-giay-chay-bo"}
+  - {tu: "ve sinh chuyen sau", cap: 3, slug_dv: "ve-sinh-vot-pickleball"}
+  - {tu: "sua vot ha noi uy tin", cap: 3}
+  - {tu: "gui tphcm ra ha noi", cap: 3}
+  - {tu: "sua vot da nang", cap: 3}
+  - {tu: "sua vot bao hanh", cap: 3}
+  - {tu: "sua vot gia bao nhieu", cap: 3}
+  - {tu: "bang gia sua vot", cap: 3}
+  - {tu: "sua vot joola", cap: 3}
+  - {tu: "sua vot selkirk", cap: 3}
+  - {tu: "sua vot crbn", cap: 3}
+  - {tu: "sua vot pickleball chuyen nghiep", cap: 3}
+  - {tu: "quy trinh sua vot", cap: 3}
+  - {tu: "gui vot di sua", cap: 3}
+  - {tu: "sua vot online", cap: 3}
+  - {tu: "dia chi sua vot", cap: 3}
+  - {tu: "dan vien bong mep gia bao nhieu", cap: 4, slug_dv: "dan-vien-vot-pickleball"}
+  - {tu: "thay vien het bao nhieu tien", cap: 4, slug_dv: "thay-vien-vot-pickleball"}
+  - {tu: "sua tach lop co ben khong", cap: 4, slug_dv: "sua-vot-pickleball-tach-lop"}
+  - {tu: "han can co chac khong", cap: 4, slug_dv: "han-can-vot-pickleball"}
+  - {tu: "va mat thung 1cm", cap: 4, slug_dv: "va-mat-vot-pickleball"}
+  - {tu: "quan grip loai nao tot", cap: 4, slug_dv: "quan-grip-vot-pickleball"}
+  - {tu: "dan chi nang them bao nhieu gam", cap: 4, slug_dv: "dan-chi-can-bang-vot-pickleball"}
+  - {tu: "phu nham co thi dau duoc khong", cap: 4, slug_dv: "phu-nham-mat-vot-pickleball"}
+  - {tu: "sua core crush bao lau", cap: 4, slug_dv: "sua-loi-vot-pickleball"}
+  - {tu: "thay de giay gia bao nhieu", cap: 4, slug_dv: "thay-de-giay-chay-bo"}
+  - {tu: "ve sinh vot bang gi", cap: 4, slug_dv: "ve-sinh-vot-pickleball"}
+  - {tu: "sua vot mat bao lau", cap: 4}
+  - {tu: "sua vot co bao hanh khong", cap: 4}
+  - {tu: "sua vot o dau uy tin ha noi", cap: 4}
+  - {tu: "gui vot tphcm ra ha noi", cap: 4}
+  - {tu: "sua vot nut vien", cap: 4, slug_dv: "dan-vien-vot-pickleball"}
+  - {tu: "sua vot nut can", cap: 4, slug_dv: "han-can-vot-pickleball"}
+  - {tu: "sua vot troc son", cap: 4, slug_dv: "ve-sinh-vot-pickleball"}
+  - {tu: "cach bao quan vot sau sua", cap: 4}
+  - {tu: "vot tach lop co sua duoc khong", cap: 4, slug_dv: "sua-vot-pickleball-tach-lop"}
+  - {tu: "vot pickleball bi lun mat", cap: 4, slug_dv: "sua-loi-vot-pickleball"}
+  - {tu: "so sanh dan vien va thay vien", cap: 4, slug_dv: "dan-vien-vot-pickleball"}
+  - {tu: "co nen phu nham khong", cap: 4, slug_dv: "phu-nham-mat-vot-pickleball"}
+  - {tu: "thay de giay loai nao ben", cap: 4, slug_dv: "thay-de-giay-chay-bo"}
+  - {tu: "sua vot joola hyperion", cap: 4}
+  - {tu: "sua vot selkirk vanguard", cap: 4}
+  - {tu: "kinh nghiem gui vot di sua", cap: 4}
+  - {tu: "cach dong goi vot gui sua", cap: 4}
+  - {tu: "sua vot co tang trong luong khong", cap: 4}
+  - {tu: "danh gia tram pickle", cap: 4}
+  - {tu: "vot nut co sua duoc khong", cap: 5}
+  - {tu: "vot bong vien lam sao", cap: 5, slug_dv: "dan-vien-vot-pickleball"}
+  - {tu: "grip bao lau thay mot lan", cap: 5, slug_dv: "quan-grip-vot-pickleball"}
+  - {tu: "dan chi de lam gi", cap: 5, slug_dv: "dan-chi-can-bang-vot-pickleball"}
+  - {tu: "phu nham co hop le thi dau khong", cap: 5, slug_dv: "phu-nham-mat-vot-pickleball"}
+  - {tu: "o tinh gui vot ra ha noi duoc khong", cap: 5}
+  - {tu: "sua vot bao nhieu ngay xong", cap: 5}
+  - {tu: "tram pickle o dau", cap: 5}
+  - {tu: "lien he tram pickle", cap: 5}
+  - {tu: "vot nut tam mat co sua duoc khong", cap: 5}
+  - {tu: "vot nut co can co nen sua khong", cap: 5}
+  - {tu: "giay chay bo mon de co thay duoc khong", cap: 5, slug_dv: "thay-de-giay-chay-bo"}
+  - {tu: "ve sinh vot nhu the nao cho dung", cap: 5, slug_dv: "ve-sinh-vot-pickleball"}
+  - {tu: "sua vot co anh huong cam giac danh khong", cap: 5}
+  - {tu: "sua vot uy tin nhat viet nam", cap: 5}
+  - {tu: "dich vu sua vot tot nhat ha noi", cap: 5}
+  - {tu: "review sua vot trampickle", cap: 5}
+  - {tu: "tram pickle co nhan gui buu dien khong", cap: 5}
+  - {tu: "chi phi gui vot di sua", cap: 5}
+  - {tu: "cach kiem tra vot sau khi sua", cap: 5}
+

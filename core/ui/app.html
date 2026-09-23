@@ -243,7 +243,7 @@
            một điểm ảnh nào của ô. */}}
       {{range .DichVu}}
       {{$noi := and $.NoiBat .NoiBat}}
-      <a class="app-o{{if $noi}} app-o-noi{{end}}" href="/app/dich-vu/{{.Ma}}"
+      <a class="app-o{{if $noi}} app-o-noi{{end}}" href="/app/dich-vu/{{.SlugSEO}}"
          title="{{.Ten}}{{if $noi}} — {{nd "trangchu.dv.noi-bat"}}{{end}}">
         {{if $noi}}<span class="app-o-sao">{{template "bt-sao"}}</span>{{end}}
         <span class="app-bt">{{template "bt-dv-mau" .Ma}}</span>

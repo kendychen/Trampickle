@@ -5,7 +5,7 @@
   <h1>Bài của việc: {{.DV.Ten}}</h1>
   <div class="phai hang" style="gap:8px">
     <a class="nut nut-vien" href="/qt/dich-vu">← Bảng dịch vụ</a>
-    <a class="nut nut-vien" href="/dich-vu/{{.DV.Ma}}" target="_blank">Xem trên web ↗</a>
+    <a class="nut nut-vien" href="{{.DV.DuongDanSEO}}" target="_blank">Xem trên web ↗</a>
   </div>
 </div>
 
@@ -13,7 +13,7 @@
 {{if .Loi}}<div class="bao bao-loi">{{.Loi}}</div>{{end}}
 
 <div class="bao" style="max-width:900px">
-  Chữ ở đây hiện thẳng trên <code>/dich-vu/{{.DV.Ma}}</code>, không có địa chỉ nào khác.
+  Chữ ở đây hiện thẳng trên <code>{{.DV.DuongDanSEO}}</code>, không có địa chỉ nào khác.
   <p class="nho" style="margin:6px 0 0">
     Đừng chép lại giá, số ngày làm hay điều kiện nhận vào bài — mấy thứ đó trang
     đã tự lấy từ bảng dịch vụ. Chép vào đây là sau này sửa giá một chỗ, chỗ kia

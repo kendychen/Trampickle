@@ -16,7 +16,7 @@
            nhấc lên đầu: hai lưới này là cùng một danh sách, khách bấm "Xem tất
            cả" từ trang chủ sang đây mà thứ tự đổi thì phải dò lại từ đầu. */}}
       {{range .DichVu}}
-      <a class="dv-the{{if and $.NoiBat .NoiBat}} dv-noi-bat{{end}}" href="/dich-vu/{{.Ma}}">
+      <a class="dv-the{{if and $.NoiBat .NoiBat}} dv-noi-bat{{end}}" href="{{.DuongDanSEO}}">
         <div class="bt-o">{{template "bt-dv-mau" .Ma}}</div>
         <div class="dau-the">
           <h3>{{.Ten}}</h3>
@@ -73,7 +73,7 @@
         <b>{{.Ten}}</b>
         <p class="nho" style="margin:6px 0 0">{{.LyDo}}</p>
         {{if coBaiDV .Ma}}
-        <p style="margin:10px 0 0"><a href="/dich-vu/{{.Ma}}">{{nd "dichvu.tuchoi.link"}}</a></p>
+        <p style="margin:10px 0 0"><a href="{{.DuongDanSEO}}">{{nd "dichvu.tuchoi.link"}}</a></p>
         {{end}}
       </div>
       {{end}}

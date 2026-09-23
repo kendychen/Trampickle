@@ -89,6 +89,7 @@ func dangKyQuanTri(mux *http.ServeMux) {
 	mux.HandleFunc("GET /qt/giao-dien", canLaChu(hQtGiaoDien))
 	mux.HandleFunc("POST /qt/giao-dien/che-do", canLaChu(hQtCheDo))
 	mux.HandleFunc("POST /qt/giao-dien/noi-bat", canLaChu(hQtNoiBat))
+	mux.HandleFunc("POST /qt/giao-dien/gd-moi", canLaChu(hQtGDMoi))
 	mux.HandleFunc("POST /qt/giao-dien/logo", canLaChu(hQtLogoTai))
 	mux.HandleFunc("POST /qt/giao-dien/logo-xoa", canLaChu(hQtLogoXoa))
 
@@ -117,6 +118,7 @@ func dangKyQuanTri(mux *http.ServeMux) {
 	mux.HandleFunc("POST /qt/dich-vu/xoa", canLaChu(hQtDichVuXoa))
 	mux.HandleFunc("GET /qt/dich-vu/{ma}/bai", canLaChu(hQtDichVuBai))
 	mux.HandleFunc("POST /qt/dich-vu/{ma}/bai", canLaChu(hQtDichVuBai))
+	mux.HandleFunc("GET /qt/seo", canLaChu(hQtSeo))
 
 	// Câu hỏi thường gặp: chữ đứng tên trạm nói với khách, cùng luật với
 	// /qt/noi-dung — thợ không sửa.
@@ -1377,8 +1379,9 @@ type dlGiaoDien struct {
 	LaOnline    bool
 	ThieuDiaChi bool
 
-	NoiBatBat bool // khung nổi bật cho việc đã tích ở /qt/dich-vu
-	SoNoiBat  int  // đã tích mấy việc — bật công tắc mà chưa tích thì không đổi gì
+	NoiBatBat bool // khung nổi bật
+        SoNoiBat  int
+        GDMoi     bool
 }
 
 func hQtGiaoDien(w http.ResponseWriter, r *http.Request) {
@@ -1397,6 +1400,7 @@ func hQtGiaoDien(w http.ResponseWriter, r *http.Request) {
 	// đừng để khách phát hiện hộ.
 	d.ThieuDiaChi = strings.TrimSpace(LienHeHienTai().DiaChi) == ""
 	d.NoiBatBat = DvNoiBatBat()
+        d.GDMoi = GDMoiBat()
 	for _, dv := range DichVuTatCa() {
 		if dv.NoiBat {
 			d.SoNoiBat++
@@ -1441,6 +1445,22 @@ func hQtNoiBat(w http.ResponseWriter, r *http.Request) {
 		loi = "Đã bật khung nổi bật"
 	}
 	http.Redirect(w, r, "/qt/giao-dien?ok="+urlEsc(loi), http.StatusSeeOther)
+}
+
+// hQtGDMoi bật/tắt giao diện mới (thanh đáy mới, bố cục thoáng hơn).
+func hQtGDMoi(w http.ResponseWriter, r *http.Request) {
+        r.Body = http.MaxBytesReader(w, r.Body, 16*1024)
+        r.ParseForm()
+        bat := r.FormValue("gd_moi") != ""
+        if err := DatGDMoi(bat); err != nil {
+                http.Redirect(w, r, "/qt/giao-dien?loi="+urlEsc("Không ghi được: "+err.Error()), http.StatusSeeOther)
+                return
+        }
+        loi := "Đã tắt giao diện mới"
+        if bat {
+                loi = "Đã bật giao diện mới — mở /app trên điện thoại để xem"
+        }
+        http.Redirect(w, r, "/qt/giao-dien?ok="+urlEsc(loi), http.StatusSeeOther)
 }
 
 func urlEsc(s string) string {

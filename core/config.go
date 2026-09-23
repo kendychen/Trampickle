@@ -189,6 +189,7 @@ type Config struct {
 
 type DichVu struct {
 	Ma                string  `yaml:"ma"`
+	Slug              string  `yaml:"slug"`
 	Ten               string  `yaml:"ten"`
 	Nhom              string  `yaml:"nhom"`
 	DoiTuong          string  `yaml:"doi_tuong"`
@@ -455,6 +456,20 @@ func (d DichVu) LeadChu() string {
 	}
 	return ""
 }
+
+// SlugSEO: đường dẫn chuẩn cho khách và bot. Ma là khóa nội bộ (DAN_VIEN),
+// Slug là đường dẫn thường chứa từ khóa (dan-vien-vot-pickleball). Rỗng thì
+// rơi về Ma để không vỡ khi file cũ chưa điền slug.
+func (d DichVu) SlugSEO() string {
+	if s := strings.TrimSpace(d.Slug); s != "" {
+		return s
+	}
+	return d.Ma
+}
+
+// DuongDanSEO: /dich-vu/<slug> để dùng thống nhất ở sitemap, JSON-LD, template.
+func (d DichVu) DuongDanSEO() string { return "/dich-vu/" + d.SlugSEO() }
+func (k KhongBan) DuongDanSEO() string { return "/dich-vu/" + strings.ToLower(k.Ma) }
 
 // DichVuDangBan — danh sách hiển thị cho KHÁCH. Đã trừ việc tắt tay bằng ô
 // "tạm ngừng nhận" ở /qt/dich-vu.

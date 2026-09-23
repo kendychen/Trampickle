@@ -116,7 +116,7 @@
       <div class="dv-doc">
         <div class="nhan-nho nhan-vach" style="margin-bottom:4px">{{nd "dichvumot.khac.nhan"}}</div>
         {{range .Khac}}{{if ne .Ma $.DV.Ma}}
-        <a href="/dich-vu/{{.Ma}}">
+        <a href="{{.DuongDanSEO}}">
           <span class="bt-o">{{template "bt-dv-mau" .Ma}}</span>
           <span class="ten">{{.Ten}}</span>
           {{with giaKhach .}}<span class="gia">{{.}}</span>{{end}}

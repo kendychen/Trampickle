@@ -1477,6 +1477,7 @@ footer .mo { color: var(--tren-dam-mo); }
 }
 .mxh-hang .bt { width: 20px; height: 20px; }
 .mxh-hang a:hover { color: var(--sang-tren-toi, var(--sang)); }
+footer .mxh-hang a { color: var(--trang); }
 footer .day {
   margin-top: 32px; padding-top: 20px;
   border-top: 1px solid rgba(255,255,255,.13); font-size: 12.5px;
@@ -2640,6 +2641,9 @@ body.la-app .app-hero h1 {
 .app-chan a:active { background: var(--th-nen); }
 .app-chan a.dang { color: var(--sang-muc); font-weight: 650; }
 .app-chan .bt { width: 22px; height: 22px; }
+/* Chỉ đường luôn đỏ để nổi trên thanh đáy — chỉ ô này, không chạm 4 nút kia. */
+.app-chan a.app-chi-duong { color: #d32f2f; }
+.app-chan a.app-chi-duong:active { background: var(--th-nen); }
 
 /* Nút giữa nhô hẳn lên khỏi thanh. Vành 4px cùng màu nền trang để nó trông
    như xuyên qua thanh chứ không dán đè lên. */
@@ -2678,6 +2682,49 @@ body.la-app .app-hero h1 {
 @media (max-width: 760px) {
   body:not(.la-app) { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
 }
+
+/* --- Giao dien moi: thanh day dang vien thuoc noi (floating pill) ----------
+   Ban cu sat day, 5 o chia deu, nut giua nho len bang vien tron. Nhin chat
+   nhung nang mat khi cuon. Ban moi gom vao mot vien nam giua day, cach mep
+   12px, bo vien va bong mo, nut giua gon hon (khong in so duoi nut). Van du
+   5 thao tac: Trang chu / Tra cuu / Goi-Zalo / Gui anh / Chi duong-Quy trinh.
+   Chi duong van do de nhan ra tren pil trang mo. */
+.app-chan.app-chan-moi {
+  left: 50%; right: auto; transform: translateX(-50%);
+  bottom: max(10px, env(safe-area-inset-bottom, 0px));
+  width: calc(100% - 24px); max-width: 460px;
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 999px;
+  background: rgba(255,255,255,.92);
+  -webkit-backdrop-filter: saturate(1.2) blur(14px);
+  backdrop-filter: saturate(1.2) blur(14px);
+  box-shadow: 0 8px 28px rgba(15,23,42,.16), 0 1px 3px rgba(15,23,42,.08);
+  padding: 6px 8px;
+  padding-bottom: 6px;
+  gap: 2px;
+  justify-content: space-around;
+}
+.app-chan.app-chan-moi a {
+  padding: 7px 6px 6px; border-radius: 999px; font-size: 10px; gap: 2px;
+}
+.app-chan.app-chan-moi a:active { background: rgba(15,23,42,.06); }
+.app-chan.app-chan-moi a.dang { background: var(--th-nen); color: var(--muc); }
+.app-chan.app-chan-moi .bt { width: 20px; height: 20px; }
+.app-chan.app-chan-moi .app-chan-tron .tron {
+  width: 48px; height: 48px; margin: 0;
+  border-width: 3px; box-shadow: 0 4px 12px rgba(0,0,0,.18);
+}
+.app-chan.app-chan-moi .app-chan-tron .tron .bt { width: 22px; height: 22px; }
+.app-chan.app-chan-moi a.app-chan-tron { flex-grow: 0; padding: 2px; background: transparent; }
+.app-chan.app-chan-moi .app-lh-menu {
+  bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%);
+  border-radius: 14px;
+}
+/* Khi bat gd_moi, body van chua 76px cho thanh sat day — pil noi chi can ~72px */
+body:has(.app-chan-moi) { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
+body.la-app:has(.app-chan-moi) { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
+@media (min-width: 761px) { body:not(.la-app) .app-chan.app-chan-moi { display: none; } }
+body.la-app.man-1 .app-chan.app-chan-moi { position: fixed; }
 
 /* --- Thẻ mời cài, nổi giữa màn hình ------------------------------------ */
 .moi-nen {
@@ -3381,7 +3428,7 @@ body.la-app .app-bia-mxh {
 }
 body.la-app .app-bia-mxh a {
   display: grid; place-items: center; width: 23px; height: 23px;
-  border-radius: 7px; color: var(--md-on-surface-variant);
+  border-radius: 7px; color: var(--muc);
 }
 body.la-app .app-bia-mxh .bt { width: 15px; height: 15px; }
 body.la-app .app-bia-mxh a:active { background: var(--md-surface-variant); }
@@ -3617,6 +3664,7 @@ body .app-chan {
 body .app-chan a { font: var(--md-label-m); gap: 2px; padding: 8px 3px 9px; }
 body .app-chan a.dang { color: var(--md-on-surface); font-weight: 700; }
 body .app-chan a .bt { width: 22px; height: 22px; }
+body .app-chan a.app-chi-duong { color: #d32f2f; }
 /* Viên thuốc sau icon của mục đang mở. M3 báo mục đang mở bằng cái này chứ
    không bằng đổi màu chữ. Viên thuốc nay tô ô-liu nên nét icon phải lật sang
    trắng — nét tối trên mảng tối là không thấy gì. */

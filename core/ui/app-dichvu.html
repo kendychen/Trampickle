@@ -118,7 +118,7 @@
     <h2 class="app-h2">{{nd "dichvumot.khac.nhan"}}</h2>
     <div class="app-luoi">
       {{range .Khac}}{{if ne .Ma $.DV.Ma}}
-      <a class="app-o" href="/app/dich-vu/{{.Ma}}">
+      <a class="app-o" href="/app/dich-vu/{{.SlugSEO}}">
         <span class="app-bt">{{template "bt-dv-mau" .Ma}}</span>
         <span class="app-ten">{{.Ten}}</span>
         {{with .LeadChu}}<span class="app-phu">{{.}}</span>{{end}}

@@ -93,7 +93,7 @@
     <nav class="hero-dv" aria-label="{{nd "trangchu.herodv.nhan"}}">
       <div class="hero-dv-dinh">{{nd "trangchu.herodv.nhan"}}</div>
       {{range .DichVu}}
-      <a href="/dich-vu/{{.Ma}}"><span>{{.Ten}}</span></a>
+      <a href="{{.DuongDanSEO}}"><span>{{.Ten}}</span></a>
       {{end}}
       <a class="hero-dv-het" href="/dich-vu"><span>{{nd "trangchu.herodv.tatca"}}</span></a>
     </nav>
@@ -204,7 +204,8 @@
         <li>{{ndd "trangchu.kham.y2"}}</li>
         <li>{{ndd "trangchu.kham.y3"}}</li>
       </ul>
-      <p style="margin-top:24px">
+      <p style="margin-top:24px; display:flex; gap:12px; flex-wrap:wrap">
+        <a class="nut nut-chinh" href="/quy-trinh">{{nd "chung.nut.quy-trinh"}}</a>
         <a class="nut nut-vien" href="/bai-viet/sua-vot-pickleball-ha-noi">{{nd "trangchu.kham.nut"}}</a>
       </p>
     </div>
@@ -224,7 +225,7 @@
            Kendy đặt ở /qt/dich-vu mất tác dụng, mà khách quay lại lần sau
            thấy lưới đảo chỗ thì phải đọc lại từ đầu. */}}
       {{range .DichVu}}
-      <a class="dv-the{{if and $.NoiBat .NoiBat}} dv-noi-bat{{end}}" href="/dich-vu/{{.Ma}}">
+      <a class="dv-the{{if and $.NoiBat .NoiBat}} dv-noi-bat{{end}}" href="{{.DuongDanSEO}}">
         <div class="bt-o">{{template "bt-dv-mau" .Ma}}</div>
         <div class="dau-the">
           <h3>{{.Ten}}</h3>

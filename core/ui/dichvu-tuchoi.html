@@ -39,7 +39,7 @@
     </div>
     <div class="luoi-vach">
       {{range .Khac}}
-      <a class="dv-the" href="/dich-vu/{{.Ma}}">
+      <a class="dv-the" href="{{.DuongDanSEO}}">
         <div class="bt-o">{{template "bt-dv-mau" .Ma}}</div>
         <div class="dau-the"><h3>{{.Ten}}</h3></div>
         {{with giaKhach .}}<div class="dv-gia">{{.}}</div>{{end}}

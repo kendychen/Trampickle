@@ -505,6 +505,7 @@ type Chung struct {
 	// NoiBat: công tắc dv_noi_bat. Ở Chung chứ không ở riêng trang chủ vì
 	// mẫu chân trang lẫn mẫu app đều dùng chung khối này.
 	NoiBat bool
+	GDMoi  bool // thử giao diện mobile mới — chọn ở /qt/giao-dien
 	// Nonce cho <script> nội tuyến. CSP chặn mọi script không mang nonce
 	// đúng của lượt tải trang đó — xem core/middleware.go.
 	Nonce string
@@ -599,6 +600,7 @@ func chung(r *http.Request, trang string) Chung {
 		CongKhai:   CongKhai,
 		GiaiDoan:   GiaiDoan,
 		NoiBat:     DvNoiBatBat(),
+                GDMoi:      GDMoiBat(),
 		Nonce:      nonceCua(r),
 		CSRF:       tokenCSRF(r),
 	}
@@ -680,16 +682,15 @@ func hDichVuList(w http.ResponseWriter, r *http.Request) {
 }
 
 func hDichVuMot(w http.ResponseWriter, r *http.Request) {
-	ma := strings.ToUpper(r.PathValue("ma"))
+	maRaw := r.PathValue("ma")
+	maUp := strings.ToUpper(maRaw)
 	var dv *DichVu
-	// Bản sao, không phải con trỏ vào lát cắt gốc: trang /qt/dich-vu thay cả
-	// danh sách khi lưu, mà template bên dưới còn đang đọc dv.
 	ds := DichVuTatCa()
 	for i := range ds {
-		// !An: tắt một việc phải tắt cả trang giá riêng của nó, không chỉ cái
-		// ô trong lưới. Link cũ còn nằm trong Google, trong tin nhắn đã gửi —
-		// để trang sống thì khách vẫn đọc được giá thứ trạm đang không nhận.
-		if ds[i].Ma == ma && !ds[i].An && ds[i].DaMo(GiaiDoan) {
+		if ds[i].An || !ds[i].DaMo(GiaiDoan) {
+			continue
+		}
+		if ds[i].Ma == maUp || strings.EqualFold(ds[i].SlugSEO(), maRaw) {
 			dv = &ds[i]
 			break
 		}
@@ -699,7 +700,7 @@ func hDichVuMot(w http.ResponseWriter, r *http.Request) {
 		// không có giá, không có quy trình, nên đi template riêng — và chỉ mở
 		// trang khi đã có bài, chứ một trang chỉ có mỗi câu "không nhận" thì
 		// không đáng để khách bấm vào.
-		if kb, ok := TimKhongBan(ma); ok {
+		if kb, ok := TimKhongBan(maUp); ok {
 			if md := BaiDichVu(kb.Ma); strings.TrimSpace(md) != "" {
 				c := chung(r, "dich-vu")
 				c.TieuDe = kb.Ten
@@ -717,6 +718,13 @@ func hDichVuMot(w http.ResponseWriter, r *http.Request) {
 	}
 	c := chung(r, "dich-vu")
 	c.TieuDe = dv.Ten
+	c.Duong = dv.DuongDanSEO()
+	c.Canonical = goc(r) + c.Duong
+	// 301 cứng nếu vào bằng Ma cũ: dồn link equity về slug chuẩn.
+	if !strings.EqualFold(maRaw, dv.SlugSEO()) && strings.EqualFold(maRaw, dv.Ma) {
+		http.Redirect(w, r, dv.DuongDanSEO(), http.StatusMovedPermanently)
+		return
+	}
 	// Bài của việc này (data/dich-vu-bai/<MA>.md). Việc chưa có bài thì Than
 	// rỗng và template bỏ hẳn khối chữ đi — trang quay về đúng bản cũ.
 	var than template.HTML
@@ -1325,6 +1333,8 @@ func NewMux(public bool) *http.ServeMux {
 	mux.HandleFunc("GET /bai-viet-anh/{ten}", hAnhBaiViet)
 	mux.HandleFunc("GET /sitemap.xml", hSitemap)
 	mux.HandleFunc("GET /robots.txt", hRobots)
+	mux.HandleFunc("GET /llms.txt", hLLM)
+	mux.HandleFunc("GET /seo/keywords.json", hSeoKeywordsJSON)
 	mux.HandleFunc("GET /favicon.svg", hFavicon)
 	mux.HandleFunc("GET /icon.png", hIconApp)
 	// App cài lên màn hình chính. Xem core/pwa.go — cả ba đường này chỉ có

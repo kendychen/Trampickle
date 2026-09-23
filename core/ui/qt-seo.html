@@ -1,0 +1,13 @@
+{{define "qt-seo.html"}}{{template "qt-dau" .}}
+<div class="qt-dau-trang"><h1>SEO — 100 từ khóa</h1><span class="nho mo" style="margin-left:12px">{{.Total}} từ · 5 cấp</span></div>
+<p class="mo" style="max-width:70ch">Nguồn: <code>seo/keywords.yaml</code> · API: <code>/seo/keywords.json</code> và <code>/seo/keywords.json?cap=3</code> · GEO: <code>/llms.txt</code> cho ChatGPT / Perplexity.</p>
+<div class="hang" style="gap:8px;flex-wrap:wrap;margin:14px 0">
+  <a class="nut nut-vien" href="/seo/keywords.json" target="_blank">keywords.json</a>
+  <a class="nut nut-vien" href="/llms.txt" target="_blank">llms.txt</a>
+  <a class="nut nut-vien" href="/sitemap.xml" target="_blank">sitemap.xml</a>
+</div>
+<table class="bang" style="max-width:860px">
+<tr><th>#</th><th>Từ khóa</th><th>Cấp</th><th>Nhóm</th><th>Link</th></tr>
+{{range $i, $k := .Keywords}}<tr><td class="nho mo">{{$i}}</td><td>{{$k.Tu}}</td><td>{{$k.Cap}}</td><td class="nho mo">{{$k.Nhom}}</td><td>{{if $k.SlugDV}}<a href="/dich-vu/{{$k.SlugDV}}" target="_blank">{{$k.SlugDV}}</a>{{else}}—{{end}}</td></tr>{{end}}
+</table>
+{{template "qt-chan" .}}{{end}}

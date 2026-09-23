@@ -38,6 +38,10 @@ type tepGiaoDien struct {
 	// file cũ không có khoá này, mà tích một việc xong không thấy gì đổi thì
 	// Kendy sẽ đi tìm bug ở /qt/dich-vu chứ không nghĩ tới công tắc.
 	DvNoiBat *bool `yaml:"dv_noi_bat"`
+	// Giao diện mobile mới — thử nghiệm thanh đáy mới. Dùng con trỏ để file
+	// cũ không có khoá này vẫn chạy bản cũ (false), không lật mặt tiền sau
+	// lưng Kendy.
+	GDMoi *bool `yaml:"gd_moi"`
 }
 
 const dvNoiBatMacDinh = true
@@ -46,6 +50,7 @@ var (
 	cheDoMu  sync.RWMutex
 	cheDoNay = CheDoTaiXuong
 	dvNoiBat = dvNoiBatMacDinh
+	gdMoi    bool
 )
 
 func fileGiaoDien() string { return P("data/giao-dien.yaml") }
@@ -57,6 +62,7 @@ func CheDoHopLe(ma string) bool { return ma == CheDoTaiXuong || ma == CheDoOnlin
 func NapCheDo() error {
 	cheDoMu.Lock()
 	cheDoNay, dvNoiBat = CheDoTaiXuong, dvNoiBatMacDinh
+	gdMoi = false
 	cheDoMu.Unlock()
 
 	b, err := os.ReadFile(fileGiaoDien())
@@ -79,6 +85,9 @@ func NapCheDo() error {
 	if t.DvNoiBat != nil {
 		dvNoiBat = *t.DvNoiBat
 	}
+	if t.GDMoi != nil {
+		gdMoi = *t.GDMoi
+	}
 	cheDoMu.Unlock()
 	return nil
 }
@@ -99,13 +108,21 @@ func DvNoiBatBat() bool {
 	return dvNoiBat
 }
 
+func GDMoiBat() bool {
+	cheDoMu.RLock()
+	defer cheDoMu.RUnlock()
+	return gdMoi
+}
+
 // ghiGiaoDien dựng lại trọn file. Mọi khoá phải có mặt ở đây.
-func ghiGiaoDien(cheDo string, noiBat bool) error {
+func ghiGiaoDien(cheDo string, noiBat, gdMoi bool) error {
 	noiDung := "# Bộ mặt site, đổi ở /qt/giao-dien.\n" +
 		"# che_do — tai_xuong: khách mang đồ tới. online: khách gửi đồ tới.\n" +
-		"# dv_noi_bat — tô nổi những việc đã tích ở /qt/dich-vu.\n\n" +
+		"# dv_noi_bat — tô nổi những việc đã tích ở /qt/dich-vu.\n" +
+		"# gd_moi — thử giao diện mobile mới (thanh đáy mới, bố cục thoáng hơn).\n\n" +
 		"che_do: " + cheDo + "\n" +
-		"dv_noi_bat: " + strconv.FormatBool(noiBat) + "\n"
+		"dv_noi_bat: " + strconv.FormatBool(noiBat) + "\n" +
+		"gd_moi: " + strconv.FormatBool(gdMoi) + "\n"
 	return ghiAtomic(fileGiaoDien(), []byte(noiDung))
 }
 
@@ -116,7 +133,7 @@ func DatCheDo(ma string) error {
 	if !CheDoHopLe(ma) {
 		return fmt.Errorf("chế độ không hợp lệ: %q", ma)
 	}
-	if err := ghiGiaoDien(ma, DvNoiBatBat()); err != nil {
+	if err := ghiGiaoDien(ma, DvNoiBatBat(), GDMoiBat()); err != nil {
 		return err
 	}
 	cheDoMu.Lock()
@@ -128,11 +145,21 @@ func DatCheDo(ma string) error {
 // DatDvNoiBat bật hay tắt khung nổi bật. Ghi trước, đổi bộ nhớ sau, y như
 // DatCheDo và vì cùng một lý do.
 func DatDvNoiBat(b bool) error {
-	if err := ghiGiaoDien(CheDoHienTai(), b); err != nil {
+	if err := ghiGiaoDien(CheDoHienTai(), b, GDMoiBat()); err != nil {
 		return err
 	}
 	cheDoMu.Lock()
 	dvNoiBat = b
+	cheDoMu.Unlock()
+	return nil
+}
+
+func DatGDMoi(b bool) error {
+	if err := ghiGiaoDien(CheDoHienTai(), DvNoiBatBat(), b); err != nil {
+		return err
+	}
+	cheDoMu.Lock()
+	gdMoi = b
 	cheDoMu.Unlock()
 	return nil
 }

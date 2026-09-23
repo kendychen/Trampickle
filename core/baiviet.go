@@ -385,7 +385,7 @@ func hSitemap(w http.ResponseWriter, r *http.Request) {
 	them("/lien-he", "", "0.6")
 	them("/chinh-sach", "", "0.2")
 	for _, dv := range DichVuDangBan(GiaiDoan) {
-		them("/dich-vu/"+dv.Ma, "", "0.8")
+		them(dv.DuongDanSEO(), "", "0.8")
 	}
 	for _, b := range DsBaiViet() {
 		them("/bai-viet/"+b.Slug, b.NgaySua(), "0.9")
