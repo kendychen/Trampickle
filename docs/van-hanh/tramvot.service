@@ -11,12 +11,16 @@ ExecStart=/opt/tramvot/tramvot -public -https -tin-proxy -port 8442
 Restart=on-failure
 RestartSec=5
 
-# Siết quyền: tiến trình web không cần ghi ở đâu ngoài data/.
+# Siết quyền: tiến trình web chỉ ghi ở data/, vanhanh/ và seo/.
+# vanhanh/bang-gia.yaml (CFG.duong_dan.bang_gia) và seo/keywords.yaml đều
+# nằm NGOÀI /opt/tramvot/data nên phải liệt kê thêm, không thì ghiAtomic()
+# qua os.WriteFile sẽ lỗi read-only file system dưới ProtectSystem=strict
+# (sudo -u tramvot touch vẫn ok khi test tay, chỉ lỗi khi chạy dưới systemd).
 NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=strict
 ProtectHome=yes
-ReadWritePaths=/opt/tramvot/data
+ReadWritePaths=/opt/tramvot/data /opt/tramvot/vanhanh /opt/tramvot/seo
 ProtectKernelTunables=yes
 ProtectControlGroups=yes
 RestrictSUIDSGID=yes
