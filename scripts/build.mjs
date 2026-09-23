@@ -9,7 +9,12 @@ const OUT = path.join(ROOT, 'dist');
 // (deploy tĩnh) Google vẫn thấy đủ. Khi có proxy nginx (VPS Go đang chạy)
 // thì file này bị qua mặt bởi proxy_pass — không xung đột.
 const DOMAIN = 'https://trampickle.vn';
-const GO_CORE_URLS = ["/","/dich-vu","/bai-viet","/quy-trinh","/cau-hoi","/gioi-thieu","/ve-chung-toi","/lien-he"];
+// Service-area business (online): địa chỉ 58 Tố Hữu - Đại Mỗ vẫn HIỂN THỊ
+// trên website (footer/lien-he) để khách gửi hàng, nhưng KHÔNG đưa
+// streetAddress chi tiết vào JSON-LD schema. Schema chỉ khai ở mức
+// addressLocality Hà Nội + areaServed Hà Nội để Google/AI hiểu là dịch vụ
+// online nhận qua gửi hàng, hẹn trước khi mang tới — không phải storefront.
+const GO_CORE_URLS = ["/","/dich-vu","/bai-viet","/quy-trinh","/cau-hoi","/gioi-thieu","/ve-chung-toi","/lien-he","/chinh-sach"];
 
 function walk(dir){ let r=[]; for(const e of fs.readdirSync(dir,{withFileTypes:true})){ const p=path.join(dir,e.name); if(e.isDirectory()) r.push(...walk(p)); else r.push(p);} return r; }
 function mdToHtml(md){
