@@ -406,15 +406,15 @@ func (d Don) ChenhCan() float64 {
 }
 
 // VuotNguongCan — quá ngưỡng thì theo cam kết là không tính tiền công.
-// Chỉ áp cho vợt: cam kết không tăng quá 3g là cam kết về vợt, đôi giày nặng
-// thêm bao nhiêu sau khi thay đế không nằm trong lời hứa nào.
+// Chỉ áp cho vợt: cam kết không tăng quá ngưỡng (NguongHienTai) là cam kết
+// về vợt, đôi giày nặng thêm bao nhiêu sau khi thay đế không nằm trong lời hứa nào.
 func (d Don) VuotNguongCan() bool {
 	if d.LaGiay() {
 		return false
 	}
 	nguong := NguongHienTai().TangKhoiLuongToiDaG
 	if nguong <= 0 {
-		nguong = 3.0
+		nguong = 15.0
 	}
 	return d.ChenhCan() > nguong
 }

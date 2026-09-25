@@ -6,8 +6,8 @@ package core
 // data/noi-dung.yaml: file đó KHÔNG chỉ Go đọc. Python đọc cùng chỗ ở
 // src/quote.py, src/intake.py, scripts/print_prices.py — và src/llm.py nói rõ
 // Python là nơi độc quyền tính con số cam kết với khách. Để Go đọc một file
-// còn Python đọc file khác là có ngày trang web hứa 3.5g mà báo giá vẫn tính
-// 3.0g. Một nguồn, không hai.
+// còn Python đọc file khác là có ngày trang web hứa 15g mà báo giá vẫn tính
+// 15g. Một nguồn, không hai.
 //
 // Vì sao sửa theo DÒNG chứ không unmarshal rồi marshal lại: bang-gia.yaml là
 // file người viết tay, mỗi con số có mấy dòng comment giải thích vì sao nó là

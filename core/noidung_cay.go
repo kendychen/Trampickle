@@ -51,10 +51,10 @@ var CayND = []TrangND{
 				},
 			},
 			{
-				Ten: "Mức cân trạm cam kết",
+				Ten: "Mức cân trạm cam kết — ĐỔI Ở /qt/nguong MỚI ĐỔI THẬT, Ô NÀY CHỈ LÀ CHỮ HIỆN CHO KHÁCH",
 				Muc: []MucND{
-					{Khoa: "chung.can.muc", Nhan: "Mức tăng cân nói cho khách (hiện ở trang chủ, dịch vụ, quy trình, giới thiệu)",
-						Mac: "10–15 g tùy vợt"},
+					{Khoa: "chung.can.muc", Nhan: "Mức tăng cân nói cho khách (hiện ở trang chủ, dịch vụ, quy trình, giới thiệu) — con số thật lấy từ /qt/nguong, đổi ô này mà không đổi ngưỡng thì bài viết hứa một đằng phiếu in một nẻo",
+						Mac: "15 g — vượt thì không lấy tiền công"},
 				},
 			},
 			{

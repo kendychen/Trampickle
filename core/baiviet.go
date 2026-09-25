@@ -24,6 +24,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
@@ -46,6 +47,8 @@ type BaiViet struct {
 	TomTat    string `yaml:"tom_tat"` // hiện ở trang danh sách
 	Anh       string `yaml:"anh"`     // ảnh bìa, tên tệp trong data/bai-viet-anh
 	Nhap      bool   `yaml:"nhap"`    // bản nháp: không hiện ra trang khách
+	HenGio    string `yaml:"hen_gio,omitempty"` // hẹn giờ đăng: RFC3339 hoặc 2006-01-02T15:04, rỗng = không hẹn
+	Loai      string `yaml:"loai,omitempty"`    // loai: chinh (mặc định) | ve-tinh
 
 	Than string `yaml:"-"` // thân bài, markdown
 }
@@ -63,6 +66,40 @@ func (b BaiViet) NgaySua() string {
 		return b.Sua
 	}
 	return b.Ngay
+}
+
+func (b BaiViet) LaVeTinh() bool { return strings.EqualFold(strings.TrimSpace(b.Loai), "ve-tinh") }
+
+func parseHenGio(s string) (time.Time, bool) {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return time.Time{}, false
+	}
+	for _, fm := range []string{time.RFC3339, "2006-01-02T15:04", "2006-01-02 15:04", "2006-01-02"} {
+		if t, err := time.Parse(fm, s); err == nil {
+			return t, true
+		}
+	}
+	return time.Time{}, false
+}
+
+func (b BaiViet) henDenHan(now time.Time) bool {
+	t, ok := parseHenGio(b.HenGio)
+	if !ok {
+		return false
+	}
+	return !t.After(now)
+}
+
+func (b BaiViet) DangHen(now time.Time) bool {
+	if b.HenGio == "" {
+		return false
+	}
+	t, ok := parseHenGio(b.HenGio)
+	if !ok {
+		return false
+	}
+	return t.After(now)
 }
 
 var (
@@ -101,6 +138,24 @@ func NapBaiViet() error {
 	baiDS = ds
 	baiMu.Unlock()
 	return nil
+}
+
+func KhoiDongHenBai() {
+	go func() {
+		for range time.Tick(time.Minute) {
+			now := time.Now()
+			baiMu.RLock()
+			ds := append([]BaiViet(nil), baiDS...)
+			baiMu.RUnlock()
+			for _, b := range ds {
+				if b.Nhap && b.HenGio != "" && b.henDenHan(now) {
+					b.Nhap = false
+					b.HenGio = ""
+					_ = LuuBaiViet(b)
+				}
+			}
+		}
+	}()
 }
 
 func docThuMucBai() ([]BaiViet, error) {
@@ -185,16 +240,32 @@ func tachFrontMatter(s string) (dau, than string, err error) {
 
 // --- Đọc danh sách ----------------------------------------------------
 
-// DsBaiViet — những bài khách xem được. Bản nháp không nằm trong này, nên
-// cũng không lọt vào sitemap hay ô "đọc tiếp".
+// DsBaiViet — những bài khách xem được. Nháp / vệ tinh / chưa tới hẹn không vào đây.
 func DsBaiViet() []BaiViet {
 	baiMu.RLock()
 	defer baiMu.RUnlock()
+	now := time.Now()
 	ds := make([]BaiViet, 0, len(baiDS))
 	for _, b := range baiDS {
-		if !b.Nhap {
-			ds = append(ds, b)
+		if b.Nhap || b.LaVeTinh() || b.DangHen(now) {
+			continue
 		}
+		ds = append(ds, b)
+	}
+	return ds
+}
+
+// DsBaiVietVeTinh — bài vệ tinh đã đăng (không vào list chính/sitemap)
+func DsBaiVietVeTinh() []BaiViet {
+	baiMu.RLock()
+	defer baiMu.RUnlock()
+	now := time.Now()
+	var ds []BaiViet
+	for _, b := range baiDS {
+		if b.Nhap || !b.LaVeTinh() || b.DangHen(now) {
+			continue
+		}
+		ds = append(ds, b)
 	}
 	return ds
 }
@@ -296,7 +367,7 @@ func hBaiVietList(w http.ResponseWriter, r *http.Request) {
 
 func hBaiVietMot(w http.ResponseWriter, r *http.Request) {
 	bai, ok := TimBaiViet(r.PathValue("slug"))
-	if !ok || bai.Nhap {
+	if !ok || bai.Nhap || bai.DangHen(time.Now()) {
 		http.NotFound(w, r)
 		return
 	}

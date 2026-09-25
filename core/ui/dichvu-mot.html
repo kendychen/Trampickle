@@ -34,13 +34,13 @@
              thích cho một dấu gạch ngang. */}}
         {{if .DV.BaoHanhThang}}<span class="t">{{nd "dichvumot.so.2-t"}}</span>{{end}}
       </div>
-      {{with tachSo (nd "chung.can.muc")}}
+      {{if not .DV.KhongTinhCan}}{{with tachSo (nd "chung.can.muc")}}
       <div>
         <span class="n">{{nd "dichvumot.so.3-n"}}</span>
         <span class="v">{{.So}}{{with .DonVi}}<i>{{.}}</i>{{end}}</span>
         <span class="t">{{with .Duoi}}{{.}}, {{end}}{{nd "dichvumot.so.3-t"}}</span>
       </div>
-      {{end}}
+      {{end}}{{end}}
     </div>
   </div>
 </section>

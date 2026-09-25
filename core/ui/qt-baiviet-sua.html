@@ -51,6 +51,12 @@
         <textarea name="tom_tat" rows="3" maxlength="800">{{.Bai.TomTat}}</textarea>
       </label>
 
+      <label>Ảnh bìa (ngoài danh sách)
+        <span class="hd">Tên tệp trong <code>data/bai-viet-anh/</code>. Để trống = không hiện ảnh ở trang danh sách. Gõ tên hoặc chọn ở mục "Ảnh chèn trong bài" bên dưới rồi sao tên lên đây.</span>
+        <input name="anh" value="{{.Bai.Anh}}" maxlength="120" placeholder="vd: vot-pickleball-bi-nut.png" style="font-family:'Roboto Mono',monospace">
+      </label>
+      {{if .Bai.Anh}}<p class="nho mo">Đang dùng: <code>{{.Bai.Anh}}</code> — <a href="/bai-viet-anh/{{.Bai.Anh}}" target="_blank">xem ảnh ↗</a></p>{{end}}
+
       <div class="hang" style="align-items:flex-end">
         <label style="margin:0">Ngày đăng
           <input name="ngay" value="{{.Bai.Ngay}}" placeholder="2026-09-05" maxlength="10">
@@ -69,6 +75,18 @@
         <input type="checkbox" name="nhap" value="1" {{if .Bai.Nhap}}checked{{end}}>
         <span>Để nháp — chưa hiện trên trang khách, chưa vào sitemap</span>
       </label>
+      <div class="hang" style="margin-top:10px;gap:12px;flex-wrap:wrap">
+        <label style="margin:0">Hẹn giờ đăng
+          <span class="hd">Để trống = đăng ngay. VD 2026-09-30T08:00</span>
+          <input name="hen_gio" value="{{.Bai.HenGio}}" placeholder="2026-09-30T08:00" maxlength="25" type="datetime-local">
+        </label>
+        <label style="margin:0">Loại bài
+          <select name="loai">
+            <option value="" {{if eq .Bai.Loai ""}}selected{{end}}>Chính</option>
+            <option value="ve-tinh" {{if eq .Bai.Loai "ve-tinh"}}selected{{end}}>Vệ tinh / backlink</option>
+          </select>
+        </label>
+      </div>
     </div>
   </div>
 

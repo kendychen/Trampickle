@@ -166,6 +166,7 @@ func dangKyQuanTri(mux *http.ServeMux) {
 	mux.HandleFunc("POST /qt/bai-viet/anh", canLaChu(hQtBaiAnhThem))
 	mux.HandleFunc("POST /qt/bai-viet/anh-xoa", canLaChu(hQtBaiAnhXoa))
 	mux.HandleFunc("GET /qt/bai-viet/{slug}", canLaChu(hQtBaiSua))
+	mux.HandleFunc("GET /qt/seo/kiem-tra", canLaChu(hQtSeoKiemTra))
 	mux.HandleFunc("POST /qt/bai-viet/{slug}/xoa", canLaChu(hQtBaiXoa))
 
 	// Chữ trên trang: cùng lý do với bài viết. Đây là lời trạm nói với khách.

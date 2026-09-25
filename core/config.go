@@ -243,6 +243,14 @@ type DichVu struct {
 	An bool `yaml:"an"`
 
 	BaoGiaRieng bool `yaml:"bao_gia_rieng"`
+
+	// KhongTinhCan: dịch vụ này không tính vào cam kết tăng cân tối đa.
+	// Dùng cho giày, vệ sinh, quấn grip ... — những việc không liên quan
+	// tới cân vợt. Bật cờ này thì trang dịch vụ riêng ẩn ô "15 g — vượt thì
+	// không lấy tiền công". VuotNguongCan đã loại đơn giày, cờ này loại
+	// theo dịch vụ để trang giới thiệu từng việc không hứa thừa.
+	// Zero-value là "có tính" nên file cũ không đổi hành vi.
+	KhongTinhCan bool `yaml:"khong_tinh_can"`
 }
 
 type KhongBan struct {

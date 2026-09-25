@@ -33,11 +33,15 @@ var (
 // Ngày nào cần chèn dữ liệu vào CSS thì chỗ này sai, và nó sai to: mọi khách
 // sẽ nhận CSS của khách đầu tiên.
 func dungCSS() error {
-	var b bytes.Buffer
-	if err := tpl.ExecuteTemplate(&b, "css", nil); err != nil {
-		return err
+	// Đọc thẳng tệp, không qua tpl.ExecuteTemplate. html/template ở ngữ
+	// cảnh <style> sẽ lọc/sửa CSS (bỏ comment, chuẩn hoá) nên cùng một
+	// css.html ra hai nội dung khác nhau giữa đọc thô và qua template,
+	// làm hash lệch giữa local và binary đã build (thấy 124k vs 212k).
+	rb, err := uiFS.ReadFile("ui/css.html")
+	if err != nil {
+		return fmt.Errorf("css: không đọc được ui/css.html: %w", err)
 	}
-	s := b.String()
+	s := string(rb)
 	// Bỏ cặp <style> bọc ngoài. Trong HTML nó là bắt buộc, trong tệp .css nó
 	// là lỗi cú pháp — trình duyệt gặp dòng đó thì bỏ luôn khối đầu tiên.
 	i := strings.Index(s, "<style>")
@@ -45,7 +49,14 @@ func dungCSS() error {
 	if i < 0 || j <= i {
 		return fmt.Errorf("css: không thấy cặp <style> trong ui/css.html")
 	}
-	cssNoiDung = []byte(strings.TrimSpace(s[i+len("<style>") : j]))
+	raw := s[i+len("<style>") : j]
+	// Chuẩn hoá xuống LF để băm bất biến dù checkout CRLF (Windows
+	// core.autocrlf=true) hay LF (Linux). Không thì cùng một css.html
+	// ra hai hash khác nhau và URL /tinh/tp-*.css lệch.
+	raw = strings.ReplaceAll(raw, "\r\n", "\n")
+	raw = strings.ReplaceAll(raw, "\r", "\n")
+	cssNoiDung = []byte(strings.TrimSpace(raw))
+	_ = bytes.MinRead // giữ import bytes khỏi bị xoá nếu vet
 	h := sha256.Sum256(cssNoiDung)
 	// 16 chữ số hex là 64 bit — đủ để hai bản CSS khác nhau không bao giờ
 	// trùng tên, mà vẫn đọc được bằng mắt lúc xem log.

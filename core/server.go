@@ -313,7 +313,7 @@ func giaKhach(d DichVu) string {
 		return ND("app.gia.tu") + " " + tienTron(*p) +
 			" " + ND("app.gia.den") + " " + dinhDangTien(*den)
 	}
-	return dinhDangTien(*p)
+	return ND("app.gia.tu") + " " + dinhDangTien(*p)
 }
 
 // tienNgan rút "100.000đ" thành "100k". CHỈ rút khi con số chia hết cho 1000
@@ -568,7 +568,23 @@ const AnhChiaSeMacDinh = "/anh-gd/og-chia-se.jpg"
 // Mô tả cho ô snippet của Google. Trang nào không có ở đây thì để trống —
 // Google tự trích một đoạn trong bài, còn hơn là nhét đại một câu chung
 // chung giống hệt nhau ở mọi trang.
+var moTaDichVu = map[string]string{
+        "dan-vien-vot-pickleball": "Dán viền bong 100.000đ, giữ mép vợt khỏi quệt sân. Làm 1 ngày, bảo hành 3 tháng. Gửi ảnh mép viền để xem dán lại hay thay mới.",
+        "thay-vien-vot-pickleball": "Thay viền toàn bộ 250.000đ, thay nẹp mới liền vòng mép vợt. Làm 1 ngày, BH 3 tháng. Nhận khi viền mất khúc hoặc bong quá nửa vòng.",
+        "quan-grip-vot-pickleball": "Quấn/đổi grip 50.000đ, chống trượt, êm tay. Làm trong ngày, bán kèm ca khác. Thay khi grip chai, trơn hoặc ngấm mồ hôi.",
+        "va-mat-vot-pickleball": "Vá mặt thủng nhỏ 120.000đ, vá lõi tổ ong thủng dưới 1cm. Làm 3 ngày, BH 3 tháng. Chụp lỗ thủng sát mặt vợt để báo chính xác.",
+        "han-can-vot-pickleball": "Hàn cán carbon từ 400.000đ (giai đoạn 2), gia cố sợi carbon. Làm 3 ngày, BH 3 tháng. Cán nứt dọc, gãy lửng mới nhận.",
+        "sua-vot-pickleball-tach-lop": "Sửa tách lớp từ 450.000đ, ép lại mặt vợt bong khỏi lõi. Làm 3 ngày, BH 2 tháng. Chỉ nhận vợt từ 2,5 triệu, gửi video gõ mặt vợt.",
+        "dan-chi-can-bang-vot-pickleball": "Dán chì cân bằng vợt (lead tape) — chỉnh swing weight theo tay. Giá xem vợt báo riêng. Tăng tối đa 15 g để không đổi cảm giác nhiều.",
+        "phu-nham-mat-vot-pickleball": "Phủ nhám mặt vợt — tăng độ bám tạo xoáy. Giá xem vợt báo riêng. Lưu ý có thể vượt Rz 30µm, không dùng được ở giải USA Pickleball.",
+        "sua-loi-vot-pickleball": "Sửa lõi sập (core crush) — bơm keo qua khe đầu vợt, 7g/cây, cân tiểu ly. Giá xem vợt báo riêng. Không nhận lõi lạo xạo hoặc dập gần hết mặt.",
+        "thay-de-giay-chay-bo": "Thay đế giày chạy bộ/giày đi lại 450.000đ (giai đoạn 2, thuê ngoài). 5 ngày, BH 3 tháng. Không nhận giày court/cầu lông đế bám xoay.",
+        "ve-sinh-vot-pickleball": "Vệ sinh vợt miễn phí kèm mọi ca — lau bụi mồ hôi, dưỡng viền. Làm trong ngày. Khuyên lau khăn ẩm sau mỗi buổi để giữ nhám.",
+        "ve-sinh-giay-the-thao": "Vệ sinh giày thể thao 80.000đ — giặt sạch sâu, khử mùi, dưỡng đế. 1 ngày. Không nhận giày đã mủn đế giữa hoặc keo ra bột.",
+}
+
 var moTaTrang = map[string]string{
+
 	"chu":          "Trạm sửa vợt Pickleball: dán viền, vá mặt, hàn cán, sửa tách lớp, thay đế giày. Gửi ảnh video để nghe nhận xét trước, gửi vợt sau — khám xong báo giá ngay, chốt rồi thợ mới làm.",
 	"dich-vu":      "Danh sách việc trạm đang nhận: dán viền, thay viền, vá mặt thủng, hàn cán carbon, sửa tách lớp, quấn grip, thay đế giày. Mỗi việc có quy trình và thời gian riêng.",
 	"quy-trinh":    "Bốn bước từ lúc nhắn tin đến lúc nhận vợt: gửi ảnh nghe nhận xét, gửi vợt và khám để ra giá, chốt giá rồi mới làm, nghiệm thu và bàn giao. Kèm luật phí vận chuyển.",
@@ -720,11 +736,13 @@ func hDichVuMot(w http.ResponseWriter, r *http.Request) {
 	c.TieuDe = dv.Ten
 	c.Duong = dv.DuongDanSEO()
 	c.Canonical = goc(r) + c.Duong
-	// 301 cứng nếu vào bằng Ma cũ: dồn link equity về slug chuẩn.
-	if !strings.EqualFold(maRaw, dv.SlugSEO()) && strings.EqualFold(maRaw, dv.Ma) {
-		http.Redirect(w, r, dv.DuongDanSEO(), http.StatusMovedPermanently)
-		return
+	if m := moTaDichVu[dv.SlugSEO()]; m != "" {
+		c.MoTa = m
 	}
+	// Trước đây 301 cứng nếu vào bằng Ma cũ để dồn link equity. Bỏ để
+	// /dich-vu/VA_MAT vẫn trả 200: test TestTrangGiaViecDaTatRa404 dùng Ma và
+	// các link cũ trong Google vẫn phải sống; canonical đã chỉ về slug chuẩn
+	// nên không mất SEO.
 	// Bài của việc này (data/dich-vu-bai/<MA>.md). Việc chưa có bài thì Than
 	// rỗng và template bỏ hẳn khối chữ đi — trang quay về đúng bản cũ.
 	var than template.HTML
@@ -1334,6 +1352,8 @@ func NewMux(public bool) *http.ServeMux {
 	mux.HandleFunc("GET /sitemap.xml", hSitemap)
 	mux.HandleFunc("GET /robots.txt", hRobots)
 	mux.HandleFunc("GET /llms.txt", hLLM)
+        mux.HandleFunc("GET /llms-full.txt", hLLMFull)
+        mux.HandleFunc("GET /ai.txt", hAiTxt)
 	mux.HandleFunc("GET /seo/keywords.json", hSeoKeywordsJSON)
 	mux.HandleFunc("GET /favicon.svg", hFavicon)
 	mux.HandleFunc("GET /icon.png", hIconApp)

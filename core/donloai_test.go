@@ -108,10 +108,10 @@ func TestLocTheoLoaiKhongLanNhau(t *testing.T) {
 // ngưỡng thì mỗi đôi giày nặng thêm đế lại đỏ một dòng vô nghĩa.
 func TestDonGiayKhongDinhNguongCan(t *testing.T) {
 	dungKhoTienThu(t)
-	// Trạm thử chưa có bang-gia.yaml nên ngưỡng rơi về mặc định 3g trong code.
+	// Trạm thử chưa có bang-gia.yaml nên ngưỡng rơi về mặc định 15g trong code.
 	nguong := NguongHienTai().TangKhoiLuongToiDaG
 	if nguong <= 0 {
-		nguong = 3.0
+		nguong = 15.0
 	}
 	giay := &Don{Ma: "TG-2609-003", Loai: LoaiGiay, CanTruocG: 300, CanSauG: 300 + nguong + 50}
 	if giay.VuotNguongCan() {

@@ -47,10 +47,19 @@ func veBaiViet(w http.ResponseWriter, r *http.Request, duong, ok, loi string) {
 }
 
 func hQtBaiDs(w http.ResponseWriter, r *http.Request) {
-	d := dlQtBai{dlQt: dlQt{Chung: chung(r, "bai-viet-qt")}}
+	loai := r.URL.Query().Get("loai")
+	trang := "bai-viet-qt"
+	if loai == "ve-tinh" {
+		trang = "bai-viet-qt-ve-tinh"
+	}
+	d := dlQtBai{dlQt: dlQt{Chung: chung(r, trang)}}
 	d.OK = r.URL.Query().Get("ok")
 	d.Loi = r.URL.Query().Get("loi")
-	d.DS = DsBaiVietQt()
+	if loai == "ve-tinh" {
+		d.DS = DsBaiVietVeTinh()
+	} else {
+		d.DS = DsBaiVietQt()
+	}
 	render(w, "qt-baiviet.html", d)
 }
 
@@ -138,6 +147,10 @@ func hQtBaiLuu(w http.ResponseWriter, r *http.Request) {
 
 func baiTuForm(r *http.Request) BaiViet {
 	thu, _ := strconv.Atoi(strings.TrimSpace(r.FormValue("thu_tu")))
+	loai := strings.TrimSpace(r.FormValue("loai"))
+	if loai != "ve-tinh" {
+		loai = ""
+	}
 	return BaiViet{
 		Slug:      strings.TrimSpace(r.FormValue("slug")),
 		ThuTu:     thu,
@@ -149,6 +162,8 @@ func baiTuForm(r *http.Request) BaiViet {
 		TomTat:    strings.TrimSpace(r.FormValue("tom_tat")),
 		Anh:       strings.TrimSpace(r.FormValue("anh")),
 		Nhap:      r.FormValue("nhap") != "",
+		HenGio:    strings.TrimSpace(r.FormValue("hen_gio")),
+		Loai:      loai,
 		Than:      r.FormValue("than"),
 	}
 }

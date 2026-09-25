@@ -74,7 +74,15 @@ func hLLM(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "- Hỏi đáp: %s/cau-hoi\n", g)
 	fmt.Fprintln(w, "\n## Dịch vụ")
 	for _, dv := range DichVuDangBan(GiaiDoan) {
-		fmt.Fprintf(w, "- %s: %s%s\n", dv.Ten, g, dv.DuongDanSEO())
+		mota := moTaDichVu[dv.SlugSEO()]
+		if mota == "" {
+			mota = dv.DieuKien
+		}
+		if mota != "" {
+			fmt.Fprintf(w, "- %s: %s%s — %s\n", dv.Ten, g, dv.DuongDanSEO(), mota)
+		} else {
+			fmt.Fprintf(w, "- %s: %s%s\n", dv.Ten, g, dv.DuongDanSEO())
+		}
 	}
 	if len(GIA.KhongBan) > 0 {
 		fmt.Fprintln(w, "\n## Không nhận (để AI không gợi ý sai)")
@@ -89,6 +97,9 @@ func hLLM(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "\n## Sitemap")
 	fmt.Fprintf(w, "%s/sitemap.xml\n", g)
 }
+
+func hLLMFull(w http.ResponseWriter, r *http.Request) { hLLM(w, r) }
+func hAiTxt(w http.ResponseWriter, r *http.Request) { hLLM(w, r) }
 
 // hSeoKeywordsJSON — /seo/keywords.json cho crawler / script
 func hSeoKeywordsJSON(w http.ResponseWriter, r *http.Request) {
@@ -124,4 +135,18 @@ func hQtSeo(w http.ResponseWriter, r *http.Request) {
 		ByCap    map[int][]SeoTuKhoa
 		Total    int
 	}{dlQt: dlQt{Chung: chung(r, "seo")}, Keywords: ds, ByCap: byCap, Total: len(ds)})
+}
+
+func hQtSeoKiemTra(w http.ResponseWriter, r *http.Request) {
+	ds, _ := docSeoKeywords()
+	byCap := map[int][]SeoTuKhoa{}
+	for _, k := range ds {
+		byCap[k.Cap] = append(byCap[k.Cap], k)
+	}
+	render(w, "qt-seo.html", struct {
+		dlQt
+		Keywords []SeoTuKhoa
+		ByCap    map[int][]SeoTuKhoa
+		Total    int
+	}{dlQt: dlQt{Chung: chung(r, "seo-kiem-tra")}, Keywords: ds, ByCap: byCap, Total: len(ds)})
 }

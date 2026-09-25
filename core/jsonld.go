@@ -63,6 +63,9 @@ func (c Chung) DuLieuCoCau() template.JS {
 	if f := nutHoiDap(c.Duong); f != nil {
 		nut = append(nut, f)
 	}
+	if s2 := c.nutDichVu(g); s2 != nil {
+		nut = append(nut, s2)
+	}
 	b, err := json.Marshal(map[string]any{
 		"@context": "https://schema.org",
 		"@graph":   nut,
@@ -200,6 +203,73 @@ func (c Chung) nutBaiViet(g string) map[string]any {
 		n["dateModified"] = ngaySua
 	}
 	return n
+}
+
+
+// nutDichVu - Service cho /dich-vu/<slug>.
+func (c Chung) nutDichVu(g string) map[string]any {
+        if !isDuongDichVu(c.Duong) {
+                return nil
+        }
+        slug := strings.TrimPrefix(c.Duong, "/dich-vu/")
+        var dv *DichVu
+        for i := range GIA.DichVu {
+                d := &GIA.DichVu[i]
+                if d.An || !d.DaMo(GiaiDoan) {
+                        continue
+                }
+                if strings.EqualFold(d.SlugSEO(), slug) || strings.EqualFold(d.Ma, slug) {
+                        dv = d
+                        break
+                }
+        }
+        if dv == nil {
+                return nil
+        }
+        n := map[string]any{
+                "@type": "Service",
+                "@id": c.Canonical + "#service",
+                "name": dv.Ten,
+                "url": c.Canonical,
+                "serviceType": dv.Ten,
+                "provider": map[string]any{"@id": g + "/#tram"},
+                "areaServed": map[string]any{"@type": "Country", "name": "Viet Nam"},
+                "inLanguage": "vi-VN",
+        }
+        if c.MoTa != "" {
+                n["description"] = c.MoTa
+        } else if s2 := strings.TrimSpace(dv.DieuKien); s2 != "" {
+                n["description"] = s2
+        }
+        if gia := dv.GiaTheoGiaiDoan(GiaiDoan); gia != nil {
+                off := map[string]any{
+                        "@type": "Offer",
+                        "priceCurrency": "VND",
+                        "price": *gia,
+                        "availability": "https://schema.org/InStock",
+                        "url": c.Canonical,
+                }
+                if den := dv.GiaDenTheoGiaiDoan(GiaiDoan); den != nil && *den > *gia {
+                        off["highPrice"] = *den
+                        off["lowPrice"] = *gia
+                }
+                n["offers"] = off
+        } else if dv.BaoGiaRieng {
+                n["offers"] = map[string]any{
+                        "@type": "Offer",
+                        "priceCurrency": "VND",
+                        "availability": "https://schema.org/InStock",
+                        "url": c.Canonical,
+                }
+        }
+        return n
+}
+func isDuongDichVu(duong string) bool {
+        if !strings.HasPrefix(duong, "/dich-vu/") {
+                return false
+        }
+        rest := strings.TrimPrefix(duong, "/dich-vu/")
+        return rest != "" && !strings.Contains(rest, "/")
 }
 
 // nutHoiDap — khối FAQPage của trang /cau-hoi, thứ Google nhặt vào ô "Mọi

@@ -78,6 +78,7 @@ func main() {
 	if err := core.NapBaiViet(); err != nil {
 		fmt.Fprintln(os.Stderr, "Cảnh báo bài viết:", err)
 	}
+	core.KhoiDongHenBai()
 	// Bài của từng việc ở data/dich-vu-bai/, cũng không nằm trong binary.
 	// Thiếu thì trang dịch vụ mất phần chữ, còn nguyên giá — chỉ cảnh báo.
 	if err := core.NapBaiDichVu(); err != nil {

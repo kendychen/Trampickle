@@ -14,10 +14,13 @@
     <div class="bv-luoi">
       {{range .DS}}
       <article class="the bv-the">
-        <div class="nho mo so">{{ngaydep .Ngay}}</div>
-        <h2 style="margin-top:8px"><a href="/bai-viet/{{.Slug}}">{{.TieuDe}}</a></h2>
-        <p class="mo" style="margin-top:10px">{{.TomTat}}</p>
-        <p><a class="nut nut-vien" href="/bai-viet/{{.Slug}}">{{nd "baiviet.nut"}}</a></p>
+        {{if .Anh}}<a class="bv-anh" href="/bai-viet/{{.Slug}}" aria-hidden="true" tabindex="-1"><img src="/bai-viet-anh/{{.Anh}}" alt="" loading="lazy" decoding="async"></a>{{end}}
+        <div class="bv-noi">
+          <div class="nho mo so">{{ngaydep .Ngay}}</div>
+          <h2 style="margin-top:8px"><a href="/bai-viet/{{.Slug}}">{{.TieuDe}}</a></h2>
+          <p class="mo" style="margin-top:10px">{{.TomTat}}</p>
+          <p><a class="nut nut-vien" href="/bai-viet/{{.Slug}}">{{nd "baiviet.nut"}}</a></p>
+        </div>
       </article>
       {{end}}
     </div>

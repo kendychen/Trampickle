@@ -87,10 +87,10 @@
       <b>{{if .DV.BaoHanhThang}}{{.DV.BaoHanhThang}}{{else}}—{{end}}</b>
       <span>{{nd "dichvumot.so.2-t"}}</span>
     </div>
-    <div>
+    {{if not .DV.KhongTinhCan}}<div>
       <b>{{nd "chung.can.muc"}}</b>
       <span>{{nd "dichvumot.so.3-t"}}</span>
-    </div>
+    </div>{{end}}
   </div>
 
   {{/* Nút gửi ảnh đứng trên phần quy trình chứ không nằm cuối trang: người đã

@@ -41,7 +41,9 @@
           <td data-n="Sửa" class="so nho">{{if .Sua}}{{ngaydep .Sua}}{{else}}<span class="mo">—</span>{{end}}</td>
           <td data-n="Trạng thái">
             {{if .Nhap}}<span class="chip chip-trung">Nháp</span>
+            {{else if .HenGio}}<span class="chip" style="background:#fef3c7">Hẹn {{.HenGio}}</span>
             {{else}}<span class="chip chip-nhan">Đang đăng</span>{{end}}
+            {{if eq .Loai "ve-tinh"}} <span class="chip chip-trung" style="margin-left:4px">vệ tinh</span>{{end}}
           </td>
           <td>
             <div class="hang" style="gap:6px">

@@ -26,6 +26,7 @@ import (
 	"html/template"
 	"os"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -78,6 +79,14 @@ func fileND() string { return P("data/noi-dung.yaml") }
 // hauToOnline nối vào khoá gốc để thành khoá của bản Online. Ký tự "@" chọn
 // vì khoá thật đặt theo <trang>.<khối>.<chỗ>, không bao giờ có "@" — nên
 // không đụng khoá nào.
+// canMucHienThi là chữ hiện cho khách, dựng từ ngưỡng thật trong bang-gia.yaml.
+// Một nguồn duy nhất: đổi ở /qt/nguong là đổi cả trang và phiếu in.
+func canMucHienThi() string {
+	g := NguongHienTai().TangKhoiLuongToiDaG
+	s := strconv.FormatFloat(g, 'f', -1, 64)
+	return s + " g — vượt thì không lấy tiền công"
+}
+
 const hauToOnline = "@online"
 
 func init() {
@@ -163,6 +172,9 @@ func NapND() error {
 // Đổi khoá TRƯỚC khi khoá ndMu: KhoaTheoCheDo không được giữ ndMu, mà gọi nó
 // trong vùng đã RLock cũng vẫn sai kiểu khác — cứ tách hẳn ra cho khỏi nghĩ.
 func ND(khoa string) string {
+	if khoa == "chung.can.muc" || khoa == "chung.can.muc"+hauToOnline {
+		return canMucHienThi()
+	}
 	khoa = KhoaTheoCheDo(khoa)
 	ndMu.RLock()
 	defer ndMu.RUnlock()
@@ -174,11 +186,19 @@ func ND(khoa string) string {
 
 // NDMac trả chữ mặc định trong code — trang quản trị cần nó để hiện nút
 // "khôi phục" và để biết ô nào đang khác mặc định.
-func NDMac(khoa string) string { return ndMac[khoa] }
+func NDMac(khoa string) string {
+	if khoa == "chung.can.muc" || khoa == "chung.can.muc"+hauToOnline {
+		return canMucHienThi()
+	}
+	return ndMac[khoa]
+}
 
 // DaSuaND: khoá này Kendy đã đổi khác mặc định chưa. Theo chế độ đang chạy —
 // admin chỉ hiện đúng ô đang sửa được.
 func DaSuaND(khoa string) bool {
+	if khoa == "chung.can.muc" || khoa == "chung.can.muc"+hauToOnline {
+		return false
+	}
 	khoa = KhoaTheoCheDo(khoa)
 	ndMu.RLock()
 	defer ndMu.RUnlock()
@@ -193,6 +213,9 @@ func SoDaSuaND(t TrangND) int {
 	n := 0
 	for _, nh := range t.Nhom {
 		for _, m := range nh.Muc {
+			if m.Khoa == "chung.can.muc" {
+				continue
+			}
 			if _, co := ndSua[KhoaTheoCheDo(m.Khoa)]; co {
 				n++
 			}
@@ -207,7 +230,14 @@ func SoDaSuaND(t TrangND) int {
 // trên trang đổi theo, không bị bản sao cũ đè lên.
 func DatND(moi map[string]string) error {
 	ndMu.Lock()
+	// chung.can.muc không còn sửa ở /qt/noi-dung nữa — chữ lấy từ ngưỡng
+	// bang-gia.yaml. Xoá dòng cũ nếu còn để lần ghi sau dọn sạch file.
+	delete(ndSua, "chung.can.muc")
+	delete(ndSua, "chung.can.muc"+hauToOnline)
 	for k, v := range moi {
+		if k == "chung.can.muc" || k == "chung.can.muc"+hauToOnline {
+			continue
+		}
 		if _, co := ndMac[k]; !co {
 			continue
 		}
