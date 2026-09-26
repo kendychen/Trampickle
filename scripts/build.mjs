@@ -28,7 +28,8 @@ function mdToHtml(md){
   let html = md
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     // code blocks ```...```
-    .replace(/```([\s\S]*?)```/g,(m,c)=>`<pre><code>${c}</code></pre>`)
+    // code blocks ```...``` - placeholder to avoid escaping inside
+    .replace(/```([\s\S]*?)```/g,(m,c)=>`__CODEBLOCK_${Buffer.from(c).toString('base64').slice(0,120)}__`)
     // inline code
     .replace(/`([^`]+)`/g,'<code>$1</code>')
     // h1-3
@@ -48,17 +49,84 @@ function mdToHtml(md){
     // tables - keep as pre for simplicity (browser will render pipe)
     // paragraphs
   ;
-  // split lines to paragraphs
+  // convert markdown tables to HTML tables (loop over lines)
+  {
+    const lines = html.split('\n');
+    let outLines=[];
+    for(let i=0;i<lines.length;){
+      const line=lines[i].trim();
+      if(line.startsWith('|')){
+        let block=[];
+        while(i<lines.length && lines[i].trim().startsWith('|')){ block.push(lines[i].trim()); i++; }
+        const isSep = (r)=> /^\|\s*[-:\s|]+\s*\|$/.test(r);
+        if(block.some(isSep)){
+          const dataRows=block.filter(r=>!isSep(r));
+          if(dataRows.length>=1){
+            const parseRow=(r)=> r.split('|').slice(1,-1).map(c=>c.trim());
+            const ths=parseRow(dataRows[0]);
+            let tbl='<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;margin:12px 0"><thead><tr>'+ths.map(c=>`<th style="background:#f6f8fa;text-align:left">${c}</th>`).join('')+'</tr></thead><tbody>';
+            for(let k=1;k<dataRows.length;k++){ const tds=parseRow(dataRows[k]); tbl+='<tr>'+tds.map(c=>`<td>${c}</td>`).join('')+'</tr>'; }
+            tbl+='</tbody></table>';
+            outLines.push(tbl);
+            continue;
+          }
+        }
+        outLines.push(...block);
+        continue;
+      }
+      outLines.push(lines[i]); i++;
+    }
+    html=outLines.join('\n');
+  }
+  // blockquote: lines starting with &gt; (escaped &gt;)
+  html = html.replace(/^&gt;\s?(.*)$/gm,'<blockquote style="border-left:3px solid #0b57d0;padding-left:12px;color:#444;margin:12px 0">$1</blockquote>');
+  // split lines to paragraphs (handle lists, headings etc)
   html = html.split(/\n{2,}/).map(block=>{
     const t=block.trim();
     if(!t) return '';
-    if(t.startsWith('<h')||t.startsWith('<pre')||t.startsWith('<ul')||t.startsWith('<table')||t.startsWith('<img')) return t;
+    if(t.startsWith('<h')||t.startsWith('<pre')||t.startsWith('<ul')||t.startsWith('<table')||t.startsWith('<img')||t.startsWith('<blockquote')||t.startsWith('__CODEBLOCK')) return t;
     // list
     if(/^[-*] /.test(t)) return '<ul>'+ t.split('\n').map(l=>l.replace(/^[-*] (.+)/,'<li>$1</li>')).join('') + '</ul>';
     if(/^\|/.test(t)) return `<pre>${t}</pre>`;
+    if(/^---/.test(t)) return '<hr/>';
     return `<p>${t.replace(/\n/g,'<br/>')}</p>`;
   }).join('\n');
+  // remove any remaining codeblock placeholders (FAQ json leaked) - strip them
+  html = html.replace(/__CODEBLOCK_[A-Za-z0-9+/=]+__/g, '');
   return html;
+}
+function cleanBody(md){
+  let out = md;
+  // remove blockquote metadata lines: > Slug: `...` | URL: `...` etc and > Meta..., > OG...
+  out = out.split('\n').filter(l=>{
+    const t=l.trim();
+    if(/^>\s*Slug:/i.test(t)) return false;
+    if(/^>\s*Meta (title|desc)/i.test(t)) return false;
+    if(/^>\s*OG image/i.test(t)) return false;
+    if(/^>\s*Title:/i.test(t)) return false;
+    if(/^>\s*Alt:/i.test(t)) return false;
+    // generic > line that contains Slug/Meta/OG should be dropped if starts with >
+    if(/^>/.test(t) && /(Slug:|Meta title|Meta desc|OG image)/i.test(t)) return false;
+    return true;
+  }).join('\n');
+  // remove trailing FAQ/internal boilerplate from display: from "---" + "### FAQ" onwards and "Internal link:"
+  // keep body up to CTA, drop everything after horizontal rule that contains FAQ schema
+  const faqIdx = out.search(/---\s*\n### FAQ/i);
+  if(faqIdx!==-1){ out = out.slice(0, faqIdx).trim(); }
+  else {
+    const altIdx = out.search(/```json[\s\S]*?```/);
+    // if FAQ code block is at end, remove it and preceding heading
+    if(altIdx!==-1){
+      const before = out.slice(0, altIdx);
+      const hIdx = before.lastIndexOf('### FAQ');
+      if(hIdx!==-1) out = before.slice(0, hIdx).trim();
+    }
+  }
+  // remove Internal link: line if remains
+  out = out.split('\n').filter(l=>!/^Internal link:/i.test(l.trim())).join('\n');
+  // remove horizontal rule alone at end
+  out = out.replace(/\n---\s*$/,'').trim();
+  return out;
 }
 function extractTitle(md){ const m=md.match(/^#\s+(.+)$/m); return m?m[1].trim():'Giao trinh sua vot Pickleball'; }
 function stripMd(s){ return s.replace(/[*_`\[\]()]/g,'').replace(/\s+/g,' ').trim(); }
@@ -169,7 +237,7 @@ if(fs.existsSync(BAIVIET_SRC)){
     const title = extractTitle(md);
     let desc = extractMeta(md, "Meta desc");
     if(!desc) desc = extractDesc(md);
-    const body = mdToHtml(md);
+    const body = mdToHtml(cleanBody(md));
     const rel = "bai-viet/" + slug + "/index.html";
     const canonical = DOMAIN + "/bai-viet/" + slug;
     const ogImg = BAIVIET_OG_MAP[slug] ? DOMAIN + BAIVIET_OG_MAP[slug] : OG_IMAGE;
