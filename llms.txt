@@ -1,0 +1,54 @@
+# Tram Pickle - Sua vot Pickleball chuyen nghiep
+> Tài liệu dạy nghề cho thợ mới. Người chưa từng cầm vợt hỏng vẫn theo được từ đầu đến cuối.
+
+URL: https://trampickle.vn/
+Sitemap: https://trampickle.vn/sitemap.xml
+
+## Giao trinh sua vot Pickleball
+Giao trinh day nghe sua vot Pickleball tu nen tang den cac ca sua thuc te.
+- [giao-trinh-sua-vot/00-ke-hoach.html](https://trampickle.vn/giao-trinh-sua-vot/00-ke-hoach.html)
+- [giao-trinh-sua-vot/01-nen-tang/1-1-cau-tao-vot.html](https://trampickle.vn/giao-trinh-sua-vot/01-nen-tang/1-1-cau-tao-vot.html)
+- [giao-trinh-sua-vot/01-nen-tang/1-2-vat-lieu-keo.html](https://trampickle.vn/giao-trinh-sua-vot/01-nen-tang/1-2-vat-lieu-keo.html)
+- [giao-trinh-sua-vot/01-nen-tang/1-3-dung-cu-an-toan.html](https://trampickle.vn/giao-trinh-sua-vot/01-nen-tang/1-3-dung-cu-an-toan.html)
+- [giao-trinh-sua-vot/02-quy-trinh/2-1-nhan-vot.html](https://trampickle.vn/giao-trinh-sua-vot/02-quy-trinh/2-1-nhan-vot.html)
+- [giao-trinh-sua-vot/02-quy-trinh/2-2-chan-doan.html](https://trampickle.vn/giao-trinh-sua-vot/02-quy-trinh/2-2-chan-doan.html)
+- [giao-trinh-sua-vot/02-quy-trinh/2-3-bao-gia.html](https://trampickle.vn/giao-trinh-sua-vot/02-quy-trinh/2-3-bao-gia.html)
+- [giao-trinh-sua-vot/02-quy-trinh/2-4-nghiem-thu.html](https://trampickle.vn/giao-trinh-sua-vot/02-quy-trinh/2-4-nghiem-thu.html)
+- [giao-trinh-sua-vot/03-ca-sua/3-1-nut-vo-vien-canh.html](https://trampickle.vn/giao-trinh-sua-vot/03-ca-sua/3-1-nut-vo-vien-canh.html)
+- [giao-trinh-sua-vot/03-ca-sua/3-2-tach-lop.html](https://trampickle.vn/giao-trinh-sua-vot/03-ca-sua/3-2-tach-lop.html)
+- [giao-trinh-sua-vot/03-ca-sua/3-3-diem-chet-loi-dap.html](https://trampickle.vn/giao-trinh-sua-vot/03-ca-sua/3-3-diem-chet-loi-dap.html)
+- [giao-trinh-sua-vot/03-ca-sua/3-4-can-vot-gay-long.html](https://trampickle.vn/giao-trinh-sua-vot/03-ca-sua/3-4-can-vot-gay-long.html)
+- [giao-trinh-sua-vot/03-ca-sua/3-5-thay-grip.html](https://trampickle.vn/giao-trinh-sua-vot/03-ca-sua/3-5-thay-grip.html)
+- [giao-trinh-sua-vot/03-ca-sua/3-6-can-bang-vot.html](https://trampickle.vn/giao-trinh-sua-vot/03-ca-sua/3-6-can-bang-vot.html)
+- [giao-trinh-sua-vot/03-ca-sua/3-7-nut-mat-vot.html](https://trampickle.vn/giao-trinh-sua-vot/03-ca-sua/3-7-nut-mat-vot.html)
+- [giao-trinh-sua-vot/03-ca-sua/3-8-ban-mat-mat-nham.html](https://trampickle.vn/giao-trinh-sua-vot/03-ca-sua/3-8-ban-mat-mat-nham.html)
+- [giao-trinh-sua-vot/03-ca-sua/3-9-lao-xao-trong-vot.html](https://trampickle.vn/giao-trinh-sua-vot/03-ca-sua/3-9-lao-xao-trong-vot.html)
+- [giao-trinh-sua-vot/03-ca-sua/readme.html](https://trampickle.vn/giao-trinh-sua-vot/03-ca-sua/readme.html)
+- [giao-trinh-sua-vot/04-lam-nghe/4-1-gia-bao-hanh.html](https://trampickle.vn/giao-trinh-sua-vot/04-lam-nghe/4-1-gia-bao-hanh.html)
+- [giao-trinh-sua-vot/04-lam-nghe/4-2-loi-tho-moi.html](https://trampickle.vn/giao-trinh-sua-vot/04-lam-nghe/4-2-loi-tho-moi.html)
+- [giao-trinh-sua-vot/04-lam-nghe/4-3-khao-sat-thi-truong-can-gay.html](https://trampickle.vn/giao-trinh-sua-vot/04-lam-nghe/4-3-khao-sat-thi-truong-can-gay.html)
+- [giao-trinh-sua-vot/anh/readme.html](https://trampickle.vn/giao-trinh-sua-vot/anh/readme.html)
+- [giao-trinh-sua-vot/nguon.html](https://trampickle.vn/giao-trinh-sua-vot/nguon.html)
+- [giao-trinh-sua-vot/readme.html](https://trampickle.vn/giao-trinh-sua-vot/readme.html)
+- [giao-trinh-sua-vot/video.html](https://trampickle.vn/giao-trinh-sua-vot/video.html)
+- [giao-trinh-sua-vot/_nguon/readme.html](https://trampickle.vn/giao-trinh-sua-vot/_nguon/readme.html)
+- [bai-viet/bang-gia-sua-vot-pickleball-ha-noi-2025/index.html](https://trampickle.vn/bai-viet/bang-gia-sua-vot-pickleball-ha-noi-2025/index.html)
+- [bai-viet/bang-gia-sua-vot-pickleball-ha-noi-2025](https://trampickle.vn/bai-viet/bang-gia-sua-vot-pickleball-ha-noi-2025)
+- [bai-viet/nut-vien-vot-pickleball-sua-duoc-khong/index.html](https://trampickle.vn/bai-viet/nut-vien-vot-pickleball-sua-duoc-khong/index.html)
+- [bai-viet/nut-vien-vot-pickleball-sua-duoc-khong](https://trampickle.vn/bai-viet/nut-vien-vot-pickleball-sua-duoc-khong)
+- [bai-viet/vot-tach-lop-bong-mat-cach-xu-ly/index.html](https://trampickle.vn/bai-viet/vot-tach-lop-bong-mat-cach-xu-ly/index.html)
+- [bai-viet/vot-tach-lop-bong-mat-cach-xu-ly](https://trampickle.vn/bai-viet/vot-tach-lop-bong-mat-cach-xu-ly)
+- [bai-viet/diem-chet-loi-dap-vot-pickleball/index.html](https://trampickle.vn/bai-viet/diem-chet-loi-dap-vot-pickleball/index.html)
+- [bai-viet/diem-chet-loi-dap-vot-pickleball](https://trampickle.vn/bai-viet/diem-chet-loi-dap-vot-pickleball)
+- [bai-viet/khi-nao-thay-de-giay-pickleball/index.html](https://trampickle.vn/bai-viet/khi-nao-thay-de-giay-pickleball/index.html)
+- [bai-viet/khi-nao-thay-de-giay-pickleball](https://trampickle.vn/bai-viet/khi-nao-thay-de-giay-pickleball)
+- [bai-viet/ve-sinh-giay-pickleball-dung-cach/index.html](https://trampickle.vn/bai-viet/ve-sinh-giay-pickleball-dung-cach/index.html)
+- [bai-viet/ve-sinh-giay-pickleball-dung-cach](https://trampickle.vn/bai-viet/ve-sinh-giay-pickleball-dung-cach)
+- [bai-viet/thay-grip-can-bang-vot-khi-nao/index.html](https://trampickle.vn/bai-viet/thay-grip-can-bang-vot-khi-nao/index.html)
+- [bai-viet/thay-grip-can-bang-vot-khi-nao](https://trampickle.vn/bai-viet/thay-grip-can-bang-vot-khi-nao)
+- [bai-viet/bao-quan-vot-pickleball-ben-gap-doi/index.html](https://trampickle.vn/bai-viet/bao-quan-vot-pickleball-ben-gap-doi/index.html)
+- [bai-viet/bao-quan-vot-pickleball-ben-gap-doi](https://trampickle.vn/bai-viet/bao-quan-vot-pickleball-ben-gap-doi)
+
+## Luu y AI
+- Dia chi 58 To Huu, Dai Mo, Ha Noi hien thi tren site de gui hang; dang service-area (online, hen truoc).
+- Sitemap dong cua Go (VPS) la canonical; sitemap tinh nay chi fallback.

@@ -3,8 +3,10 @@ WORKDIR /app
 COPY package.json ./
 COPY scripts/build.mjs ./scripts/build.mjs
 COPY giao-trinh-sua-vot ./giao-trinh-sua-vot
-COPY sitemap.xml robots.txt ./
-RUN node scripts/build.mjs
+COPY assets ./assets
+COPY content ./content
+COPY sitemap.xml robots.txt llms.txt* ai.txt* ./
+RUN rm -f llms.txt ai.txt && node scripts/build.mjs
 
 FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html

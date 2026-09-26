@@ -112,10 +112,10 @@ Vợt khách đắt hơn dụng cụ. Bốn quy tắc:
 
 ## Xem them
 
-- [01-nen-tang/1-1-cau-tao-vot.md](01-nen-tang/1-1-cau-tao-vot.md)
-- [01-nen-tang/1-2-vat-lieu-keo.md](01-nen-tang/1-2-vat-lieu-keo.md)
-- [02-quy-trinh/2-1-nhan-vot.md](02-quy-trinh/2-1-nhan-vot.md)
-- [02-quy-trinh/2-2-chan-doan.md](02-quy-trinh/2-2-chan-doan.md)
+- [1-1 Cau tao vot](1-1-cau-tao-vot.md)
+- [1-2 Vat lieu & keo](1-2-vat-lieu-keo.md)
+- [2-1 Nhan vot](../02-quy-trinh/2-1-nhan-vot.md)
+- [2-2 Chan doan](../02-quy-trinh/2-2-chan-doan.md)
 
 <!-- seo-nav -->
 ---

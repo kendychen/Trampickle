@@ -2,6 +2,7 @@ User-agent: *
 Disallow: /qt
 Disallow: /noi-bo
 Disallow: /api
+Disallow: /admin
 Disallow: /dang-nhap
 Disallow: /tra-cuu
 Allow: /
